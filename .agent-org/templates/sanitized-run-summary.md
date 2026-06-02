@@ -1,4 +1,4 @@
-# Sanitized Run Summary / Sanitized Run Summary
+# Sanitized Run Summary
 
 - run_id:
 - date:
@@ -25,4 +25,4 @@
 - assumptions:
 - next_action:
 
-Sanitization rule: do not include secrets, credentials, raw prompts, raw stderr, personal/customer data, raw screenshots, recordings, or unnecessary local absolute paths.
+Sanitization rule: do not include secrets, credentials, raw prompts, raw stderr, personal data, customer data, raw screenshots, recordings, or unnecessary local absolute paths.

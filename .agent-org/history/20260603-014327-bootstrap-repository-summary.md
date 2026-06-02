@@ -1,4 +1,4 @@
-# Bootstrap Repository Summary / Bootstrap Repository Summary
+# Bootstrap Repository Summary
 
 - run_id: 20260603-014327
 - target_repo: mishima-computing/ai-org-bootstrap
@@ -10,7 +10,7 @@
 - initial_push_approval: yes
 - push_target: mishima-computing/ai-org-bootstrap
 
-## Files created / 作成ファイル
+## Files created
 
 - README.md
 - .gitignore
@@ -25,13 +25,13 @@
 - .agent-org/templates/candidate-audit-bundle.md
 - .agent-org/history/20260603-014327-bootstrap-repository-summary.md
 
-## Safety confirmations / Safety confirmations
+## Safety confirmations
 
 - `.agent-runs/` is ignored and not committed.
 - `.claude/`, `.antigravity/`, package files, CI, deploy config, and app code were not created.
 - No secrets, credentials, raw prompts, raw stderr, screenshots, recordings, production personal data, customer data, or local absolute paths were intentionally committed.
 - No LICENSE file was created.
 
-## Next human action / Next human action
+## Next human action
 
 Review the public repository content and select a license separately if reuse rights should be granted.

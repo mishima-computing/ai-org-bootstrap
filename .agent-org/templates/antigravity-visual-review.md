@@ -1,4 +1,4 @@
-# Antigravity Visual Review / Antigravity Visual Review
+# Antigravity Visual Review
 
 - run_id:
 - approval:

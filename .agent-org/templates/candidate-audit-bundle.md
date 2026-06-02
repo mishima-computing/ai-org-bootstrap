@@ -1,4 +1,4 @@
-# Candidate Audit Bundle / Candidate Audit Bundle
+# Candidate Audit Bundle
 
 - run_id:
 - candidate_objective_id:

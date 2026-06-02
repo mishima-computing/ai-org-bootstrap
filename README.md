@@ -1,69 +1,204 @@
-# AI Agent Organization Bootstrap / AI開発組織Bootstrap
+# AI Agent Organization Bootstrap
 
-## これは何か / What this is
+This repository is public. Committed content, Issues, Pull Requests, and Discussions must be sanitized by design.
 
-**日本語:** このリポジトリは、AI支援ソフトウェア開発のための governance bootstrap を収めています。アプリケーションフレームワークではなく、プロンプト集でもありません。Codex Supervisor、Claude candidate implementers、Codex Auditor、Antigravity Visual Pod、Local Tooling、Human Owner の権限を分ける、境界付きの運用契約です。
+## What this is
 
-**English:** This repository contains a governance bootstrap for AI-assisted software development. It is not an application framework and not a prompt collection. It is a bounded operating contract for Codex Supervisor, Claude candidate implementers, Codex Auditor, Antigravity Visual Pod, Local Tooling, and Human Owner.
+This repository contains a governance bootstrap for AI-assisted software development. It is not an application framework and not a prompt collection.
 
-This repository is public. Committed content must be sanitized by design.
+It is a bounded operating contract for Supervisor Codex, Claude candidate implementers, Codex Auditor, Antigravity Visual Pod, Local Tooling, and Human Owner.
 
-## 設計思想 / Design philosophy
+## Start here
 
-**日本語:** 生成量を無条件に増やすのではなく、書き込み前の権限を小さくします。最初に workspace を分類し、implementation、audit、adoption、release の権限を分離します。raw artifacts は漏えいリスクを持つものとして扱い、LLM 判断の前に deterministic gates を優先します。
+Before using this bootstrap, classify the workspace first.
 
-**English:** The design does not maximize generation blindly. It minimizes authority before writes, classifies the workspace first, separates implementation, audit, adoption, and release authority, treats raw artifacts as risky, and prefers deterministic gates before LLM judgment.
+| Workspace state | Required first action |
+|---|---|
+| New project | Use a fresh local-only workspace. |
+| Existing repo | Require a clean tracked working tree before writing. |
+| Dirty repo | Stop before writing anything. |
+| Ambiguous workspace | Stop unless files resolve the ambiguity safely. |
+| OneDrive / Dropbox / iCloud / Google Drive / similar sync path | Do not write without explicit approval. |
 
-## なぜ必要か / Why this exists
+## Normative source
 
-**日本語:** LLM は有能ですが、既定では範囲を広げがちです。branch を切るだけでは、dirty worktree、古い project state、cloud-sync path に残る raw logs や local metadata の継承を防げません。candidate patches には audit bundles、base SHA identity、bounded revision loops が必要です。
+This README is an overview. The normative execution contract is `bootstrap/ai-org-bootstrap-v0.4.md`.
 
-**English:** LLMs are capable, but overbroad by default. Branches alone do not prevent inheritance of dirty worktrees or old project state. Cloud-sync paths can expose raw logs and local metadata. Candidate patches need audit bundles, base SHA identity, and bounded revision loops.
+If this README conflicts with the bootstrap document, the bootstrap document wins.
 
-## 中核契約 / Core contracts
+## Public repository warning
 
-**日本語:** 中核契約は、classification 前に書かないこと、新規 project を隔離すること、dirty existing repo では停止すること、cloud-sync workspace には approval gate を置くことです。`.agent-runs/` は ignored raw runtime material とし、commit するのは sanitized summaries のみです。bootstrap self-audit は mechanical governance scope の範囲だけに限定されます。
+Do not paste the following into commits, Issues, Pull Requests, or Discussions:
 
-**English:** Core contracts are: no writes before classification, new project isolation, dirty repo hard stop, cloud-sync approval gate, `.agent-runs/` as ignored raw runtime material, sanitized committed summaries only, and bootstrap self-audit only within the mechanical governance scope.
+- secrets, credentials, tokens, webhook URLs, or private keys
+- raw prompts, transcripts, stdout, or stderr
+- local absolute paths or local machine details
+- screenshots or recordings containing private data
+- production personal data or customer data
+- unredacted candidate artifacts or invocation manifests
 
-## ロール / Roles
+## Design philosophy
 
-**日本語:** Human Owner は merge、push、deploy、publish、production data、credentials、legal/privacy/brand decisions を管理します。Supervisor Codex は task routing、accepted patch adoption、verification、許可された local commit を担当し、deploy はしません。Codex Auditor は独立した read-only reviewer です。Candidate Implementer と Claude は patch-only の候補作成者です。Antigravity Visual Pod は UI/UX/graphic/browser review specialist で、既定では review-only です。Local Tooling Pod は deterministic evidence を生成します。
+Do not maximize generation blindly. Minimize authority before writes.
 
-**English:** The Human Owner controls merge, push, deploy, publish, production data, credentials, and legal/privacy/brand decisions. Supervisor Codex routes tasks, adopts accepted patches, verifies work, and creates allowed local commits, but does not deploy. Codex Auditor is an independent read-only reviewer. Candidate Implementer and Claude produce patch-only candidates. Antigravity Visual Pod specializes in UI, UX, graphic, and browser review, defaulting to review-only. Local Tooling Pod generates deterministic evidence.
+The contract classifies the workspace first, separates implementation, audit, adoption, and release authority, treats raw artifacts as risky, and prefers deterministic gates before LLM judgment.
 
-## Candidate Patch Governance
+## Why this exists
 
-**日本語:** candidate patch は `candidate_objective_id`、target branch/worktree ownership、`candidate_base_sha`、`current_target_sha` の再検証で管理します。audit bundle は deterministic に生成し、Auditor は structured findings を返します。`needs_revision` は bounded loop で扱い、agent を切り替えても cross-agent attempt limit は reset しません。
+LLMs are capable, but overbroad by default.
 
-**English:** Candidate patches are governed by a candidate objective, target branch/worktree ownership, `candidate_base_sha`, and `current_target_sha` revalidation. Audit bundles are generated deterministically. The Auditor returns structured findings. `needs_revision` is bounded, and cross-agent attempt limits do not reset when implementers change.
+Branches alone do not prevent inheritance of dirty worktrees or old project state. Cloud-sync paths can expose raw logs and local metadata. Candidate patches need audit bundles, base SHA identity, and bounded revision loops.
+
+## Core contracts
+
+- No writes before workspace classification.
+- New projects use isolated local-only workspaces.
+- Dirty existing repos are hard stops.
+- Cloud-synced workspaces require explicit approval before writes.
+- `.agent-runs/` is ignored raw runtime material.
+- Committed history uses sanitized summaries only.
+- Bootstrap self-audit is limited to mechanical governance scope.
+
+## Approval phrases
+
+These actions require explicit human approval.
+
+| Action | Required approval |
+|---|---|
+| Write in a cloud-synced workspace | `APPROVE CLOUD-SYNC WORKSPACE <run_id>` |
+| Merge into a protected branch | `APPROVE MERGE <run_id> <target_branch>` |
+| Let Antigravity produce a candidate UI patch | `APPROVE ANTIGRAVITY CANDIDATE UI PATCH <run_id>` |
+| Push, deploy, or publish | Separate explicit human approval |
+
+## Roles
+
+- Human Owner: controls merge, push, deploy, publish, production data, credentials, and legal, privacy, and brand decisions.
+- Supervisor Codex: routes tasks, adopts accepted patches, verifies work, maintains governance, and creates allowed local commits. It does not deploy.
+- Codex Auditor: independent read-only reviewer for scope, policy, diff, evidence, base SHA, target ownership, and high-risk changes. It cannot be the implementer.
+- Candidate Implementer: produces patch-only candidates in an isolated branch or worktree.
+- Claude: optional candidate implementer, reviewer, or spec critic only when explicitly approved.
+- Antigravity Visual Pod: UI, UX, graphic, and browser review specialist. Default mode is review-only and artifact-first.
+- Local Tooling Pod: generates deterministic evidence. It does not make release or audit decisions.
+
+## Candidate patch governance
+
+Candidate patches are governed by a candidate objective, target branch or worktree ownership, `candidate_base_sha`, and `current_target_sha` revalidation.
+
+By default, automatic candidate attempts are capped at 3 per `run_id` and `candidate_objective_id`. Switching agents does not reset the counter.
+
+```text
+Human task
+  |
+  v
+Supervisor Codex
+  |
+  v
+Candidate Implementer
+  |
+  v
+Raw candidate output under .agent-runs/
+  |
+  v
+Local Tooling deterministic gates
+  |
+  v
+Deterministic audit bundle
+  |
+  v
+Codex Auditor read-only review
+  |
+  v
+accepted / rejected / needs_revision
+  |
+  v
+Supervisor Codex adopts only accepted patches
+  |
+  v
+Human Owner approves merge / push / deploy when required
+```
+
+Auditor findings are structured. `needs_revision` loops are bounded. Candidate base and current target SHA are reread before audit and adoption.
 
 ## Antigravity Visual Pod
 
-**日本語:** Antigravity Visual Pod は UI/UX/graphic/browser review specialist です。既定は review-only and artifact-first で、candidate UI patch は明示 approval がある場合だけです。既定では commit、deploy、terminal、backend、auth、DB、package changes を行いません。
+Antigravity Visual Pod is a UI, UX, graphic, and browser review specialist.
 
-**English:** Antigravity Visual Pod is a UI, UX, graphic, and browser review specialist. Its default mode is review-only and artifact-first. Candidate UI patches require explicit approval. By default, it does not commit, deploy, use a terminal, or change backend, auth, database, or package files.
+Its default mode is review-only and artifact-first. Candidate UI patches require explicit approval. By default, it does not commit, deploy, use a terminal, or change backend, auth, database, dependency, or package files.
 
-## Repository layout / リポジトリ構成
+## What this protects against
 
-**日本語:** `bootstrap/ai-org-bootstrap-v0.4.md` は canonical source です。`.agent-org/runbook.md` は実行手順をまとめます。`.agent-org/policies/` は workspace、artifact retention、Ask Gate、staffing の短い派生 policy です。`.agent-org/templates/` は sanitized summary、Antigravity visual review、candidate audit bundle の field contract です。`.agent-org/history/` には raw logs ではなく sanitized run summaries だけを置きます。
+| Risk | Mitigation |
+|---|---|
+| Dirty worktree inheritance | No-write-before-classification and dirty repo hard stop |
+| Old project state reuse | New project isolation |
+| Raw log leakage | `.agent-runs/` ignored and untracked |
+| LLM overreach | Scope gates and role separation |
+| Self-audit loopholes | Bootstrap self-audit limited to mechanical governance scope |
+| Infinite revision loops | Cross-agent attempt ceiling |
+| Stale patch base | `candidate_base_sha` and `current_target_sha` revalidation |
 
-**English:** `bootstrap/ai-org-bootstrap-v0.4.md` is the canonical source. `.agent-org/runbook.md` summarizes execution. `.agent-org/policies/` contains concise derived policies for workspace, artifact retention, Ask Gate, and staffing. `.agent-org/templates/` defines field contracts for sanitized summaries, Antigravity visual review, and candidate audit bundles. `.agent-org/history/` stores sanitized run summaries, not raw logs.
+## What this does not prove
 
-## 使い方 / Usage
+| Non-guarantee | Notes |
+|---|---|
+| Absence of all secrets | Scanners are best-effort. |
+| Safety of every LLM output | Auditor and gates reduce risk; they do not eliminate it. |
+| Production readiness | Deploy and publish remain Human Owner decisions. |
+| Legal or license compliance | Final legal, privacy, license, and brand decisions remain human-owned. |
 
-**日本語:** existing repo bootstrap では、clean repo を確認して bootstrap branch を作成し、許可された governance files だけを変更します。new project bootstrap では、fresh local-only workspace を使い、初回 commit 前の branch 作成は任意です。candidate patch flow では、candidate output、deterministic gates、audit bundle、Auditor decision、adoption を分離します。raw artifacts は `.agent-runs/` に置き、commit しません。commit してはいけないものは secrets、credentials、raw prompts、raw stderr、screenshots、recordings、production personal/customer data、local absolute paths です。
+## Repository layout
 
-**English:** For existing repo bootstrap, confirm a clean repo, create a bootstrap branch, and change only allowed governance files. For new project bootstrap, use a fresh local-only workspace; branch creation before the first commit is optional. Candidate patch flow separates candidate output, deterministic gates, audit bundle, Auditor decision, and adoption. Store raw artifacts under `.agent-runs/` and do not commit them. Do not commit secrets, credentials, raw prompts, raw stderr, screenshots, recordings, production personal/customer data, or local absolute paths.
+- `bootstrap/ai-org-bootstrap-v0.4.md`: canonical operating contract.
+- `.agent-org/runbook.md`: concise execution runbook derived from the canonical contract.
+- `.agent-org/policies/`: workspace, artifact retention, Ask Gate, and staffing policies.
+- `.agent-org/templates/`: field contracts for sanitized run summaries, Antigravity visual reviews, and candidate audit bundles.
+- `.agent-org/history/`: sanitized run summaries only. Raw logs do not belong here.
+- `.gitignore`: keeps `.agent-runs/` out of Git history.
 
-## 非目標 / Non-goals
+## Usage
 
-**日本語:** この bootstrap は autonomous deployment、secret handling、production data access、CI/provider configuration を提供しません。scanner が secrets の不存在を証明することも保証しません。これは governance layer であり、application code や deploy 設定ではありません。
+For an existing repo bootstrap, confirm a clean tracked working tree, create a bootstrap branch, and change only allowed governance files.
 
-**English:** This bootstrap does not provide autonomous deployment, secret handling, production data access, CI configuration, or provider configuration. It does not guarantee that scanners prove absence of secrets. It is a governance layer, not application code or deploy configuration.
+For a new project bootstrap, use a fresh local-only workspace. Branch creation before the first commit is optional.
 
-## ライセンス / License
+For candidate patch flow, keep candidate output, deterministic gates, audit bundle generation, Auditor decision, and adoption as separate steps.
 
-**日本語:** ライセンスは未選択です。`LICENSE` file が追加されるまで、再利用権を仮定しないでください。
+Store raw artifacts under `.agent-runs/` and do not commit them.
 
-**English:** License is not yet selected. Do not assume reuse rights until a `LICENSE` file is added.
+## Tooling
+
+Required:
+
+- Git
+
+Recommended:
+
+- GitHub CLI (`gh`) when creating repositories or checking public surface state
+- `gitleaks` or `trufflehog` for sanitation gates
+- `rg` or `grep` for local checks
+
+Not required by bootstrap:
+
+- Claude execution
+- Antigravity execution
+- Gemini execution
+- Local AI execution
+- CI provider configuration
+
+## Versioning
+
+`bootstrap/ai-org-bootstrap-v*.md` files are versions of the operating contract.
+
+Changes that alter execution semantics should be treated as minor or major version changes. The README summarizes the latest stable contract.
+
+## Non-goals
+
+This bootstrap does not provide autonomous deployment, secret handling, production data access, CI configuration, provider configuration, or proof that all secrets are absent.
+
+It is a governance layer, not application code and not deploy configuration.
+
+## License
+
+License is not yet selected. All rights are reserved unless a `LICENSE` file is added.
+
+Do not assume reuse rights until a `LICENSE` file is added.
