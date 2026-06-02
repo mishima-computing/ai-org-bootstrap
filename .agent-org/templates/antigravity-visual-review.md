@@ -1,0 +1,22 @@
+# Antigravity Visual Review / Antigravity Visual Review
+
+- run_id:
+- approval:
+- mode: `review-only` or `candidate-ui-patch`
+- scope:
+- screens_reviewed:
+- viewports_reviewed:
+- artifacts_produced:
+- top_visual_issues:
+- quick_wins:
+- accessibility_observations:
+- typography_spacing_color_observations:
+- responsive_behavior_observations:
+- graphic_asset_and_license_notes:
+- copy_clarity_observations:
+- candidate_patch_summary:
+- risky_changes_to_avoid:
+- assumptions:
+- unresolved_questions:
+- privacy_and_artifact_notes:
+- adoption_decision:
