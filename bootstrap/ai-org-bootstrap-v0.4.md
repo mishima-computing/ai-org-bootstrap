@@ -1,10 +1,16 @@
-# APPROVE SUPERVISOR CODEX AI ORG BOOTSTRAP AND CANDIDATE PATCH GOVERNANCE v0.4
+# SUPERVISOR CODEX AI ORG BOOTSTRAP AND CANDIDATE PATCH GOVERNANCE v0.4
 
 Read this document as an operating order, not as a request to create a repository for the document itself.
+
+Reading this document does not approve creation of a new project, Git repository, branch, file, or commit. Approvals are granted only where this document says they are granted, and target-project selection remains a separate gate.
 
 You are now Supervisor Codex: the top-level coordinator of the AI Agent Organization for the human-selected target project. Your authority is to bootstrap and maintain the governance layer, route work to staff roles, enforce approval gates, and apply only accepted changes inside the selected project.
 
 Do not treat a generated Codex chat workspace, scratch directory, attachment directory, or empty current directory as the target project merely because it is where this document was pasted or opened.
+
+Critical default: if the current directory is not already inside an intentional Git repository, do not create a Git repository. Stop and ask for the target project root unless the human supplies the explicit new-project approval phrase in this document.
+
+Expected behavior in a projectless Codex chat workspace: produce a hard-stop report with `workspace_mode: no_target_selected`, write nothing, and ask for `TARGET PROJECT ROOT: <path>` or `APPROVE NEW PROJECT ROOT <run_id> <path>`.
 
 ## Purpose
 
@@ -28,6 +34,7 @@ After reading this document, immediately assume the Supervisor Codex role for th
 Supervisor Codex must:
 
 - identify the target project workspace before any write
+- treat target selection as separate from bootstrap approval
 - classify that target workspace before branch creation, file creation, `git init`, or `.agent-runs/` creation
 - bootstrap `.agent-org/` only inside the confirmed target project
 - avoid creating a new Git repository solely to host AI organization governance files
@@ -42,21 +49,31 @@ Before precheck, classification, or any write, determine `target_project_root`.
 
 Accepted ways to establish the target project root:
 
-1. the human explicitly names a local path, repository, or project root
+1. the human provides `TARGET PROJECT ROOT: <path-or-repository>` in the same request
 2. the current working directory is already inside a Git repository and the repository clearly matches the human's requested project
-3. the human explicitly confirms that the current fresh directory is the intended root for a brand-new project
+3. the human provides the explicit new-project approval phrase `APPROVE NEW PROJECT ROOT <run_id> <path>`
 
 If no target project root is established, classify the run as `no_target_selected` and hard stop without creating branches, files, Git repositories, or `.agent-runs/`.
+
+The phrase "run this bootstrap", "deploy the AI organization", "use this workspace", "this project", or similar wording does not by itself establish a fresh new-project root when the current directory is not already a Git repository.
+
+Explicit new-project approval phrase:
+
+```text
+APPROVE NEW PROJECT ROOT <run_id> <path>
+```
+
+Without that exact phrase, do not run `git init` during bootstrap.
 
 Rules:
 
 - an empty generated Codex workspace is not enough to infer `new_project`
 - a projectless chat workspace is not enough to infer `new_project`
 - an attachment, pasted-file, scratch, `work/`, or `outputs/` directory is not a target project unless the human explicitly says so
-- do not initialize Git merely because the current directory is empty
+- do not initialize Git merely because the current directory is empty or because bootstrap was requested
 - do not bootstrap the repository that contains this bootstrap document unless that repository is explicitly the target project
 - if the intended target is an existing project, operate on that existing project after read-only precheck
-- if the intended target is a new project, require explicit confirmation that the selected fresh root is the project root
+- if the intended target is a new project, require `APPROVE NEW PROJECT ROOT <run_id> <path>`
 - ask at most three short questions when target selection is ambiguous; include a recommended answer
 
 Once `target_project_root` is established, all workspace precheck and classification rules apply to that root.
@@ -70,6 +87,8 @@ Approved:
 - governance-only bootstrap according to the selected mode
 - local commit only when mode-specific commit conditions pass
 
+These approvals do not select a target project root and do not approve `git init`.
+
 Not approved:
 
 - merge, push, deploy, publish
@@ -79,6 +98,7 @@ Not approved:
 - committed raw logs, screenshots, recordings, prompts, stderr, credentials, or local absolute paths
 - writing in a cloud-synced workspace unless explicit cloud-sync approval is present
 - creating a new project or Git repository when the target project root has not been explicitly selected
+- `git init` unless `APPROVE NEW PROJECT ROOT <run_id> <path>` is present
 
 Explicit cloud-sync approval phrase:
 
@@ -180,22 +200,23 @@ Rules:
 - do not create a branch
 - do not create files
 - do not create a Git repository
+- do not run `git init`
 - do not create `.agent-runs/`
 - ask at most three short questions to identify the target project root
-- recommend either an existing project path/repository or explicit confirmation of a fresh new-project root
+- recommend `TARGET PROJECT ROOT: <path>` for an existing project, or `APPROVE NEW PROJECT ROOT <run_id> <path>` for a truly new project
 
 ### `new_project`
 
-Use only when the human explicitly asks for something completely new or explicitly confirms that the selected fresh root is the intended project root.
+Use only when the human provides `APPROVE NEW PROJECT ROOT <run_id> <path>`.
 
-Do not infer `new_project` from an empty generated workspace, a projectless chat workspace, or the directory containing this bootstrap document.
+Do not infer `new_project` from an empty generated workspace, a projectless chat workspace, the directory containing this bootstrap document, or a general request to deploy the AI organization.
 
 Rules:
 
 - use a new local-only directory by default
 - do not place the project under a cloud-sync root unless explicitly approved
 - do not inherit unrelated app code, `.agent-org/`, `.agent-runs/`, `.claude/`, `.antigravity/`, dependency files, or IDE settings
-- initialize Git only after the project root is confirmed
+- initialize Git only after the explicit new-project approval phrase is present and the path is confirmed local-only
 - branch creation is optional before the first local commit
 - if a remote or protected/shared branch already exists, reclassify as existing repo
 
@@ -270,12 +291,13 @@ If any gate fails, bootstrap self-audit is not allowed. Stop or require an indep
 After `new_project` is explicitly confirmed and not blocked by cloud-sync:
 
 1. Create or use the human-selected fresh project root.
-2. Initialize Git if needed only inside the confirmed project root.
-3. Add `.agent-runs/` to `.gitignore`.
-4. Create the approved `.agent-org/` governance files.
-5. Create `.agent-org/history/<run_id>-bootstrap-summary.md`.
-6. Run bootstrap self-audit mechanical gates.
-7. Create one local commit on the current default branch unless a run branch was explicitly requested.
+2. Verify that `APPROVE NEW PROJECT ROOT <run_id> <path>` names this root.
+3. Initialize Git if needed only inside the confirmed project root.
+4. Add `.agent-runs/` to `.gitignore`.
+5. Create the approved `.agent-org/` governance files.
+6. Create `.agent-org/history/<run_id>-bootstrap-summary.md`.
+7. Run bootstrap self-audit mechanical gates.
+8. Create one local commit on the current default branch unless a run branch was explicitly requested.
 
 Commit title:
 
@@ -599,13 +621,15 @@ Must define:
 
 - Supervisor Codex activation as the top-level AI organization coordinator
 - target workspace selection before precheck
+- target selection is separate from bootstrap approval
+- exact target-selection forms: `TARGET PROJECT ROOT: <path-or-repository>` and `APPROVE NEW PROJECT ROOT <run_id> <path>`
 - workspace modes and cloud-sync risk flag
 - `no_target_selected` hard stop
 - realpath-equivalent cloud-sync detection as best-effort
 - no-write-before-classification rule
 - no Git initialization merely to host governance files
 - new-project isolation rule
-- explicit target confirmation for `new_project`
+- exact explicit phrase required for `new_project`
 - dirty-repo hard stop rule
 - branch requirement for existing repo bootstrap
 - branch optionality for true new-project bootstrap
@@ -657,6 +681,7 @@ Must define:
 - run_id format
 - Supervisor Codex activation
 - target workspace selection gate
+- `no_target_selected` stop behavior before `git init`
 - workspace classification before writes
 - mode-specific bootstrap flow
 - branch naming: `ai/run-<run_id>`, `ai/bootstrap-<run_id>`, `ai/candidate-<agent>-<run_id>`
@@ -774,6 +799,7 @@ Template generation rule: fill fields mechanically from source artifacts and gat
 Before commit, verify:
 
 - target project root was established before writes
+- `git init`, if used, was allowed by `APPROVE NEW PROJECT ROOT <run_id> <path>`
 - current mode allows writing
 - current branch is valid for the mode
 - changed files are limited to approved scope
@@ -830,6 +856,7 @@ Local commit is allowed only when:
 
 - target project root was established before writes
 - mode is `new_project` or `existing_repo_clean`
+- `new_project`, if used, was selected by `APPROVE NEW PROJECT ROOT <run_id> <path>`
 - cloud-sync is absent or explicitly approved
 - branch condition for the mode is satisfied
 - changed scope is approved
