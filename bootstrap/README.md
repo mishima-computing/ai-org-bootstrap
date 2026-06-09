@@ -4,6 +4,8 @@
 
 Target repositories should not regenerate role specs or skill loaders. This repository is the source pack for AI Quality Bootstrap.
 
+The entrypoint supports source-pack repos, target repos with vendored packs, and target repos that still need explicit pack materialization.
+
 Canonical roles live under `roles/`.
 
 Carrier adapters live under:

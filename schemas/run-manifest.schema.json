@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.run-manifest.v0.1",
+  "type": "object",
+  "required": [
+    "run_id",
+    "target_repo_root",
+    "branch",
+    "locked_target_sha",
+    "pack_mode",
+    "gate_profile"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "target_repo_root": {
+      "type": "string"
+    },
+    "branch": {
+      "type": "string"
+    },
+    "locked_target_sha": {
+      "type": "string"
+    },
+    "current_target_sha": {
+      "type": "string"
+    },
+    "pack_mode": {
+      "enum": [
+        "source-pack-repo",
+        "target-repo-with-vendored-pack",
+        "target-repo-without-vendored-pack"
+      ]
+    },
+    "pack_materialization_strategy": {
+      "type": "string"
+    },
+    "carriers_used": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fallbacks_used": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "active_worktree_owners": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "gate_profile": {
+      "type": "string"
+    },
+    "adoption_decision": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

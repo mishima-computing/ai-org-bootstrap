@@ -30,6 +30,12 @@ smoke/             Future smoke tests
 Legacy/            Preserved pre-rebuild material and old drafts
 ```
 
+Key runtime policies:
+
+- `.agent-org/pack-materialization.md`
+- `.agent-org/carrier-invocation.md`
+- `.agent-org/run-lifecycle.md`
+
 ## Carriers
 
 - Codex: supervisor, dispatcher, boring worker, schema output, audit

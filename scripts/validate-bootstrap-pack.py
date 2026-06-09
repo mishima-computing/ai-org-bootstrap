@@ -105,6 +105,24 @@ REQUIRED_ANTIGRAVITY_AGENTS = [
     "mapmaker-agent",
 ]
 
+REQUIRED_POLICY_DOCS = [
+    ".agent-org/runtime-registry.yaml",
+    ".agent-org/execution-substrate.md",
+    ".agent-org/worktree-policy.md",
+    ".agent-org/artifact-policy.md",
+    ".agent-org/pack-materialization.md",
+    ".agent-org/carrier-invocation.md",
+    ".agent-org/run-lifecycle.md",
+]
+
+REQUIRED_SCRIPTS = [
+    "scripts/run-gates.sh",
+    "scripts/build-audit-bundle.py",
+    "scripts/hash-artifacts.py",
+    "scripts/build-mapmaker-input-bundle.py",
+    "scripts/validate-bootstrap-pack.py",
+]
+
 REQUIRED_CODEX_SKILLS = [
     "convergence",
     "critical-surface",
@@ -130,6 +148,8 @@ REQUIRED_SCHEMAS = [
     "experiment-packet.schema.json",
     "gate-report.schema.json",
     "audit-bundle.schema.json",
+    "run-manifest.schema.json",
+    "mapmaker-input-bundle.schema.json",
 ]
 
 BOOTSTRAP_SECTIONS = [
@@ -176,6 +196,8 @@ def check_required_files() -> list[str]:
         ROOT / ".codex/config.toml",
         ROOT / ".claude/settings.json",
     ]
+    required.extend(ROOT / path for path in REQUIRED_POLICY_DOCS)
+    required.extend(ROOT / path for path in REQUIRED_SCRIPTS)
     required.extend(ROOT / "roles" / f"{name}.md" for name in REQUIRED_ROLES)
     required.extend(ROOT / ".codex/agents" / f"{name}.toml" for name in REQUIRED_CODEX_AGENTS)
     required.extend(ROOT / ".claude/agents" / f"{name}.md" for name in REQUIRED_CLAUDE_AGENTS)
@@ -462,6 +484,71 @@ def check_skill_loaders() -> list[str]:
     return errors
 
 
+def check_policy_docs() -> list[str]:
+    errors: list[str] = []
+    required_phrases = {
+        ".agent-org/pack-materialization.md": [
+            "Mode A",
+            "Mode B",
+            "Mode C",
+            "APPROVE BOOTSTRAP PACK MATERIALIZATION",
+            "bootstrap_pack_not_materialized",
+            "Do not invent or generate",
+        ],
+        ".agent-org/carrier-invocation.md": [
+            "carrier_unavailable",
+            "Claude CLI",
+            ".agent-runs/<run_id>/carriers/claude/<role>/",
+            "Antigravity is provisional",
+            "Only Supervisor Codex may adopt",
+        ],
+        ".agent-org/run-lifecycle.md": [
+            "YYYYMMDD-HHMMSS-<shortsha>",
+            "run-manifest.json",
+            "ai/candidate-<role>-<run_id>",
+            "gate_profile: bootstrap-v0.1-minimal",
+            "mapmaker/input-bundle.json",
+            "Candidate Implementer Selection",
+        ],
+    }
+    for raw_path, phrases in required_phrases.items():
+        path = ROOT / raw_path
+        if not path.is_file():
+            continue
+        for phrase in contains_all(text(path), phrases):
+            errors.append(f"{raw_path} missing policy phrase: {phrase}")
+    return errors
+
+
+def check_scripts() -> list[str]:
+    errors: list[str] = []
+    run_gates = ROOT / "scripts/run-gates.sh"
+    if run_gates.is_file():
+        content = text(run_gates)
+        for phrase in [
+            "bootstrap-v0.1-minimal",
+            "forbidden_path_check",
+            "candidate_output_schema_check",
+            "optional_not_configured",
+            "git rev-parse HEAD",
+        ]:
+            if phrase not in content:
+                errors.append(f"{rel(run_gates)} missing gate phrase: {phrase}")
+    mapmaker = ROOT / "scripts/build-mapmaker-input-bundle.py"
+    if mapmaker.is_file():
+        content = text(mapmaker)
+        for phrase in [
+            "p0_acceptance",
+            "repo_hotspots",
+            "complexity_observations",
+            "critical_surfaces",
+            "non_goals",
+        ]:
+            if phrase not in content:
+                errors.append(f"{rel(mapmaker)} missing Mapmaker bundle field: {phrase}")
+    return errors
+
+
 def check_bootstrap_entrypoint() -> list[str]:
     errors: list[str] = []
     path = ROOT / "bootstrap/codex-bootstrap-v0.1.md"
@@ -475,6 +562,15 @@ def check_bootstrap_entrypoint() -> list[str]:
             errors.append(f"{rel(path)} missing section heading: {heading}")
     phrase_groups = {
         "target repo confirmation": ["target repository confirmation", "target repo"],
+        "run mode classification": ["Mode A", "Mode B", "Mode C"],
+        "pack materialization": ["bootstrap_pack_not_materialized", "APPROVE BOOTSTRAP PACK MATERIALIZATION"],
+        "run id format": ["YYYYMMDD-HHMMSS-<shortsha>"],
+        "run manifest": ["run-manifest.json"],
+        "carrier invocation": ["carrier invocation"],
+        "worktree creation": ["ai/candidate-<role>-<run_id>", ".agent-runs/<run_id>/worktrees/<role>/"],
+        "gate profile": ["gate_profile: bootstrap-v0.1-minimal"],
+        "Mapmaker input bundle": ["mapmaker/input-bundle.json"],
+        "candidate implementer selection": ["Select candidate implementer by surface"],
         "max decomposition depth": ["max_decomposition_depth", "max decomposition depth"],
         "P0/P1/P2": ["p0/p1/p2"],
         "high risk is not a stop reason": ["high risk is not a stop reason"],
@@ -502,6 +598,8 @@ def main() -> int:
     errors.extend(check_claude_adapters())
     errors.extend(check_antigravity_adapters())
     errors.extend(check_skill_loaders())
+    errors.extend(check_policy_docs())
+    errors.extend(check_scripts())
     errors.extend(check_bootstrap_entrypoint())
 
     payload = {

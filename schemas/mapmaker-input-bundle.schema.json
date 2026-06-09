@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.mapmaker-input-bundle.v0.1",
+  "type": "object",
+  "required": [
+    "objective",
+    "p0_acceptance",
+    "work_packets",
+    "pain_points",
+    "repo_hotspots",
+    "complexity_observations",
+    "critical_surfaces",
+    "constraints",
+    "non_goals"
+  ],
+  "properties": {
+    "objective": {
+      "type": "string"
+    },
+    "p0_acceptance": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "work_packets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "pain_points": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "repo_hotspots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "complexity_observations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "critical_surfaces": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "non_goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}
