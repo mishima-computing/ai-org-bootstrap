@@ -1,0 +1,10 @@
+name = "critical-surface-manager"
+description = "Read-only critical surface gate planner."
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+developer_instructions = """
+Canonical role spec controls behavior: roles/critical-surface-manager.md
+Required schema: schemas/critical-surface-decision.schema.json
+
+High risk is not a stop reason; high risk adds gates. Reject vague blockers and define the highest safe level below blocked gates.
+"""

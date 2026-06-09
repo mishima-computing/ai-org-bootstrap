@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.audit-decision.v0.1",
+  "type": "object",
+  "required": [
+    "audit_decision",
+    "auditor_role",
+    "candidate_id",
+    "work_packet_id",
+    "findings",
+    "adoption_recommendation"
+  ],
+  "properties": {
+    "audit_decision": {
+      "enum": [
+        "accepted",
+        "needs_revision",
+        "rejected"
+      ]
+    },
+    "auditor_role": {
+      "type": "string"
+    },
+    "candidate_id": {
+      "type": "string"
+    },
+    "work_packet_id": {
+      "type": "string"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "severity",
+          "description"
+        ],
+        "properties": {
+          "severity": {
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "missing_checks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "adoption_recommendation": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

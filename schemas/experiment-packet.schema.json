@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.experiment-packet.v0.1",
+  "type": "object",
+  "required": [
+    "experiment_packet_id",
+    "hypothesis",
+    "allowed_files",
+    "forbidden_files",
+    "max_scope",
+    "success_evidence",
+    "rejection_condition"
+  ],
+  "properties": {
+    "experiment_packet_id": {
+      "type": "string"
+    },
+    "hypothesis": {
+      "type": "string"
+    },
+    "allowed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "max_scope": {
+      "type": "string"
+    },
+    "success_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rejection_condition": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

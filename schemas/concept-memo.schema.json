@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.concept-memo.v0.1",
+  "type": "object",
+  "required": [
+    "concept_memo_id",
+    "title",
+    "observed_pain",
+    "problem_compression",
+    "key_abstraction",
+    "invariants",
+    "expected_quality_gain",
+    "experiment",
+    "rejection_condition"
+  ],
+  "properties": {
+    "concept_memo_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "observed_pain": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "problem_compression": {
+      "type": "object",
+      "required": [
+        "before",
+        "after"
+      ],
+      "properties": {
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "key_abstraction": {
+      "type": "string"
+    },
+    "invariants": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expected_quality_gain": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "rejection_condition": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}
