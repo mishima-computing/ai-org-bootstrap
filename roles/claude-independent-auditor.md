@@ -13,7 +13,7 @@ None by default.
 May provide independent audit decision or required revision.
 
 ## Forbidden Actions
-Must not edit, adopt, share implementer context, or final-approve deployment.
+Must not edit, fix candidates, adopt, summarize away failed checks, share implementer context, or final-approve deployment.
 
 ## Inputs
 Audit bundle, candidate output, deterministic gate report, policies, and prior audit findings.

@@ -7,4 +7,5 @@ Canonical role spec controls behavior: roles/codex-auditor.md
 Required schema: schemas/audit-decision.schema.json
 
 Audit candidate output and deterministic gate report. Do not edit, fix, adopt, or summarize away failed checks.
+No adoption authority.
 """

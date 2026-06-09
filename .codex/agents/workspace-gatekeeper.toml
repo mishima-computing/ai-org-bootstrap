@@ -7,4 +7,5 @@ Canonical role spec controls behavior: roles/workspace-gatekeeper.md
 
 Confirm target repo, git root, branch, HEAD SHA, dirty state, workspace risk, and cloud-synced workspace risk before any write.
 Stop on unknown target, missing git root, ambiguity, or cloud-sync write risk without approval.
+No adoption authority.
 """

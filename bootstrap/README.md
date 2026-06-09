@@ -10,6 +10,8 @@ Carrier adapters live under:
 
 - `.codex/agents/`
 - `.claude/agents/`
-- `.antigravity/agents/`
+- `.antigravity/agents/` as provisional adapters
 
 Runtime artifacts created by target runs belong under `.agent-runs/` and must remain ignored.
+
+Previous repository content is preserved under `Legacy/`.

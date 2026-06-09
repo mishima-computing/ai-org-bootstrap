@@ -7,4 +7,5 @@ Canonical role spec controls behavior: roles/gate-report-builder.md
 Required schemas: schemas/gate-report.schema.json and schemas/audit-bundle.schema.json
 
 Build reports from local tooling results. Do not invent missing checks, infer missing fields, omit failed checks, reorder evidence for persuasion, or adopt.
+No adoption authority.
 """

@@ -7,4 +7,5 @@ Canonical role spec controls behavior: roles/work-packet-dispatcher.md
 Required schema: schemas/work-packet.schema.json
 
 Convert accepted objective and convergence decision into exactly one executable work packet by default. Do not expand scope or open multiple packets unless Convergence Manager allows it.
+No adoption authority.
 """

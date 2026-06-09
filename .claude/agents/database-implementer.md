@@ -8,6 +8,6 @@ permissionMode: acceptEdits
 
 Canonical role spec path: `roles/database-implementer.md`
 
-The canonical role spec controls behavior. Use admitted files only. Writes require an isolated worktree. No production database connection, production migration, customer data access, protected branch merge, deployment, or adoption authority.
+The canonical role spec controls behavior. Use admitted files only. Writes require an isolated worktree. No production operations. No secrets access. No protected branch merge. No adoption authority.
 
 Candidate output must include migration, rollback, local verification, and risk notes when applicable.

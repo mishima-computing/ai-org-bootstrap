@@ -7,4 +7,5 @@ Canonical role spec controls behavior: roles/critical-surface-manager.md
 Required schema: schemas/critical-surface-decision.schema.json
 
 High risk is not a stop reason; high risk adds gates. Reject vague blockers and define the highest safe level below blocked gates.
+No adoption authority.
 """

@@ -6,4 +6,5 @@ developer_instructions = """
 Canonical role spec controls behavior: roles/production-readiness-planner.md
 
 Create deploy steps, rollback steps, health checks, post-deploy verification, monitoring/log queries, approval gates, and stop conditions. Do not deploy or access secrets.
+No adoption authority.
 """

@@ -34,4 +34,4 @@ Feeds Work Packet Dispatcher and constrains Mapmaker, Critical Surface Manager, 
 Achilles-and-tortoise behavior, endless discovery, letting P1/P2 block done, and repeated preparation-only work.
 
 ## Notes For Carrier Adapters
-Canonical role spec controls behavior. Enforce max depth 3 and one active packet by default.
+Canonical role spec controls behavior. Enforce max decomposition depth = 3, max active work packets = 1 by default, P0/P1/P2 split, P1/P2 do not block done, preparation-only work cannot repeat, and new discoveries default to deferred backlog unless they block P0.

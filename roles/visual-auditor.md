@@ -13,7 +13,7 @@ Claude read-only subagent.
 May produce candidate visual audit evidence.
 
 ## Forbidden Actions
-Must not make final adoption decision, edit files, touch auth/database/production/secrets, or deploy.
+Must not make final audit or adoption decision, edit files, touch auth/database/production/secrets, or deploy.
 
 ## Inputs
 Visual artifacts, screenshots, recordings, browser evidence, changed files, and visual acceptance criteria.
