@@ -17,6 +17,7 @@
   ],
   "properties": {
     "role_id": {
+      "type": "string",
       "const": "implementer"
     },
     "implementation_contract_id": {

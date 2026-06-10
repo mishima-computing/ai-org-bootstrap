@@ -22,6 +22,7 @@
   ],
   "properties": {
     "role_id": {
+      "type": "string",
       "const": "aufheben-designer"
     },
     "contract_id": {
@@ -44,6 +45,7 @@
         ],
         "properties": {
           "source": {
+            "type": "string",
             "enum": [
               "aggressive-designer",
               "conservative-designer",
