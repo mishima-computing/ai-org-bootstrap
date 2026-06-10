@@ -23,6 +23,13 @@ Stop if the target repo is ambiguous or the git root cannot be determined.
 
 Do not initialize Git unless the human explicitly requested a new repository with an exact target path.
 
+If the run may use a Claude carrier, also confirm one of:
+
+- Claude CLI is available, authenticated, network-capable, and non-interactive permissions are already configured for the target repo
+- a human or higher-level orchestrator will run Claude outside the Codex sandbox and preserve `.agent-runs/<run_id>/carriers/claude/<agent>/`
+
+If Claude CLI exists but API/auth/network/approval is unavailable, treat the Claude carrier as `carrier_unavailable`; do not retry by guessing a different invocation.
+
 ## 3. Bootstrap Pack Loading
 
 Required source pack files:

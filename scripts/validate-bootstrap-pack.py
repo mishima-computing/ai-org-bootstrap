@@ -371,6 +371,7 @@ def check_required_files() -> list[str]:
         ROOT / ".codex/config.toml",
         ROOT / ".claude/settings.json",
         ROOT / "scripts/run-gates.sh",
+        ROOT / "scripts/extract-claude-result.py",
         ROOT / "scripts/hash-artifacts.py",
         ROOT / "scripts/validate-bootstrap-pack.py",
     ]
@@ -510,6 +511,43 @@ def check_registry() -> list[str]:
     return errors
 
 
+def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
+    errors: list[str] = []
+
+    codex_config = toml_data.get(ROOT / ".codex/config.toml", {})
+    if "skills" in codex_config:
+        errors.append(".codex/config.toml must not use bare [skills] enabled config")
+
+    carrier = text(ROOT / ".agent-org/carrier-invocation.md")
+    for phrase in [
+        "--agent \"<agent>\"",
+        "cli-output.json",
+        "result.json",
+        "scripts/extract-claude-result.py",
+        "claude_api_unreachable",
+        "claude_auth_unavailable",
+        "Claude carrier requires network access",
+        "--allowedTools",
+        "--json-schema",
+    ]:
+        if phrase not in carrier:
+            errors.append(f".agent-org/carrier-invocation.md missing phrase: {phrase}")
+    forbidden_prompt_flag = "--append-system" + "-prompt"
+    if forbidden_prompt_flag in carrier:
+        errors.append(f".agent-org/carrier-invocation.md must not invoke Claude adapters through {forbidden_prompt_flag}")
+
+    bootstrap = text(ROOT / "bootstrap/codex-bootstrap.md")
+    for phrase in [
+        "Claude CLI is available, authenticated, network-capable",
+        "carrier_unavailable",
+        "do not retry by guessing a different invocation",
+    ]:
+        if phrase not in bootstrap:
+            errors.append(f"bootstrap/codex-bootstrap.md missing Claude precondition phrase: {phrase}")
+
+    return errors
+
+
 def check_bootstrap() -> list[str]:
     errors: list[str] = []
     path = ROOT / "bootstrap/codex-bootstrap.md"
@@ -559,6 +597,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(check_codex_adapters(toml_data))
     errors.extend(check_claude_adapters())
     errors.extend(check_registry())
+    errors.extend(check_pack_policies(toml_data))
     errors.extend(check_bootstrap())
 
     payload = {

@@ -27,12 +27,17 @@ Before invoking Claude Code, create:
 ```text
 .agent-runs/<run_id>/carriers/claude/<agent>/
   input.md
-  output.json
+  cli-output.json
+  result.json
   stderr.log
   carrier-status.json
 ```
 
-`input.md` must include the objective, selected role spec path, adapter path, schema path, allowed files, forbidden files, and expected output path.
+`input.md` must include the objective, selected role spec path, adapter path, schema path, allowed files, forbidden files, expected output path, and this output rule:
+
+```text
+Return pure JSON conforming to the schema. Do not wrap it in Markdown, code fences, or explanatory text.
+```
 
 Required preflight:
 
@@ -40,8 +45,14 @@ Required preflight:
 2. verify `.claude/agents/<agent>.md` exists
 3. verify `roles/<agent>.md` exists
 4. verify the required output schema exists
+5. verify `scripts/extract-claude-result.py` exists
 
-If the CLI is unavailable, write `carrier-status.json` with `status: carrier_unavailable`, record `claude_cli_unavailable`, and use an allowed fallback or stop. Do not guess another Claude invocation.
+Claude carrier requires network access and working Claude authentication. If the CLI is missing, API/auth is unavailable, network access is blocked, or the non-interactive run cannot obtain required approval, write `carrier-status.json` with `status: carrier_unavailable`, record a concrete reason such as `claude_cli_unavailable`, `claude_api_unreachable`, `claude_auth_unavailable`, or `claude_approval_unavailable`, and use an allowed fallback or stop. Do not guess another Claude invocation.
+
+Codex may run Claude either:
+
+1. inside a trusted project execution with network and non-interactive permissions already configured, or
+2. outside the Codex sandbox through a human or higher-level orchestrator that records the same artifact layout.
 
 ### Read-only Claude Roles
 
@@ -50,14 +61,30 @@ Read-only Claude roles are `aggressive-designer`, `genius`, and `aufheben-design
 Invocation template:
 
 ```sh
+schema_path="schemas/<schema>.schema.json"
+schema_json="$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$schema_path")"
+
 claude --print \
+  --agent "<agent>" \
   --permission-mode plan \
-  --append-system-prompt "$(cat .claude/agents/<agent>.md)" \
+  --tools "Read,Grep,Glob" \
+  --allowedTools "Read,Grep,Glob" \
+  --json-schema "$schema_json" \
   --output-format json \
   < ".agent-runs/<run_id>/carriers/claude/<agent>/input.md" \
-  > ".agent-runs/<run_id>/carriers/claude/<agent>/output.json" \
+  > ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
   2> ".agent-runs/<run_id>/carriers/claude/<agent>/stderr.log"
+
+python3 scripts/extract-claude-result.py \
+  --cli-output ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
+  --out ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
+
+python3 scripts/validate-bootstrap-pack.py \
+  --schema "$schema_path" \
+  --instance ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
 ```
+
+For `genius`, use `--tools "Read,Grep,Glob,WebSearch,WebFetch"` and `--allowedTools "Read,Grep,Glob,WebSearch,WebFetch"`.
 
 Read-only adapters must not include Bash, Edit, or Write tools.
 
@@ -68,14 +95,33 @@ Write-capable Claude roles are `security-ci-action-writer` and secondary `implem
 Invocation template:
 
 ```sh
+schema_path="schemas/<schema>.schema.json"
+schema_json="$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$schema_path")"
+model_args=()
+[ "<adapter-model>" = "inherit" ] || model_args=(--model "<adapter-model>")
+
 claude --print \
+  --agent "<agent>" \
+  "${model_args[@]}" \
   --permission-mode acceptEdits \
-  --append-system-prompt "$(cat .claude/agents/<agent>.md)" \
+  --tools "Read,Grep,Glob,Bash,Edit,Write" \
+  --allowedTools "Read,Grep,Glob,Bash,Edit,Write" \
+  --json-schema "$schema_json" \
   --output-format json \
   < ".agent-runs/<run_id>/carriers/claude/<agent>/input.md" \
-  > ".agent-runs/<run_id>/carriers/claude/<agent>/output.json" \
+  > ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
   2> ".agent-runs/<run_id>/carriers/claude/<agent>/stderr.log"
+
+python3 scripts/extract-claude-result.py \
+  --cli-output ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
+  --out ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
+
+python3 scripts/validate-bootstrap-pack.py \
+  --schema "$schema_path" \
+  --instance ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
 ```
+
+Set `<adapter-model>` from the adapter frontmatter. This passes `--model fable` for `security-ci-action-writer` and omits the model flag for adapters with `model: inherit`.
 
 Write-capable Claude roles may write only the scope allowed by their role and input contract.
 
@@ -89,12 +135,16 @@ If web/search/fetch tools are unavailable, `genius` must produce a schema-shaped
 
 Claude output is valid only after:
 
-1. `output.json` exists
-2. `output.json` parses as JSON
-3. `output.json` conforms to the role schema
-4. `carrier-status.json` records the CLI command, exit status, adapter path, role path, schema path, and fallback status
+1. `cli-output.json` exists
+2. `cli-output.json` parses as a Claude CLI result envelope
+3. `scripts/extract-claude-result.py` extracts the `result` field into `result.json`
+4. `result.json` parses as JSON
+5. `result.json` conforms to the role schema
+6. `carrier-status.json` records the CLI command, exit status, adapter path, role path, schema path, network/auth status, and fallback status
 
 If the local Claude CLI does not support the invocation template, stop with `claude_invocation_contract_unsupported`.
+
+`.claude/settings.json` sets project default permission mode to `plan` as a safety baseline for human Claude sessions. Role invocation templates override permission mode explicitly.
 
 ## Fallback Rule
 
