@@ -99,17 +99,64 @@ SCHEMA_SAMPLE_INSTANCES = {
     "schemas/genius-packet.schema.json": {
         "role_id": "genius",
         "objective": "example objective",
-        "sources": [
+        "substrate_inputs": [
             {
-                "title": "example source",
-                "url_or_reference": "https://example.com",
+                "ref_type": "repo_pointer",
+                "locator": "roles/genius.md",
+                "summary": "Example local role pointer.",
             }
         ],
-        "core_mechanisms": [],
-        "what_to_copy": [],
-        "what_not_to_copy": [],
-        "fit_to_current_problem": "example fit",
-        "risks": [],
+        "official_spec_evidence": [
+            {
+                "ref_type": "official_spec",
+                "locator": "https://example.com/spec",
+                "summary": "Example named-interface specification evidence.",
+            }
+        ],
+        "repo_evidence": [
+            {
+                "ref_type": "repo_pointer",
+                "locator": "schemas/genius-packet.schema.json",
+                "summary": "Example schema pointer.",
+            }
+        ],
+        "kept_hypotheses": [
+            {
+                "hypothesis_id": "H1",
+                "mechanism": "Use pointer-style evidence to keep handoff compact.",
+                "score": 0.82,
+                "verification_status": "confirmed",
+                "repo_evidence_refs": [
+                    {
+                        "ref_type": "repo_pointer",
+                        "locator": "roles/genius.md",
+                        "summary": "Example role evidence reference.",
+                    }
+                ],
+                "external_refs": [
+                    {
+                        "ref_type": "official_spec",
+                        "locator": "https://example.com/spec",
+                        "summary": "Example external verification reference.",
+                    }
+                ],
+                "expected_benefit": "Example benefit.",
+                "risks": [
+                    "Example risk."
+                ],
+                "rejection_conditions": [
+                    "Reject if localized evidence is absent."
+                ],
+                "what_not_to_copy": [
+                    "Do not copy unrelated implementation bodies."
+                ],
+            }
+        ],
+        "refuted_hypotheses": [],
+        "unverified_hypotheses": [],
+        "what_not_to_copy": [
+            "Do not perform search-first idea gathering."
+        ],
         "handoff_to_aufheben": "example handoff",
     },
     "schemas/implementation-contract.schema.json": {
@@ -430,6 +477,10 @@ def check_roles() -> list[str]:
         for phrase in ["Outputs only to `aufheben-designer`", "directly instruct `implementer`"]:
             if phrase.lower() not in content.lower():
                 errors.append(f"roles/{agent}.md missing designer boundary: {phrase}")
+        if agent == "genius":
+            for phrase in ["Output Budget", "8000"]:
+                if phrase.lower() not in content.lower():
+                    errors.append(f"roles/{agent}.md missing genius budget phrase: {phrase}")
     return errors
 
 
@@ -494,8 +545,10 @@ def check_claude_adapters() -> list[str]:
             for tool in ["WebSearch", "WebFetch"]:
                 if tool not in tools:
                     errors.append(f"{rel(path)} missing external research tool: {tool}")
-            if "external_research_unavailable" not in body:
-                errors.append(f"{rel(path)} must define external_research_unavailable behavior")
+            if "verification_status" not in body:
+                errors.append(f"{rel(path)} must define verification_status behavior")
+            if "8000" not in body:
+                errors.append(f"{rel(path)} missing genius budget phrase: 8000")
     return errors
 
 
