@@ -357,6 +357,32 @@ def check_schema_samples() -> list[str]:
     return errors
 
 
+def check_schema_explicit_types() -> list[str]:
+    errors: list[str] = []
+
+    def walk(schema: dict, schema_path: str, json_path: str) -> None:
+        if ("const" in schema or "enum" in schema) and "type" not in schema:
+            errors.append(f"{schema_path}: {json_path}: const/enum schema must declare explicit type")
+
+        properties = schema.get("properties")
+        if isinstance(properties, dict):
+            for key, subschema in properties.items():
+                if isinstance(subschema, dict):
+                    walk(subschema, schema_path, f"{json_path}.properties.{key}")
+
+        items = schema.get("items")
+        if isinstance(items, dict):
+            walk(items, schema_path, f"{json_path}.items")
+
+    for path in sorted((ROOT / "schemas").glob("*.json")):
+        loaded, error = load_json(path)
+        if error or not isinstance(loaded, dict):
+            continue
+        walk(loaded, rel(path), "$")
+
+    return errors
+
+
 def resolve_cli_path(value: str) -> Path:
     path = Path(value)
     return path if path.is_absolute() else ROOT / path
@@ -658,6 +684,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(f"missing: {item}" for item in check_required_files())
     errors.extend(f"json_parse_error: {item}" for item in parse_json_files())
     errors.extend(f"schema_conformance_error: {item}" for item in check_schema_samples())
+    errors.extend(f"schema_explicit_type_error: {item}" for item in check_schema_explicit_types())
     errors.extend(f"toml_parse_error: {item}" for item in toml_errors)
     errors.extend(check_active_directories())
     errors.extend(check_roles())

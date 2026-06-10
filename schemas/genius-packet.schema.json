@@ -16,6 +16,7 @@
   ],
   "properties": {
     "role_id": {
+      "type": "string",
       "const": "genius"
     },
     "objective": {
@@ -32,6 +33,7 @@
         ],
         "properties": {
           "ref_type": {
+            "type": "string",
             "enum": [
               "repo_pointer",
               "official_spec",
@@ -62,6 +64,7 @@
         ],
         "properties": {
           "ref_type": {
+            "type": "string",
             "enum": [
               "repo_pointer",
               "official_spec",
@@ -92,6 +95,7 @@
         ],
         "properties": {
           "ref_type": {
+            "type": "string",
             "enum": [
               "repo_pointer",
               "official_spec",
@@ -140,6 +144,7 @@
             "description": "Advisory score only; keep/drop authority rests with aufheben-designer."
           },
           "verification_status": {
+            "type": "string",
             "enum": [
               "confirmed",
               "refuted",
@@ -157,6 +162,7 @@
               ],
               "properties": {
                 "ref_type": {
+                  "type": "string",
                   "enum": [
                     "repo_pointer",
                     "official_spec",
@@ -187,6 +193,7 @@
               ],
               "properties": {
                 "ref_type": {
+                  "type": "string",
                   "enum": [
                     "repo_pointer",
                     "official_spec",
@@ -260,6 +267,7 @@
             "description": "Advisory score only; keep/drop authority rests with aufheben-designer."
           },
           "verification_status": {
+            "type": "string",
             "enum": [
               "confirmed",
               "refuted",
@@ -277,6 +285,7 @@
               ],
               "properties": {
                 "ref_type": {
+                  "type": "string",
                   "enum": [
                     "repo_pointer",
                     "official_spec",
@@ -307,6 +316,7 @@
               ],
               "properties": {
                 "ref_type": {
+                  "type": "string",
                   "enum": [
                     "repo_pointer",
                     "official_spec",
@@ -380,6 +390,7 @@
             "description": "Advisory score only; keep/drop authority rests with aufheben-designer."
           },
           "verification_status": {
+            "type": "string",
             "enum": [
               "confirmed",
               "refuted",
@@ -397,6 +408,7 @@
               ],
               "properties": {
                 "ref_type": {
+                  "type": "string",
                   "enum": [
                     "repo_pointer",
                     "official_spec",
@@ -427,6 +439,7 @@
               ],
               "properties": {
                 "ref_type": {
+                  "type": "string",
                   "enum": [
                     "repo_pointer",
                     "official_spec",

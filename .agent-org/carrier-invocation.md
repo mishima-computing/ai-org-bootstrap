@@ -58,6 +58,8 @@ python3 scripts/validate-bootstrap-pack.py \
   --instance ".agent-runs/<run_id>/carriers/codex/<agent>/result.json"
 ```
 
+Codex `--output-schema` requires every property schema that declares `const` or `enum` to also declare an explicit `type`, because OpenAI structured_output validation rejects typeless const/enum properties. If `--output-schema` fails before model execution, for example with HTTP 400, re-run without `--output-schema`, instruct final-message-JSON-only output, and validate the captured result post-hoc with `python3 scripts/validate-bootstrap-pack.py --schema "schemas/<schema>.schema.json" --instance ".agent-runs/<run_id>/carriers/codex/<agent>/result.json"`.
+
 ## Claude Code Invocation
 
 Before invoking Claude Code, create:
