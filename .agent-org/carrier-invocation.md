@@ -2,20 +2,22 @@
 
 ## Purpose
 
-This policy defines how Supervisor Codex invokes carrier-specific roles without granting those carriers adoption authority.
+This policy defines carrier-specific invocation without turning carriers into agents.
 
-Canonical role behavior lives in `roles/*.md`. Carrier adapters translate that behavior for each carrier.
+Canonical agent behavior lives in `roles/*.md`. Carrier adapters translate that behavior for Codex or Claude Code.
 
 ## Codex Invocation
 
 Use `.codex/agents/*.toml` when available.
 
-Codex read-only roles must use read-only tool access. Codex write-capable roles must use workspace-write access only inside an admitted work packet and an isolated worktree when writing.
+Codex read-only agents must use read-only tool access.
 
-Codex role output must be captured under:
+Codex write-capable agents must use workspace-write access only for the scope allowed by their role and input contract.
+
+Codex output should be captured under:
 
 ```text
-.agent-runs/<run_id>/carriers/codex/<role>/
+.agent-runs/<run_id>/carriers/codex/<agent>/
 ```
 
 ## Claude Code Invocation
@@ -23,40 +25,18 @@ Codex role output must be captured under:
 Before invoking Claude Code:
 
 1. Check whether the Claude CLI is available.
-2. If unavailable, return `carrier_unavailable` and use an approved fallback carrier or stop.
-3. Load the matching `.claude/agents/<role>.md` adapter.
-4. Load the canonical `roles/<role>.md` spec.
+2. If unavailable, return `carrier_unavailable` and use an allowed fallback or stop.
+3. Load the matching `.claude/agents/<agent>.md` adapter.
+4. Load the canonical `roles/<agent>.md` spec.
 
-Read-only Claude roles must not receive write permission.
+Read-only Claude agents must not receive write permission.
 
-Write-capable Claude roles must run only inside:
+Write-capable Claude agents must receive only the scope allowed by their role and input contract.
 
-```text
-.agent-runs/<run_id>/worktrees/<role>/
-```
-
-Capture Claude stdout, stderr, invocation prompt, and parsed output under:
+Claude output should be captured under:
 
 ```text
-.agent-runs/<run_id>/carriers/claude/<role>/
-```
-
-Claude output must be schema-shaped JSON or a structured Markdown block that can be converted into the required schema.
-
-## Antigravity Invocation
-
-Antigravity is provisional.
-
-Do not invoke Antigravity until a smoke test confirms the local CLI behavior and output contract.
-
-If Antigravity is requested before smoke testing, return `carrier_unavailable` or use an approved fallback carrier.
-
-Antigravity may provide candidate visual evidence only. It has no final audit authority and no adoption authority.
-
-Capture Antigravity evidence under:
-
-```text
-.agent-runs/<run_id>/carriers/antigravity/<role>/
+.agent-runs/<run_id>/carriers/claude/<agent>/
 ```
 
 ## Fallback Rule
@@ -66,10 +46,8 @@ When a preferred carrier is unavailable:
 1. Record `carrier_unavailable`.
 2. Use the secondary carrier only if the runtime registry allows it.
 3. Preserve the same canonical role spec.
-4. Record the fallback in `run-manifest.json`.
+4. Record the fallback in runtime notes.
 
-## Adoption Rule
+## Authority Rule
 
-Carrier output is candidate evidence only.
-
-Only Supervisor Codex may adopt a candidate after deterministic gates and accepted audit.
+Carrier output is candidate evidence or a structured result. It is not adoption.

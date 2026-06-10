@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.design-proposal.v1",
+  "type": "object",
+  "required": [
+    "role_id",
+    "objective",
+    "proposal_summary",
+    "recommended_direction",
+    "expected_benefits",
+    "risks",
+    "assumptions",
+    "constraints",
+    "things_to_avoid",
+    "handoff_notes"
+  ],
+  "properties": {
+    "role_id": {
+      "enum": [
+        "aggressive-designer",
+        "conservative-designer"
+      ]
+    },
+    "objective": {
+      "type": "string"
+    },
+    "proposal_summary": {
+      "type": "string"
+    },
+    "recommended_direction": {
+      "type": "string"
+    },
+    "expected_benefits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "things_to_avoid": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "handoff_notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

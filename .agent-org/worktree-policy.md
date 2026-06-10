@@ -2,55 +2,38 @@
 
 ## Purpose
 
-This policy prevents multiple agents from sharing the same writable target and corrupting each other's work.
+This policy prevents multiple writers from sharing the same writable target.
 
-## Read-only Roles
+## Read-only Agents
 
-Read-only roles may run in the main checkout.
+Read-only agents may run in the main checkout:
 
-Read-only roles include:
+- aggressive-designer
+- conservative-designer
+- genius
+- aufheben-designer
 
-- workspace-gatekeeper
-- convergence-manager
-- work-packet-dispatcher
-- critical-surface-manager
-- mapmaker-agent
-- experiment-designer
-- codex-auditor
-- claude-independent-auditor
-- visual-auditor
-- gate-report-builder
+## Workflow-only Writers
 
-## Write-capable Roles
+These agents may write only under `.github/workflows/**`:
 
-Write-capable roles must run in isolated git worktrees.
+- functional-ci-action-writer
+- security-ci-action-writer
+- nonfunctional-ci-action-writer
 
-Write-capable roles include:
+They must not edit application code, tests, package manifests, lockfiles, secrets, deployments, or branch protection.
 
-- boring-worker
-- auth-security-implementer
-- database-implementer
-- visual-ux-worker
+## Contract-bound Writer
 
-## Candidate Branch Naming
+`implementer` may write only files allowed by the implementation contract.
 
-Use this branch format:
-
-```text
-ai/candidate-<role>-<run_id>
-```
-
-Use this worktree format:
-
-```text
-.agent-runs/<run_id>/worktrees/<role>/
-```
+It must not edit `.github/workflows/**`, bootstrap pack files, agent role specs, bootstrap schemas, or `Legacy/**` unless the implementation contract explicitly allows it.
 
 ## Ownership Rule
 
-One active writer owns one candidate branch or worktree.
+One active writer owns one branch or worktree.
 
-Two active writer roles must not share:
+Two active writers must not share:
 
 - a branch
 - a worktree
@@ -58,20 +41,11 @@ Two active writer roles must not share:
 
 ## SHA Rule
 
-Before candidate generation, record:
+Before write work, record:
 
 - run_id
-- role
-- candidate_objective_id
-- target branch or worktree
+- agent
+- target branch
 - locked_target_sha
 
-Before audit and adoption, reread HEAD as current_target_sha.
-
-A candidate must not be adopted if current_target_sha does not match candidate_base_sha unless the candidate is regenerated against the new base.
-
-## Adoption Rule
-
-Candidate implementers do not merge or adopt their own work.
-
-Only Supervisor Codex may adopt an accepted candidate after deterministic gates and audit.
+Before final reporting, reread HEAD as current_target_sha.

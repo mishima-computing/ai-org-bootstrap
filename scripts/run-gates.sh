@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-gate_profile="${GATE_PROFILE:-bootstrap-v0.1-minimal}"
+gate_profile="${GATE_PROFILE:-bootstrap-final-minimal}"
 run_id="${RUN_ID:-not_provided}"
 candidate_id="${CANDIDATE_ID:-not_provided}"
 candidate_output="${CANDIDATE_OUTPUT:-}"

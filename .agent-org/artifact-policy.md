@@ -16,14 +16,9 @@ This directory is ignored by git.
 .agent-runs/
   <run_id>/
     intake/
-    work-packets/
-    candidates/
-      codex/
-      claude/
-      antigravity/
+    carriers/
+    results/
     gates/
-    audit-bundles/
-    audits/
     worktrees/
     logs/
 ```
@@ -38,7 +33,7 @@ Do not commit:
 - raw model transcripts
 - screenshots
 - recordings
-- unreviewed candidate outputs
+- unreviewed outputs
 - local worktrees
 - raw tool logs
 - secrets
@@ -48,31 +43,23 @@ Do not commit:
 
 ## May Commit
 
-The following may be committed only when sanitized and intentionally reviewed:
+The following may be committed only when intentionally reviewed:
 
 - role specs
 - carrier adapters
 - schemas
 - deterministic scripts
 - bootstrap policies
-- sanitized summaries
 - accepted documentation
 
 ## Hashing
 
-When practical, record SHA-256 hashes for:
-
-- candidate patch
-- deterministic gate report
-- audit bundle
-- audit decision
+When practical, record SHA-256 hashes for structured outputs and patches.
 
 ## History
 
-Human-readable sanitized summaries may later be stored under:
+Human-readable summaries may later be stored under:
 
 ```text
 .agent-org/history/
 ```
-
-Do not create history summaries in this task.

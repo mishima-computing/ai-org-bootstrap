@@ -1,151 +1,76 @@
-version: 0.1
+version: 1
 
-note: This registry is executable routing metadata for the bootstrap pack. Canonical role behavior lives in `roles/*.md`. Carrier-specific adapters live in `.codex/agents/`, `.claude/agents/`, and `.antigravity/agents/`.
+note: Active routing metadata for the final Bootstrap roster. Canonical behavior lives in roles/*.md.
+
+agents:
+  functional-ci-action-writer:
+    primary: codex
+    write_scope:
+      - .github/workflows/**
+    adapter: .codex/agents/functional-ci-action-writer.toml
+    schema: schemas/ci-action-writer-result.schema.json
+  security-ci-action-writer:
+    primary: claude
+    model: fable
+    write_scope:
+      - .github/workflows/**
+    adapter: .claude/agents/security-ci-action-writer.md
+    schema: schemas/ci-action-writer-result.schema.json
+  nonfunctional-ci-action-writer:
+    primary: codex
+    write_scope:
+      - .github/workflows/**
+    adapter: .codex/agents/nonfunctional-ci-action-writer.toml
+    schema: schemas/ci-action-writer-result.schema.json
+  aggressive-designer:
+    primary: claude
+    write_scope: []
+    adapter: .claude/agents/aggressive-designer.md
+    schema: schemas/design-proposal.schema.json
+    output_to: aufheben-designer
+  conservative-designer:
+    primary: codex
+    write_scope: []
+    adapter: .codex/agents/conservative-designer.toml
+    schema: schemas/design-proposal.schema.json
+    output_to: aufheben-designer
+  genius:
+    primary: claude
+    write_scope: []
+    adapter: .claude/agents/genius.md
+    schema: schemas/genius-packet.schema.json
+    output_to: aufheben-designer
+  aufheben-designer:
+    primary: claude
+    write_scope: []
+    adapter: .claude/agents/aufheben-designer.md
+    schema: schemas/implementation-contract.schema.json
+    output_to: implementer
+  implementer:
+    primary: codex
+    secondary: claude
+    write_scope: implementation-contract
+    adapter: .codex/agents/implementer.toml
+    secondary_adapter: .claude/agents/implementer.md
+    schema: schemas/implementation-result.schema.json
+
+protocol:
+  - codex-main-controller
+
+subsystems:
+  - local-tooling
+  - gate-reporting
+  - artifact-hashing
 
 carriers:
   codex:
     status: active
     config_dir: .codex
     agents_dir: .codex/agents
-    skills_dir: .agents/skills
-    default_sandbox: read-only
-    max_depth: 1
-    purpose:
-      - supervisor
-      - workspace-gatekeeper
-      - convergence-manager
-      - work-packet-dispatcher
-      - experiment-designer
-      - boring-worker
-      - codex-auditor
-      - gate-report-builder
   claude:
     status: active
     config_dir: .claude
     agents_dir: .claude/agents
-    skills_dir: .claude/skills
-    default_permission_mode: plan
-    purpose:
-      - critical-surface-manager
-      - mapmaker-agent
-      - design-space-searcher
-      - invariant-scout
-      - auth-security-implementer
-      - database-implementer
-      - claude-independent-auditor
   antigravity:
-    status: provisional
+    status: reserved
     config_dir: .antigravity
-    agents_dir: .antigravity/agents
-    skills_dir: .antigravity/skills
-    allowed_initial_use:
-      - visual-review
-      - browser-evidence
-      - ui-exploration
-    prohibited_initial_use:
-      - authentication
-      - authorization
-      - database
-      - production
-      - deployment
-      - secrets
-      - final-audit
-      - adoption-authority
-
-roles:
-  bootstrap-supervisor:
-    primary: codex-main
-    write_capable: true
-    requires_worktree: false
-    adoption_authority: true
-  workspace-gatekeeper:
-    primary: codex
-    secondary: claude
-    write_capable: false
-    requires_worktree: false
-  convergence-manager:
-    primary: codex
-    secondary: claude
-    write_capable: false
-    requires_worktree: false
-  work-packet-dispatcher:
-    primary: codex
-    write_capable: false
-    requires_worktree: false
-  critical-surface-manager:
-    primary: claude
-    secondary: codex
-    write_capable: false
-    requires_worktree: false
-  mapmaker-agent:
-    primary: claude
-    secondary: antigravity
-    tertiary: codex
-    write_capable: false
-    requires_worktree: false
-  design-space-searcher:
-    primary: claude
-    secondary: codex
-    write_capable: false
-    requires_worktree: false
-  invariant-scout:
-    primary: claude
-    secondary: codex
-    write_capable: false
-    requires_worktree: false
-  experiment-designer:
-    primary: codex
-    secondary: claude
-    write_capable: false
-    requires_worktree: false
-  boring-worker:
-    primary: codex
-    secondary: claude
-    write_capable: true
-    requires_worktree: true
-  auth-security-implementer:
-    primary: claude
-    secondary: codex
-    write_capable: true
-    requires_worktree: true
-  database-implementer:
-    primary: claude
-    secondary: codex
-    write_capable: true
-    requires_worktree: true
-  production-readiness-planner:
-    primary: codex
-    secondary: claude
-    write_capable: false
-    requires_worktree: false
-  codex-auditor:
-    primary: codex
-    write_capable: false
-    requires_worktree: false
-    adoption_authority: false
-  claude-independent-auditor:
-    primary: claude
-    write_capable: false
-    requires_worktree: false
-    adoption_authority: false
-  visual-ux-worker:
-    primary: antigravity
-    secondary: claude
-    write_capable: true
-    requires_worktree: true
-    status: provisional
-  visual-auditor:
-    primary: antigravity
-    secondary: claude
-    write_capable: false
-    requires_worktree: false
-    status: provisional
-  local-tooling-pod:
-    primary: deterministic-scripts
-    write_capable: false
-    requires_worktree: false
-  gate-report-builder:
-    primary: deterministic-scripts
-    secondary: codex
-    write_capable: false
-    requires_worktree: false

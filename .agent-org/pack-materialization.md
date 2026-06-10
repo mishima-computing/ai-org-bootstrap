@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This policy resolves the difference between the GitHub source pack and the target repository where a human pastes `bootstrap/codex-bootstrap-v0.1.md`.
+This policy resolves the difference between the GitHub source pack and a target repository where a human pastes `bootstrap/codex-bootstrap.md`.
 
 The bootstrap pack must not be invented, regenerated, or partially guessed inside target repositories.
 
@@ -18,13 +18,13 @@ The pack files are already local. Validate the pack in place before using it as 
 
 Use when the current Git repository is the human target repository and the required pack files are already present locally.
 
-Validate the local pack files before routing roles.
+Validate the local pack files before routing agents.
 
 ### Mode C: target repo without vendored pack
 
 Use when the current Git repository is the human target repository and required pack files are missing.
 
-Do not generate missing role specs, skills, schemas, policies, or adapters.
+Do not generate missing role specs, schemas, policies, or adapters.
 
 ## Materialization Rule
 
@@ -41,19 +41,6 @@ Explicit materialization approval phrase:
 APPROVE BOOTSTRAP PACK MATERIALIZATION <run_id> <target_repo_root>
 ```
 
-## Allowed Materialization Strategies
-
-Allowed strategies:
-
-- git submodule
-- git subtree
-- vendor directory copy
-- GitHub raw file sync
-- source-pack repo execution with explicit target repo path
-- manual sync command handoff
-
-The chosen strategy must be recorded in `.agent-runs/<run_id>/run-manifest.json`.
-
 ## Stop Conditions
 
 Stop with `bootstrap_pack_not_materialized` when:
@@ -63,13 +50,3 @@ Stop with `bootstrap_pack_not_materialized` when:
 - required tooling is unavailable
 - the target repo is ambiguous
 - materialization would overwrite existing target content
-
-## Manual Handoff
-
-When stopping for manual sync, report:
-
-- target repository root
-- missing pack files
-- recommended materialization strategy
-- exact commands the human can run
-- confirmation that no role specs or skills were generated
