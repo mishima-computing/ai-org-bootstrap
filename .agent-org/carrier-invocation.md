@@ -186,7 +186,9 @@ The invocation templates require Bash because the write-capable template uses an
 
 ### Output Repair
 
-If extraction or schema validation fails because the carrier returned non-JSON, truncated JSON, or JSON wrapped in explanatory text:
+Before retrying a carrier response, run `scripts/extract-claude-result.py`. For string `result` values, the extractor first parses intact JSON, then automatically applies bounded closure repair for truncated JSON by appending only JSON closing characters. A successful repaired extraction records `extraction_mode` as `result_closure_repaired`.
+
+If extraction including automatic closure repair, largest-object salvage, and `structured_output` fallback still fails because the carrier returned non-JSON, truncated JSON, or JSON wrapped in explanatory text, or fails role-schema validation:
 
 1. Preserve the failing attempt artifacts.
 2. Retry the same carrier once with this extra instruction:
@@ -197,7 +199,7 @@ Retry with concise JSON only. Each string must be 400 characters or fewer. Each 
 
 3. If the retry fails, stop with `carrier_output_invalid`.
 
-`scripts/extract-claude-result.py` may salvage a single leading prose prefix by parsing from the first JSON object start. Salvaged output must still pass schema validation.
+`scripts/extract-claude-result.py` may salvage JSON wrapped in prose by parsing from each JSON object start and choosing the largest parseable object. Salvaged output must still pass schema validation.
 
 If the local Claude CLI does not support the invocation template, stop with `claude_invocation_contract_unsupported`.
 
