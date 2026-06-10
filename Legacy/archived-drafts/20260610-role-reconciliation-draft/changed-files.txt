@@ -1,0 +1,14 @@
+.agents/skills/convergence/SKILL.md
+.agents/skills/critical-surface/SKILL.md
+.agents/skills/work-packet/SKILL.md
+.claude/agents/critical-surface-manager.md
+.claude/skills/critical-surface/SKILL.md
+.codex/agents/convergence-manager.toml
+.codex/agents/critical-surface-manager.toml
+.codex/agents/work-packet-dispatcher.toml
+roles/convergence-manager.md
+roles/critical-surface-manager.md
+roles/work-packet-dispatcher.md
+schemas/convergence-decision.schema.json
+schemas/critical-surface-decision.schema.json
+schemas/work-packet.schema.json

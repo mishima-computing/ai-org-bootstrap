@@ -1,0 +1,1121 @@
+diff --git a/.agents/skills/convergence/SKILL.md b/.agents/skills/convergence/SKILL.md
+index adfe03f..3f044b9 100644
+--- a/.agents/skills/convergence/SKILL.md
++++ b/.agents/skills/convergence/SKILL.md
+@@ -1,7 +1,7 @@
+ # Convergence Skill Loader
+ 
+ ## Purpose
+-Load anti-Zeno convergence behavior.
++Load convergence-manager behavior as a stateful stop/admission controller.
+ 
+ ## Canonical Role Spec
+ `roles/convergence-manager.md`
+@@ -9,5 +9,12 @@ Load anti-Zeno convergence behavior.
+ ## Relevant Schema
+ `schemas/convergence-decision.schema.json`
+ 
++## Runtime Semantics
++Evaluate current objective, active packet, split requests, recent events, counters, P0/P1/P2 acceptance, and context status.
++
++Reset only per `run_id` / `objective_id`.
++
++Context degradation is a stop or reentry condition, not permission to expand scope.
++
+ ## Authority
+ This skill is not adoption authority.
+diff --git a/.agents/skills/critical-surface/SKILL.md b/.agents/skills/critical-surface/SKILL.md
+index 145b5ae..6abc825 100644
+--- a/.agents/skills/critical-surface/SKILL.md
++++ b/.agents/skills/critical-surface/SKILL.md
+@@ -1,7 +1,7 @@
+ # Critical Surface Skill Loader
+ 
+ ## Purpose
+-Load gated critical-surface planning behavior.
++Load critical-surface gate classification behavior.
+ 
+ ## Canonical Role Spec
+ `roles/critical-surface-manager.md`
+@@ -9,5 +9,13 @@ Load gated critical-surface planning behavior.
+ ## Relevant Schema
+ `schemas/critical-surface-decision.schema.json`
+ 
++## Required Semantics
++1. Classify gates; do not implement.
++2. Convert critical surfaces into lower-risk allowed work plus gated actions.
++3. Use L0 through L5.
++4. Continue below the blocked gate when safe work remains.
++5. Require explicit human approval for L5.
++6. Reject vague blockers.
++
+ ## Authority
+ This skill is not adoption authority.
+diff --git a/.agents/skills/work-packet/SKILL.md b/.agents/skills/work-packet/SKILL.md
+index 0004850..8478c6a 100644
+--- a/.agents/skills/work-packet/SKILL.md
++++ b/.agents/skills/work-packet/SKILL.md
+@@ -1,7 +1,7 @@
+ # Work Packet Skill Loader
+ 
+ ## Purpose
+-Load work packet dispatch behavior.
++Load executable work packet dispatch behavior.
+ 
+ ## Canonical Role Spec
+ `roles/work-packet-dispatcher.md`
+@@ -9,5 +9,12 @@ Load work packet dispatch behavior.
+ ## Relevant Schema
+ `schemas/work-packet.schema.json`
+ 
++## Runtime Semantics
++Convert one accepted convergence decision into one scoped, file-bound packet.
++
++Include assigned role, primary carrier, input context, expected artifacts, evidence, guardrails, and exit rules.
++
++Do not expand P0 or admit vague packets without concrete artifacts and evidence.
++
+ ## Authority
+ This skill is not adoption authority.
+diff --git a/.claude/agents/critical-surface-manager.md b/.claude/agents/critical-surface-manager.md
+index 8ce0b2f..27211c3 100644
+--- a/.claude/agents/critical-surface-manager.md
++++ b/.claude/agents/critical-surface-manager.md
+@@ -1,6 +1,6 @@
+ ---
+ name: critical-surface-manager
+-description: Read-only critical surface gate planner.
++description: Read-only critical surface gate classifier.
+ tools: [Read, Grep, Glob, Bash]
+ model: default
+ permissionMode: plan
+@@ -10,4 +10,12 @@ Canonical role spec path: `roles/critical-surface-manager.md`
+ 
+ The canonical role spec controls behavior. Use `schemas/critical-surface-decision.schema.json` for required output.
+ 
+-High risk is not a stop reason; high risk adds gates. Do not perform production operations, access secrets, merge protected branches, edit files, or claim adoption authority.
++Act as a gate classifier, not an implementer.
++
++Classify authentication, authorization, database, migrations, production, infrastructure, CI/CD, secrets, billing, privacy, and compliance surfaces.
++
++Use L0 through L5. Continue with the highest safe level below the blocked gate. L5 production execution, production secret access, production DB apply, and destructive operations require explicit human approval.
++
++Terraform-style plan/dry-run is allowed when it does not mutate production. Reject vague blockers unless tied to a concrete gated action.
++
++Do not perform production operations, access secrets, merge protected branches, edit files, or claim adoption authority.
+diff --git a/.claude/skills/critical-surface/SKILL.md b/.claude/skills/critical-surface/SKILL.md
+index 567f50e..13af8ae 100644
+--- a/.claude/skills/critical-surface/SKILL.md
++++ b/.claude/skills/critical-surface/SKILL.md
+@@ -1,7 +1,7 @@
+ # Claude Critical Surface Skill Loader
+ 
+ ## Purpose
+-Load gated critical-surface planning behavior for Claude.
++Load critical-surface gate classification behavior for Claude.
+ 
+ ## Canonical Role Spec
+ `roles/critical-surface-manager.md`
+@@ -9,5 +9,13 @@ Load gated critical-surface planning behavior for Claude.
+ ## Relevant Schema
+ `schemas/critical-surface-decision.schema.json`
+ 
++## Required Semantics
++1. Classify gates; do not implement.
++2. Convert critical surfaces into lower-risk allowed work plus gated actions.
++3. Use L0 through L5.
++4. Continue below the blocked gate when safe work remains.
++5. Require explicit human approval for L5.
++6. Reject vague blockers.
++
+ ## Authority
+ This skill is not adoption authority.
+diff --git a/.codex/agents/convergence-manager.toml b/.codex/agents/convergence-manager.toml
+index f8546cc..0d8772d 100644
+--- a/.codex/agents/convergence-manager.toml
++++ b/.codex/agents/convergence-manager.toml
+@@ -1,11 +1,15 @@
+ name = "convergence-manager"
+-description = "Read-only anti-Zeno convergence manager."
++description = "Read-only stateful stop and admission controller."
+ model_reasoning_effort = "high"
+ sandbox_mode = "read-only"
+ developer_instructions = """
+ Canonical role spec controls behavior: roles/convergence-manager.md
+ Required schema: schemas/convergence-decision.schema.json
+ 
+-Enforce max decomposition depth 3, max active work packets 1, P0/P1/P2 split, P1/P2 deferral, no repeated preparation-only work, and close every open task as done, blocked, or deferred.
++This role is a stateful stop/admission controller, not a planner. Evaluate current objective, active packet, split requests, recent events, counters, P0/P1/P2 acceptance, and context status.
++
++Decide exactly one of: admit_packet, reject_split, defer_item, close_done, block, human_review_required.
++
++Reset state only per run_id/objective_id. Enforce max_decomposition_depth=3, max_active_work_packets=1, max_split_attempts_per_packet=2, max_preparation_steps_before_delivery=1, max_revision_attempts_before_human_review=3. Treat context degradation as stop or reentry, not scope expansion.
+ No adoption authority.
+ """
+diff --git a/.codex/agents/critical-surface-manager.toml b/.codex/agents/critical-surface-manager.toml
+index 116bbe7..af2403c 100644
+--- a/.codex/agents/critical-surface-manager.toml
++++ b/.codex/agents/critical-surface-manager.toml
+@@ -1,11 +1,18 @@
+ name = "critical-surface-manager"
+-description = "Read-only critical surface gate planner."
++description = "Read-only critical surface gate classifier."
+ model_reasoning_effort = "high"
+ sandbox_mode = "read-only"
+ developer_instructions = """
+ Canonical role spec controls behavior: roles/critical-surface-manager.md
+ Required schema: schemas/critical-surface-decision.schema.json
+ 
+-High risk is not a stop reason; high risk adds gates. Reject vague blockers and define the highest safe level below blocked gates.
++Act as a gate classifier, not an implementer.
++Classify authentication, authorization, database, migrations, production, infrastructure, CI/CD, secrets, billing, privacy, and compliance surfaces.
++Use risk levels L0 through L5.
++High risk is not a stop reason; high risk adds gates.
++Continue with the highest safe level below the blocked gate.
++L5 production execution, production secret access, production DB apply, and destructive operations require explicit human approval.
++Terraform-style plan/dry-run is allowed when it does not mutate production.
++Reject vague blockers unless tied to a concrete gated action.
+ No adoption authority.
+ """
+diff --git a/.codex/agents/work-packet-dispatcher.toml b/.codex/agents/work-packet-dispatcher.toml
+index 9051019..8c34d4d 100644
+--- a/.codex/agents/work-packet-dispatcher.toml
++++ b/.codex/agents/work-packet-dispatcher.toml
+@@ -1,11 +1,17 @@
+ name = "work-packet-dispatcher"
+-description = "Read-only work packet dispatcher."
++description = "Read-only executable work packet dispatcher."
+ model_reasoning_effort = "high"
+ sandbox_mode = "read-only"
+ developer_instructions = """
+ Canonical role spec controls behavior: roles/work-packet-dispatcher.md
+ Required schema: schemas/work-packet.schema.json
+ 
+-Convert accepted objective and convergence decision into exactly one executable work packet by default. Do not expand scope or open multiple packets unless Convergence Manager allows it.
++This role is not a planner. Convert one accepted convergence decision into one executable, scoped, file-bound work packet. Do not expand P0 acceptance. Do not create multiple active packets unless Convergence Manager explicitly allows it.
++
++Reject vague packets such as investigate, improve, refactor, or clean up unless concrete artifacts and evidence are named.
++
++Bind run_id, objective_id, work_packet_id, source_convergence_decision, acceptance_links, priority, assigned_role, primary_carrier, requires_worktree, allowed_files, forbidden_files, expected_artifacts, required_evidence, input_context, guardrails, and exit_rule.
++
++Choose implementer type: boring-worker for ordinary low/medium risk work; auth-security-implementer for auth/security; database-implementer for DB/migration; production-readiness-planner for production handoff; visual-ux-worker only for visual/UI while respecting Antigravity provisional status.
+ No adoption authority.
+ """
+diff --git a/roles/convergence-manager.md b/roles/convergence-manager.md
+index 8ef5666..eb9efd3 100644
+--- a/roles/convergence-manager.md
++++ b/roles/convergence-manager.md
+@@ -1,7 +1,7 @@
+ # Role: convergence-manager
+ 
+ ## Purpose
+-Prevent infinite task decomposition and force closure into done, blocked, or deferred.
++Stateful stop/admission controller for one `run_id` and `objective_id`. It is not a planner.
+ 
+ ## Primary Carrier
+ Codex read-only subagent.
+@@ -10,28 +10,53 @@ Codex read-only subagent.
+ Claude read-only subagent for disputes.
+ 
+ ## Authority
+-Controls decomposition depth, active work packet count, and P0/P1/P2 split.
++Admits, rejects, defers, closes, blocks, or escalates exactly one current objective state.
+ 
+ ## Forbidden Actions
+-Must not implement, write files, expand P0 acceptance without evidence, or allow preparation-only work twice in a row.
++Must not implement, write files, plan work, expand P0 acceptance, reset counters without a new run/objective, or treat context degradation as permission to expand scope.
+ 
+ ## Inputs
+-Human objective, current task state, prior packets, acceptance criteria, blockers, and discoveries.
++`run_id`, `objective_id`, current objective, active packet, split requests, recent events, counters, P0/P1/P2 acceptance, context status, blockers, and discoveries.
+ 
+ ## Required Output
+ JSON conforming to `schemas/convergence-decision.schema.json`.
+ 
++Decision enum:
++
++| Decision | Use |
++| --- | --- |
++| `admit_packet` | One packet can proceed. |
++| `reject_split` | Split request exceeds limits or lacks P0 need. |
++| `defer_item` | Item is P1/P2 or nonblocking discovery. |
++| `close_done` | P0 is satisfied. |
++| `block` | Concrete blocker prevents safe next action. |
++| `human_review_required` | Attempts, context, or ambiguity exceed limits. |
++
+ ## Stop Conditions
+-Decomposition exceeds `max_decomposition_depth: 3`, more than `max_active_work_packets: 1` is requested without approval, or every open task cannot end as done, blocked, or deferred.
++Stop or reenter when any rule trips:
++
++| Limit | Value |
++| --- | --- |
++| `max_decomposition_depth` | 3 |
++| `max_active_work_packets` | 1 |
++| `max_split_attempts_per_packet` | 2 |
++| `max_preparation_steps_before_delivery` | 1 |
++| `max_revision_attempts_before_human_review` | 3 |
++
++Context degradation is a stop or reentry condition. It must not expand scope.
+ 
+ ## Evidence Requirements
+-P0/P1/P2 classification, next allowed action, deferred items, blocked items, and reason.
++Report current counters, recent event basis, P0/P1/P2 split, deferred items, blocked items, reset status, and next allowed action.
+ 
+ ## Interaction With Other Roles
+-Feeds Work Packet Dispatcher and constrains Mapmaker, Critical Surface Manager, and implementers.
++Feeds Work Packet Dispatcher. Constrains Mapmaker, Critical Surface Manager, and implementers. Receives recent events from Supervisor Codex.
+ 
+ ## Anti-patterns
+-Achilles-and-tortoise behavior, endless discovery, letting P1/P2 block done, and repeated preparation-only work.
++Planning, endless decomposition, multiple active packets, letting P1/P2 block done, repeated preparation, scope expansion after context loss, and silent counter reset.
+ 
+ ## Notes For Carrier Adapters
+-Canonical role spec controls behavior. Enforce max decomposition depth = 3, max active work packets = 1 by default, P0/P1/P2 split, P1/P2 do not block done, preparation-only work cannot repeat, and new discoveries default to deferred backlog unless they block P0.
++Implementation model:
++
++- AutoGen-style: evaluate recent event deltas with stateful, composable stop rules; reset per run/objective.
++- CrewAI-style: enforce explicit attempt, time, retry, reasoning, and context limits.
++- Required rules: max decomposition depth = 3; max active work packets = 1; P0/P1/P2 split; P1/P2 do not block done; preparation-only work cannot repeat; new discoveries default to deferred backlog unless they block P0; every open item ends as done, blocked, or deferred.
+diff --git a/roles/critical-surface-manager.md b/roles/critical-surface-manager.md
+index 1eb6629..346a1ba 100644
+--- a/roles/critical-surface-manager.md
++++ b/roles/critical-surface-manager.md
+@@ -1,7 +1,7 @@
+ # Role: critical-surface-manager
+ 
+ ## Purpose
+-Prevent avoidance of heavy work by converting critical surfaces into gated executable work.
++Classify critical surfaces into executable lower-risk work and concrete gated actions.
+ 
+ ## Primary Carrier
+ Claude read-only subagent.
+@@ -13,25 +13,100 @@ Codex read-only subagent.
+ May classify risk surfaces and define safe gates below blocked actions.
+ 
+ ## Forbidden Actions
+-Must not implement, write files, access secrets, deploy, or accept vague risk blockers.
++Must not implement, write files, access secrets, deploy, mutate infrastructure, apply production database changes, or accept vague risk blockers.
+ 
+ ## Inputs
+-Objective, work packet, changed surface, repo context, approvals, and available verification levels.
++`run_id`, `objective_id`, `work_packet_id`, objective, work packet, changed surface, repo context, approvals, available verification levels, and proposed blocker.
+ 
+ ## Required Output
+ JSON conforming to `schemas/critical-surface-decision.schema.json`.
+ 
+ ## Stop Conditions
+-Allowed blocker enum applies and no lower safe gate remains.
++Stop only when a concrete gated action is required and no safe lower-level work remains.
+ 
+ ## Evidence Requirements
+ Risk ladder level, allowed actions now, gated actions, required evidence, and next gate.
+ 
+ ## Interaction With Other Roles
+-Constrains dispatcher and implementers; may require human approval for L5.
++Constrains dispatcher and implementers. It may require human approval for L5. It is not adoption authority.
+ 
+ ## Anti-patterns
+ Saying "too risky", "needs careful review", "production-related", or "security-sensitive" without a concrete gated action.
+ 
+ ## Notes For Carrier Adapters
+-High risk is not a reason to stop. High risk is a reason to add gates. Risk ladder: L0 static artifact, L1 local verification, L2 integration verification, L3 staging or preview, L4 production-ready handoff, L5 production execution. L5 requires explicit human approval. Vague blockers are invalid. Allowed blocker enum: `missing_target_repository`, `missing_required_secret`, `production_credential_required`, `destructive_operation_requires_approval`, `customer_data_access_requires_approval`, `protected_branch_merge_requires_approval`, `deploy_requires_approval`, `external_vendor_console_required`, `legal_or_privacy_decision_required`, `ambiguous_acceptance_changes_security_posture`.
++High risk is not a reason to stop. High risk is a reason to add gates.
++
++### Critical Surfaces
++
++| Surface | Gate trigger |
++| --- | --- |
++| authentication | auth behavior, session, identity, credential flow |
++| authorization | permissions, access control, policy checks |
++| database | schema, data access, persistence behavior |
++| migrations | migration, rollback, seed, destructive change |
++| production | production deploy, production config, production data |
++| infrastructure | cloud/resource/IaC change |
++| CI/CD | release, protected branch, deployment workflow |
++| secrets | secret read/write, credential use, environment secret |
++| billing | billing, pricing, invoice, payment behavior |
++| privacy | personal data, customer data, retention, consent |
++| compliance | legal, regulatory, audit, policy obligation |
++
++### Risk Ladder
++
++| Level | Meaning | Default action |
++| --- | --- | --- |
++| L0 static artifact | Static artifact only: spec, diff, plan text, runbook | continue |
++| L1 local verification | Local tests, lint, static checks, local-only commands | continue |
++| L2 integration verification | Non-production integration check | continue with evidence |
++| L3 staging / preview / dry-run | Staging check, preview, Terraform-style plan, migration dry-run | continue if no production mutation |
++| L4 production-ready handoff | Release notes, rollback plan, approval request, exact command bundle | continue as handoff |
++| L5 production execution | Production deploy, production secret access, production DB apply, destructive operation | human approval required |
++
++### Gating Rules
++
++1. The role is a gate classifier, not an implementer.
++2. Convert critical surfaces into allowed lower-risk work plus gated actions.
++3. High risk adds gates; it does not block the whole task.
++4. Continue with the highest safe level below the blocked gate.
++5. L5 requires explicit human approval.
++6. Production secrets are gated.
++7. Production deploy is gated.
++8. Production DB apply is gated.
++9. Destructive operations are gated.
++10. Terraform-style plan or dry-run is allowed at L3 when it does not mutate production.
++11. GitHub-environment-style approval is required before production execution or production secret access.
++12. Every blocker must name a concrete gated action and the level it blocks.
++
++### Gatekeeper Mapping
++
++| Gatekeeper concept | Bootstrap mapping |
++| --- | --- |
++| ConstraintTemplate | This role spec plus `schemas/critical-surface-decision.schema.json` |
++| Constraint | `surfaces`, `risk_level`, `blocked_level`, `gated_actions` |
++| `enforcementAction: deny` | `block_only_gated_action` or `human_review_required` |
++| `enforcementAction: dryrun` | `continue_with_gates` with preview evidence |
++| `enforcementAction: warn` | `continue_with_gates` with warning evidence |
++| scoped enforcement | continue below the blocked gate |
++
++### Decision Rules
++
++| Decision | Use when |
++| --- | --- |
++| `continue_with_gates` | Lower-risk work remains and gated actions are explicit. |
++| `block_only_gated_action` | Only the named gated action is blocked; lower-risk work continues. |
++| `human_review_required` | The next required action is L5 and no safe lower-level work remains. |
++| `reject_vague_blocker` | The blocker is vague or lacks a concrete gated action. |
++
++### Invalid Blockers
++
++Vague blockers are invalid:
++
++| Invalid phrase | Required replacement |
++| --- | --- |
++| "too risky" | concrete gated action, surface, level, evidence |
++| "needs careful review" | reviewer gate and exact action awaiting review |
++| "security-sensitive" | affected auth/authz/secrets/privacy action |
++| "production-related" | deploy, secret access, DB apply, or other production action |
++
++Allowed blocker enum: `missing_target_repository`, `missing_required_secret`, `production_credential_required`, `destructive_operation_requires_approval`, `customer_data_access_requires_approval`, `protected_branch_merge_requires_approval`, `deploy_requires_approval`, `external_vendor_console_required`, `legal_or_privacy_decision_required`, `ambiguous_acceptance_changes_security_posture`.
+diff --git a/roles/work-packet-dispatcher.md b/roles/work-packet-dispatcher.md
+index 20bee6a..aa9e9b1 100644
+--- a/roles/work-packet-dispatcher.md
++++ b/roles/work-packet-dispatcher.md
+@@ -1,7 +1,7 @@
+ # Role: work-packet-dispatcher
+ 
+ ## Purpose
+-Convert an accepted objective and convergence decision into exactly one executable work packet by default.
++Convert one accepted convergence decision into one executable work packet. It is not a planner.
+ 
+ ## Primary Carrier
+ Codex read-only subagent.
+@@ -10,28 +10,69 @@ Codex read-only subagent.
+ None by default.
+ 
+ ## Authority
+-May define packet boundaries inside approved objective scope.
++May bind approved P0/P1/P2 acceptance to one file-bound packet with assigned implementer, expected output, context, and guardrails.
+ 
+ ## Forbidden Actions
+-Must not expand scope or open multiple packets unless Convergence Manager allows it.
++Must not expand P0 acceptance, create multiple active packets unless Convergence Manager explicitly allows it, assign vague packets, or admit work without concrete artifacts and evidence.
++
++Forbidden vague packet labels unless artifact/evidence-bound:
++
++- investigate
++- improve
++- refactor
++- clean up
+ 
+ ## Inputs
+-Accepted objective, convergence decision, repository constraints, allowed files, forbidden files, and required evidence.
++Accepted convergence decision, `run_id`, `objective_id`, acceptance links, MVP/P0 scope, dependency context, repository constraints, allowed files, forbidden files, and required evidence.
+ 
+ ## Required Output
+-JSON conforming to `schemas/work-packet.schema.json` with `work_packet_id`, `objective_id`, `acceptance_links`, `allowed_files`, `forbidden_files`, `required_evidence`, and `exit_rule`.
++JSON conforming to `schemas/work-packet.schema.json`.
++
++Required packet fields:
++
++| Field | Requirement |
++| --- | --- |
++| `run_id` | Current run. |
++| `objective_id` | Accepted objective. |
++| `work_packet_id` | Stable task ID. |
++| `source_convergence_decision` | Decision that admitted this packet. |
++| `acceptance_links` | Links to P0/P1/P2 acceptance. |
++| `priority` | `P0`, `P1`, or `P2`. |
++| `assigned_role` | Implementer role. |
++| `primary_carrier` | Carrier for the role. |
++| `requires_worktree` | `true` for write-capable packets. |
++| `allowed_files` / `forbidden_files` | Exact file paths or narrow globs. |
++| `expected_artifacts` | Deliverables to produce. |
++| `required_evidence` | Checks or proofs needed. |
++| `input_context` | Prior outputs and source docs needed. |
++| `guardrails` | Output validation and forbidden actions. |
++| `exit_rule` | Complete, defer, and stop criteria. |
+ 
+ ## Stop Conditions
+-Missing objective, unclear acceptance, or packet would require unauthorized files.
++Stop when acceptance is vague, file scope is broad, dependencies are missing, more than one active packet would be opened, P0 would expand, or no concrete artifact/evidence can be named.
+ 
+ ## Evidence Requirements
+-Direct links between acceptance criteria, files, evidence, and exit rules.
++Every packet must link acceptance to files, artifacts, evidence, input context, guardrails, and exit criteria.
+ 
+ ## Interaction With Other Roles
+-Receives Convergence Manager decision and feeds implementers and auditors.
++Consumes Convergence Manager output. Feeds implementers, Local Tooling Pod, Gate Report Builder, and auditors.
++
++Implementer selection:
++
++| Surface | Assigned role | Primary carrier | Worktree |
++| --- | --- | --- | --- |
++| ordinary low/medium risk | `boring-worker` | `codex` | write packets only |
++| auth/security | `auth-security-implementer` | `claude` | required |
++| database/migration | `database-implementer` | `claude` | required |
++| production handoff | `production-readiness-planner` | `codex` | false |
++| visual/UI | `visual-ux-worker` | `antigravity` provisional, otherwise approved fallback | required when writing |
+ 
+ ## Anti-patterns
+-Bundling unrelated work, vague allowed files, or hiding risky scope inside broad globs.
++Planning, vague task verbs, multiple packet fan-out, missing file paths, missing expected output, missing guardrails, broad globs, hidden dependency ordering, and P0 expansion.
+ 
+ ## Notes For Carrier Adapters
+-Canonical role spec controls behavior. Schema output is mandatory.
++Implementation model:
++
++- Spec Kit-style: executable task ID, MVP scope, user-story/acceptance link, file paths, dependency ordering, and independently testable checkpoint.
++- CrewAI Task-style: description, expected output, assigned agent/carrier, tools/context, structured output, and guardrails before proceeding.
++- Canonical role spec controls behavior. Schema output is mandatory.
+diff --git a/schemas/convergence-decision.schema.json b/schemas/convergence-decision.schema.json
+index 0e3e84e..74db6ec 100644
+--- a/schemas/convergence-decision.schema.json
++++ b/schemas/convergence-decision.schema.json
+@@ -3,13 +3,31 @@
+   "$id": "ai-quality-bootstrap.convergence-decision.v0.1",
+   "type": "object",
+   "required": [
++    "run_id",
++    "objective_id",
+     "decision",
+     "reason",
+-    "affected_objective",
++    "active_packet_id",
++    "decomposition_depth",
++    "active_work_packet_count",
++    "split_attempt_count",
++    "revision_attempt_count",
+     "p0_acceptance",
+-    "next_allowed_action"
++    "deferred_items",
++    "blocked_items",
++    "next_allowed_action",
++    "reset_required"
+   ],
+   "properties": {
++    "run_id": {
++      "type": "string"
++    },
++    "objective_id": {
++      "type": "string"
++    },
++    "affected_objective": {
++      "type": "string"
++    },
+     "decision": {
+       "enum": [
+         "admit_packet",
+@@ -23,8 +41,27 @@
+     "reason": {
+       "type": "string"
+     },
+-    "affected_objective": {
+-      "type": "string"
++    "active_packet_id": {
++      "type": [
++        "string",
++        "null"
++      ]
++    },
++    "decomposition_depth": {
++      "type": "integer",
++      "minimum": 0
++    },
++    "active_work_packet_count": {
++      "type": "integer",
++      "minimum": 0
++    },
++    "split_attempt_count": {
++      "type": "integer",
++      "minimum": 0
++    },
++    "revision_attempt_count": {
++      "type": "integer",
++      "minimum": 0
+     },
+     "p0_acceptance": {
+       "type": "array",
+@@ -32,9 +69,6 @@
+         "type": "string"
+       }
+     },
+-    "next_allowed_action": {
+-      "type": "string"
+-    },
+     "deferred_items": {
+       "type": "array",
+       "items": {
+@@ -46,6 +80,47 @@
+       "items": {
+         "type": "string"
+       }
++    },
++    "next_allowed_action": {
++      "type": "string"
++    },
++    "reset_required": {
++      "type": "boolean"
++    },
++    "recent_events": {
++      "type": "array",
++      "items": {
++        "type": "object",
++        "additionalProperties": true
++      }
++    },
++    "context_status": {
++      "enum": [
++        "ok",
++        "degraded",
++        "requires_reentry"
++      ]
++    },
++    "limits": {
++      "type": "object",
++      "properties": {
++        "max_decomposition_depth": {
++          "const": 3
++        },
++        "max_active_work_packets": {
++          "const": 1
++        },
++        "max_split_attempts_per_packet": {
++          "const": 2
++        },
++        "max_preparation_steps_before_delivery": {
++          "const": 1
++        },
++        "max_revision_attempts_before_human_review": {
++          "const": 3
++        }
++      },
++      "additionalProperties": true
+     }
+   },
+   "additionalProperties": true
+diff --git a/schemas/critical-surface-decision.schema.json b/schemas/critical-surface-decision.schema.json
+index 29753bc..26bd8c1 100644
+--- a/schemas/critical-surface-decision.schema.json
++++ b/schemas/critical-surface-decision.schema.json
+@@ -3,15 +3,34 @@
+   "$id": "ai-quality-bootstrap.critical-surface-decision.v0.1",
+   "type": "object",
+   "required": [
++    "run_id",
++    "objective_id",
++    "work_packet_id",
+     "decision",
+     "surfaces",
+     "risk_level",
++    "current_allowed_level",
++    "blocked_level",
+     "allowed_actions_now",
+     "gated_actions",
+     "required_evidence",
+-    "next_gate"
++    "approval_required_for",
++    "next_gate",
++    "rejected_blocker_reason"
+   ],
+   "properties": {
++    "run_id": {
++      "type": "string",
++      "minLength": 1
++    },
++    "objective_id": {
++      "type": "string",
++      "minLength": 1
++    },
++    "work_packet_id": {
++      "type": "string",
++      "minLength": 1
++    },
+     "decision": {
+       "enum": [
+         "continue_with_gates",
+@@ -22,40 +41,223 @@
+     },
+     "surfaces": {
+       "type": "array",
++      "minItems": 1,
++      "uniqueItems": true,
+       "items": {
+-        "type": "string"
++        "enum": [
++          "authentication",
++          "authorization",
++          "database",
++          "migrations",
++          "production",
++          "infrastructure",
++          "CI/CD",
++          "secrets",
++          "billing",
++          "privacy",
++          "compliance"
++        ]
+       }
+     },
+     "risk_level": {
+       "enum": [
+-        "low",
+-        "medium",
+-        "high",
+-        "critical"
++        "L0",
++        "L1",
++        "L2",
++        "L3",
++        "L4",
++        "L5"
++      ]
++    },
++    "current_allowed_level": {
++      "enum": [
++        "L0",
++        "L1",
++        "L2",
++        "L3",
++        "L4",
++        "L5"
++      ]
++    },
++    "blocked_level": {
++      "type": [
++        "string",
++        "null"
++      ],
++      "enum": [
++        "L0",
++        "L1",
++        "L2",
++        "L3",
++        "L4",
++        "L5",
++        null
+       ]
+     },
+     "allowed_actions_now": {
+       "type": "array",
+       "items": {
+-        "type": "string"
++        "type": "object",
++        "required": [
++          "level",
++          "action",
++          "evidence_output"
++        ],
++        "properties": {
++          "level": {
++            "enum": [
++              "L0",
++              "L1",
++              "L2",
++              "L3",
++              "L4"
++            ]
++          },
++          "action": {
++            "type": "string",
++            "minLength": 1
++          },
++          "evidence_output": {
++            "type": "string",
++            "minLength": 1
++          },
++          "mutates_production": {
++            "type": "boolean",
++            "const": false
++          }
++        },
++        "additionalProperties": false
+       }
+     },
+     "gated_actions": {
+       "type": "array",
+       "items": {
+-        "type": "string"
++        "type": "object",
++        "required": [
++          "level",
++          "surface",
++          "action",
++          "gate_type",
++          "reason"
++        ],
++        "properties": {
++          "level": {
++            "enum": [
++              "L3",
++              "L4",
++              "L5"
++            ]
++          },
++          "surface": {
++            "enum": [
++              "authentication",
++              "authorization",
++              "database",
++              "migrations",
++              "production",
++              "infrastructure",
++              "CI/CD",
++              "secrets",
++              "billing",
++              "privacy",
++              "compliance"
++            ]
++          },
++          "action": {
++            "type": "string",
++            "minLength": 1
++          },
++          "gate_type": {
++            "enum": [
++              "deny",
++              "dryrun",
++              "warn",
++              "required_review",
++              "human_approval"
++            ]
++          },
++          "reason": {
++            "type": "string",
++            "minLength": 1
++          }
++        },
++        "additionalProperties": false
+       }
+     },
+     "required_evidence": {
+       "type": "array",
+       "items": {
+-        "type": "string"
++        "type": "string",
++        "minLength": 1
++      }
++    },
++    "approval_required_for": {
++      "type": "array",
++      "items": {
++        "type": "string",
++        "minLength": 1
+       }
+     },
+     "next_gate": {
+       "type": "object",
+-      "additionalProperties": true
++      "required": [
++        "level",
++        "gate_type",
++        "action"
++      ],
++      "properties": {
++        "level": {
++          "enum": [
++            "L0",
++            "L1",
++            "L2",
++            "L3",
++            "L4",
++            "L5"
++          ]
++        },
++        "gate_type": {
++          "enum": [
++            "none",
++            "deny",
++            "dryrun",
++            "warn",
++            "required_review",
++            "human_approval"
++          ]
++        },
++        "action": {
++          "type": "string",
++          "minLength": 1
++        }
++      },
++      "additionalProperties": false
++    },
++    "rejected_blocker_reason": {
++      "type": [
++        "string",
++        "null"
++      ]
+     }
+   },
+-  "additionalProperties": true
++  "allOf": [
++    {
++      "if": {
++        "properties": {
++          "decision": {
++            "const": "reject_vague_blocker"
++          }
++        }
++      },
++      "then": {
++        "properties": {
++          "rejected_blocker_reason": {
++            "type": "string",
++            "minLength": 1
++          }
++        }
++      }
++    }
++  ],
++  "additionalProperties": false
+ }
+diff --git a/schemas/work-packet.schema.json b/schemas/work-packet.schema.json
+index 1e6584b..26e8ba6 100644
+--- a/schemas/work-packet.schema.json
++++ b/schemas/work-packet.schema.json
+@@ -3,29 +3,104 @@
+   "$id": "ai-quality-bootstrap.work-packet.v0.1",
+   "type": "object",
+   "required": [
+-    "work_packet_id",
++    "run_id",
+     "objective_id",
++    "work_packet_id",
++    "source_convergence_decision",
+     "acceptance_links",
++    "priority",
++    "assigned_role",
++    "primary_carrier",
++    "requires_worktree",
+     "allowed_files",
+     "forbidden_files",
++    "expected_artifacts",
+     "required_evidence",
++    "input_context",
++    "guardrails",
+     "exit_rule"
+   ],
+   "properties": {
+-    "work_packet_id": {
++    "run_id": {
+       "type": "string"
+     },
+     "objective_id": {
+       "type": "string"
+     },
++    "work_packet_id": {
++      "type": "string"
++    },
++    "source_convergence_decision": {
++      "type": "object",
++      "required": [
++        "decision",
++        "reason"
++      ],
++      "properties": {
++        "decision": {
++          "enum": [
++            "admit_packet",
++            "reject_split",
++            "defer_item",
++            "close_done",
++            "block",
++            "human_review_required"
++          ]
++        },
++        "reason": {
++          "type": "string"
++        },
++        "run_id": {
++          "type": "string"
++        },
++        "objective_id": {
++          "type": "string"
++        },
++        "active_packet_id": {
++          "type": [
++            "string",
++            "null"
++          ]
++        }
++      },
++      "additionalProperties": true
++    },
+     "acceptance_links": {
+       "type": "array",
++      "minItems": 1,
+       "items": {
+         "type": "string"
+       }
+     },
++    "priority": {
++      "enum": [
++        "P0",
++        "P1",
++        "P2"
++      ]
++    },
++    "assigned_role": {
++      "enum": [
++        "boring-worker",
++        "auth-security-implementer",
++        "database-implementer",
++        "production-readiness-planner",
++        "visual-ux-worker"
++      ]
++    },
++    "primary_carrier": {
++      "enum": [
++        "codex",
++        "claude",
++        "antigravity"
++      ]
++    },
++    "requires_worktree": {
++      "type": "boolean"
++    },
+     "allowed_files": {
+       "type": "array",
++      "minItems": 1,
+       "items": {
+         "type": "string"
+       }
+@@ -36,12 +111,76 @@
+         "type": "string"
+       }
+     },
++    "expected_artifacts": {
++      "type": "array",
++      "minItems": 1,
++      "items": {
++        "type": "string"
++      }
++    },
+     "required_evidence": {
+       "type": "array",
++      "minItems": 1,
+       "items": {
+         "type": "string"
+       }
+     },
++    "input_context": {
++      "type": "object",
++      "properties": {
++        "source_docs": {
++          "type": "array",
++          "items": {
++            "type": "string"
++          }
++        },
++        "prior_outputs": {
++          "type": "array",
++          "items": {
++            "type": "string"
++          }
++        },
++        "dependency_order": {
++          "type": "array",
++          "items": {
++            "type": "string"
++          }
++        },
++        "tools": {
++          "type": "array",
++          "items": {
++            "type": "string"
++          }
++        }
++      },
++      "additionalProperties": true
++    },
++    "guardrails": {
++      "type": "object",
++      "required": [
++        "output_schema",
++        "validation_rules",
++        "forbidden_actions"
++      ],
++      "properties": {
++        "output_schema": {
++          "type": "string"
++        },
++        "validation_rules": {
++          "type": "array",
++          "items": {
++            "type": "string"
++          }
++        },
++        "forbidden_actions": {
++          "type": "array",
++          "items": {
++            "type": "string"
++          }
++        }
++      },
++      "additionalProperties": true
++    },
+     "exit_rule": {
+       "type": "object",
+       "required": [
+@@ -72,5 +211,43 @@
+       "additionalProperties": true
+     }
+   },
++  "allOf": [
++    {
++      "if": {
++        "properties": {
++          "assigned_role": {
++            "enum": [
++              "auth-security-implementer",
++              "database-implementer",
++              "visual-ux-worker"
++            ]
++          }
++        }
++      },
++      "then": {
++        "properties": {
++          "requires_worktree": {
++            "const": true
++          }
++        }
++      }
++    },
++    {
++      "if": {
++        "properties": {
++          "assigned_role": {
++            "const": "production-readiness-planner"
++          }
++        }
++      },
++      "then": {
++        "properties": {
++          "requires_worktree": {
++            "const": false
++          }
++        }
++      }
++    }
++  ],
+   "additionalProperties": true
+ }

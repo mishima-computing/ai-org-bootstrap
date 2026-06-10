@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.genius-packet.v1",
+  "type": "object",
+  "required": [
+    "role_id",
+    "objective",
+    "sources",
+    "core_mechanisms",
+    "what_to_copy",
+    "what_not_to_copy",
+    "fit_to_current_problem",
+    "risks",
+    "handoff_to_aufheben"
+  ],
+  "properties": {
+    "role_id": {
+      "const": "genius"
+    },
+    "objective": {
+      "type": "string"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "url_or_reference"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url_or_reference": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "core_mechanisms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "what_to_copy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "what_not_to_copy": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fit_to_current_problem": {
+      "type": "string"
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "handoff_to_aufheben": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

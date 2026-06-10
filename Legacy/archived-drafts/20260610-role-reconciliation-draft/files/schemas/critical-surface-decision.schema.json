@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.critical-surface-decision.v0.1",
+  "type": "object",
+  "required": [
+    "run_id",
+    "objective_id",
+    "work_packet_id",
+    "decision",
+    "surfaces",
+    "risk_level",
+    "current_allowed_level",
+    "blocked_level",
+    "allowed_actions_now",
+    "gated_actions",
+    "required_evidence",
+    "approval_required_for",
+    "next_gate",
+    "rejected_blocker_reason"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "objective_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work_packet_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision": {
+      "enum": [
+        "continue_with_gates",
+        "block_only_gated_action",
+        "human_review_required",
+        "reject_vague_blocker"
+      ]
+    },
+    "surfaces": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "authentication",
+          "authorization",
+          "database",
+          "migrations",
+          "production",
+          "infrastructure",
+          "CI/CD",
+          "secrets",
+          "billing",
+          "privacy",
+          "compliance"
+        ]
+      }
+    },
+    "risk_level": {
+      "enum": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5"
+      ]
+    },
+    "current_allowed_level": {
+      "enum": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5"
+      ]
+    },
+    "blocked_level": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "L0",
+        "L1",
+        "L2",
+        "L3",
+        "L4",
+        "L5",
+        null
+      ]
+    },
+    "allowed_actions_now": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "level",
+          "action",
+          "evidence_output"
+        ],
+        "properties": {
+          "level": {
+            "enum": [
+              "L0",
+              "L1",
+              "L2",
+              "L3",
+              "L4"
+            ]
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_output": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mutates_production": {
+            "type": "boolean",
+            "const": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "gated_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "level",
+          "surface",
+          "action",
+          "gate_type",
+          "reason"
+        ],
+        "properties": {
+          "level": {
+            "enum": [
+              "L3",
+              "L4",
+              "L5"
+            ]
+          },
+          "surface": {
+            "enum": [
+              "authentication",
+              "authorization",
+              "database",
+              "migrations",
+              "production",
+              "infrastructure",
+              "CI/CD",
+              "secrets",
+              "billing",
+              "privacy",
+              "compliance"
+            ]
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "gate_type": {
+            "enum": [
+              "deny",
+              "dryrun",
+              "warn",
+              "required_review",
+              "human_approval"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "approval_required_for": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "next_gate": {
+      "type": "object",
+      "required": [
+        "level",
+        "gate_type",
+        "action"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "L0",
+            "L1",
+            "L2",
+            "L3",
+            "L4",
+            "L5"
+          ]
+        },
+        "gate_type": {
+          "enum": [
+            "none",
+            "deny",
+            "dryrun",
+            "warn",
+            "required_review",
+            "human_approval"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "rejected_blocker_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "reject_vague_blocker"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "rejected_blocker_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

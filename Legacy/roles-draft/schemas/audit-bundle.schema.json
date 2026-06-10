@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.audit-bundle.v0.1",
+  "type": "object",
+  "required": [
+    "run_id",
+    "work_packet_id",
+    "candidate_id",
+    "candidate_base_sha",
+    "current_target_sha",
+    "changed_files",
+    "candidate_summary",
+    "deterministic_gate_report",
+    "known_risks",
+    "missing_fields"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "work_packet_id": {
+      "type": "string"
+    },
+    "candidate_id": {
+      "type": "string"
+    },
+    "candidate_base_sha": {
+      "type": "string"
+    },
+    "current_target_sha": {
+      "type": "string"
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "candidate_summary": {
+      "type": "string"
+    },
+    "deterministic_gate_report": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "known_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "missing_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

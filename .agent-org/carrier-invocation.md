@@ -1,0 +1,217 @@
+# Carrier Invocation
+
+## Purpose
+
+This policy defines carrier-specific invocation without turning carriers into agents.
+
+Canonical agent behavior lives in `roles/*.md`. Carrier adapters translate that behavior for Codex or Claude Code.
+
+## Codex Invocation
+
+Use `.codex/agents/*.toml` when available.
+
+Codex read-only agents must use read-only tool access.
+
+Codex write-capable agents must use workspace-write access only for the scope allowed by their role and input contract.
+
+Codex output should be captured under:
+
+```text
+.agent-runs/<run_id>/carriers/codex/<agent>/
+  input.md
+  result.json
+  stderr.log
+  carrier-status.json
+```
+
+Codex `exec` does not directly select project custom agents as a persona. The invocation input must therefore include the matching `.codex/agents/<agent>.toml` `developer_instructions`, canonical `roles/<agent>.md`, schema path, objective, allowed files, forbidden files, and expected output path.
+
+Read-only invocation template:
+
+```bash
+codex exec \
+  -C "<target_repo_root>" \
+  --sandbox read-only \
+  --output-schema "schemas/<schema>.schema.json" \
+  -o ".agent-runs/<run_id>/carriers/codex/<agent>/result.json" \
+  "$(cat .agent-runs/<run_id>/carriers/codex/<agent>/input.md)" \
+  2> ".agent-runs/<run_id>/carriers/codex/<agent>/stderr.log"
+```
+
+Write-capable invocation template:
+
+```bash
+codex exec \
+  -C "<target_repo_root>" \
+  --sandbox workspace-write \
+  --output-schema "schemas/<schema>.schema.json" \
+  -o ".agent-runs/<run_id>/carriers/codex/<agent>/result.json" \
+  "$(cat .agent-runs/<run_id>/carriers/codex/<agent>/input.md)" \
+  2> ".agent-runs/<run_id>/carriers/codex/<agent>/stderr.log"
+```
+
+Then validate:
+
+```bash
+python3 scripts/validate-bootstrap-pack.py \
+  --schema "schemas/<schema>.schema.json" \
+  --instance ".agent-runs/<run_id>/carriers/codex/<agent>/result.json"
+```
+
+## Claude Code Invocation
+
+Before invoking Claude Code, create:
+
+```text
+.agent-runs/<run_id>/carriers/claude/<agent>/
+  input.md
+  cli-output.json
+  result.json
+  stderr.log
+  carrier-status.json
+```
+
+`input.md` must include the objective, selected role spec path, adapter path, schema path, allowed files, forbidden files, expected output path, and this output rule:
+
+```text
+Return pure JSON conforming to the schema. Do not wrap it in Markdown, code fences, or explanatory text.
+```
+
+Required preflight:
+
+1. `command -v claude`
+2. verify `.claude/agents/<agent>.md` exists
+3. verify `roles/<agent>.md` exists
+4. verify the required output schema exists
+5. verify `scripts/extract-claude-result.py` exists
+
+Claude carrier requires network access and working Claude authentication. If the CLI is missing, API/auth is unavailable, network access is blocked, or the non-interactive run cannot obtain required approval, write `carrier-status.json` with `status: carrier_unavailable`, record a concrete reason such as `claude_cli_unavailable`, `claude_api_unreachable`, `claude_auth_unavailable`, or `claude_approval_unavailable`, and use an allowed fallback or stop. Do not guess another Claude invocation.
+
+Codex may run Claude either:
+
+1. inside a trusted project execution with network and non-interactive permissions already configured, or
+2. outside the Codex sandbox through a human or higher-level orchestrator that records the same artifact layout.
+
+### Read-only Claude Roles
+
+Read-only Claude roles are `aggressive-designer`, `genius`, and `aufheben-designer`.
+
+Invocation template:
+
+```bash
+schema_path="schemas/<schema>.schema.json"
+schema_json="$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$schema_path")"
+
+claude --print \
+  --agent "<agent>" \
+  --permission-mode plan \
+  --tools "Read,Grep,Glob" \
+  --allowedTools "Read,Grep,Glob" \
+  --json-schema "$schema_json" \
+  --output-format json \
+  < ".agent-runs/<run_id>/carriers/claude/<agent>/input.md" \
+  > ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
+  2> ".agent-runs/<run_id>/carriers/claude/<agent>/stderr.log"
+
+python3 scripts/extract-claude-result.py \
+  --cli-output ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
+  --out ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
+
+python3 scripts/validate-bootstrap-pack.py \
+  --schema "$schema_path" \
+  --instance ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
+```
+
+For `genius`, use `--tools "Read,Grep,Glob,WebSearch,WebFetch"` and `--allowedTools "Read,Grep,Glob,WebSearch,WebFetch"`.
+
+Read-only adapters must not include Bash, Edit, or Write tools.
+
+### Write-capable Claude Roles
+
+Write-capable Claude roles are `security-ci-action-writer` and secondary `implementer`.
+
+Invocation template:
+
+```bash
+schema_path="schemas/<schema>.schema.json"
+schema_json="$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$schema_path")"
+model_args=()
+[ "<adapter-model>" = "inherit" ] || model_args=(--model "<adapter-model>")
+
+claude --print \
+  --agent "<agent>" \
+  "${model_args[@]}" \
+  --permission-mode acceptEdits \
+  --tools "Read,Grep,Glob,Bash,Edit,Write" \
+  --allowedTools "Read,Grep,Glob,Bash,Edit,Write" \
+  --json-schema "$schema_json" \
+  --output-format json \
+  < ".agent-runs/<run_id>/carriers/claude/<agent>/input.md" \
+  > ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
+  2> ".agent-runs/<run_id>/carriers/claude/<agent>/stderr.log"
+
+python3 scripts/extract-claude-result.py \
+  --cli-output ".agent-runs/<run_id>/carriers/claude/<agent>/cli-output.json" \
+  --out ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
+
+python3 scripts/validate-bootstrap-pack.py \
+  --schema "$schema_path" \
+  --instance ".agent-runs/<run_id>/carriers/claude/<agent>/result.json"
+```
+
+Set `<adapter-model>` from the adapter frontmatter. This passes `--model fable` for `security-ci-action-writer` and omits the model flag for adapters with `model: inherit`.
+
+Write-capable Claude roles may write only the scope allowed by their role and input contract.
+
+### Genius Invocation
+
+`genius` requires external research. Its adapter must include web/search/fetch capability when available.
+
+If web/search/fetch tools are unavailable, `genius` must produce a schema-shaped output whose handoff states `external_research_unavailable`. It must not fabricate sources.
+
+### Output Capture
+
+Claude output is valid only after:
+
+1. `cli-output.json` exists
+2. `cli-output.json` parses as a Claude CLI result envelope
+3. `scripts/extract-claude-result.py` extracts the `result` field into `result.json`
+4. `result.json` parses as JSON
+5. `result.json` conforms to the role schema
+6. `carrier-status.json` records the CLI command, exit status, adapter path, role path, schema path, network/auth status, and fallback status
+
+`--json-schema` is an output constraint, not the validation source of truth. In tool-using runs, `structured_output` may be absent or null. Treat `result` parsing plus schema validation as the main path. `structured_output` is only a fallback when it is present and `result` cannot be parsed.
+
+The invocation templates require Bash because the write-capable template uses an array for optional model arguments.
+
+### Output Repair
+
+If extraction or schema validation fails because the carrier returned non-JSON, truncated JSON, or JSON wrapped in explanatory text:
+
+1. Preserve the failing attempt artifacts.
+2. Retry the same carrier once with this extra instruction:
+
+```text
+Retry with concise JSON only. Each string must be 400 characters or fewer. Each array must contain 12 items or fewer. Do not include Markdown, code fences, or explanatory text.
+```
+
+3. If the retry fails, stop with `carrier_output_invalid`.
+
+`scripts/extract-claude-result.py` may salvage a single leading prose prefix by parsing from the first JSON object start. Salvaged output must still pass schema validation.
+
+If the local Claude CLI does not support the invocation template, stop with `claude_invocation_contract_unsupported`.
+
+`.claude/settings.json` sets project default permission mode to `plan` as a safety baseline for human Claude sessions. Role invocation templates override permission mode explicitly.
+
+## Fallback Rule
+
+When a preferred carrier is unavailable:
+
+1. Record `carrier_unavailable`.
+2. Use the secondary carrier only if the runtime registry allows it.
+3. Preserve the same canonical role spec.
+4. Record the fallback in runtime notes.
+
+## Authority Rule
+
+Carrier output is candidate evidence or a structured result. It is not adoption.

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.critical-surface-decision.v0.1",
+  "type": "object",
+  "required": [
+    "decision",
+    "surfaces",
+    "risk_level",
+    "allowed_actions_now",
+    "gated_actions",
+    "required_evidence",
+    "next_gate"
+  ],
+  "properties": {
+    "decision": {
+      "enum": [
+        "continue_with_gates",
+        "block_only_gated_action",
+        "human_review_required",
+        "reject_vague_blocker"
+      ]
+    },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risk_level": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "allowed_actions_now": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gated_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_gate": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

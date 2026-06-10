@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.convergence-decision.v0.1",
+  "type": "object",
+  "required": [
+    "decision",
+    "reason",
+    "affected_objective",
+    "p0_acceptance",
+    "next_allowed_action"
+  ],
+  "properties": {
+    "decision": {
+      "enum": [
+        "admit_packet",
+        "reject_split",
+        "defer_item",
+        "close_done",
+        "block",
+        "human_review_required"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "affected_objective": {
+      "type": "string"
+    },
+    "p0_acceptance": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_allowed_action": {
+      "type": "string"
+    },
+    "deferred_items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blocked_items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

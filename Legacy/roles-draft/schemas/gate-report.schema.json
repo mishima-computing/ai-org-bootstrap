@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.gate-report.v0.1",
+  "type": "object",
+  "required": [
+    "status",
+    "run_id",
+    "candidate_id",
+    "current_target_sha",
+    "changed_files",
+    "checks"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "pass",
+        "fail",
+        "not_configured"
+      ]
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "candidate_id": {
+      "type": "string"
+    },
+    "current_target_sha": {
+      "type": "string"
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

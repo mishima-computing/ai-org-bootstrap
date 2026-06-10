@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.work-packet.v0.1",
+  "type": "object",
+  "required": [
+    "run_id",
+    "objective_id",
+    "work_packet_id",
+    "source_convergence_decision",
+    "acceptance_links",
+    "priority",
+    "assigned_role",
+    "primary_carrier",
+    "requires_worktree",
+    "allowed_files",
+    "forbidden_files",
+    "expected_artifacts",
+    "required_evidence",
+    "input_context",
+    "guardrails",
+    "exit_rule"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "objective_id": {
+      "type": "string"
+    },
+    "work_packet_id": {
+      "type": "string"
+    },
+    "source_convergence_decision": {
+      "type": "object",
+      "required": [
+        "decision",
+        "reason"
+      ],
+      "properties": {
+        "decision": {
+          "enum": [
+            "admit_packet",
+            "reject_split",
+            "defer_item",
+            "close_done",
+            "block",
+            "human_review_required"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "objective_id": {
+          "type": "string"
+        },
+        "active_packet_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "acceptance_links": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "priority": {
+      "enum": [
+        "P0",
+        "P1",
+        "P2"
+      ]
+    },
+    "assigned_role": {
+      "enum": [
+        "boring-worker",
+        "auth-security-implementer",
+        "database-implementer",
+        "production-readiness-planner",
+        "visual-ux-worker"
+      ]
+    },
+    "primary_carrier": {
+      "enum": [
+        "codex",
+        "claude",
+        "antigravity"
+      ]
+    },
+    "requires_worktree": {
+      "type": "boolean"
+    },
+    "allowed_files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expected_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "input_context": {
+      "type": "object",
+      "properties": {
+        "source_docs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prior_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dependency_order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "guardrails": {
+      "type": "object",
+      "required": [
+        "output_schema",
+        "validation_rules",
+        "forbidden_actions"
+      ],
+      "properties": {
+        "output_schema": {
+          "type": "string"
+        },
+        "validation_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "exit_rule": {
+      "type": "object",
+      "required": [
+        "complete_when",
+        "defer_when",
+        "stop_when"
+      ],
+      "properties": {
+        "complete_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defer_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stop_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "assigned_role": {
+            "enum": [
+              "auth-security-implementer",
+              "database-implementer",
+              "visual-ux-worker"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "requires_worktree": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "assigned_role": {
+            "const": "production-readiness-planner"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "requires_worktree": {
+            "const": false
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

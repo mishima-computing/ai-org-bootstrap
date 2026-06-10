@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.candidate-output.v0.1",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "work_packet_id",
+    "candidate_base_sha",
+    "implementer_role",
+    "changed_files",
+    "summary",
+    "checks_run",
+    "known_risks"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string"
+    },
+    "work_packet_id": {
+      "type": "string"
+    },
+    "candidate_base_sha": {
+      "type": "string"
+    },
+    "implementer_role": {
+      "type": "string"
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "summary": {
+      "type": "string"
+    },
+    "checks_run": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "known_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gated_not_done": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

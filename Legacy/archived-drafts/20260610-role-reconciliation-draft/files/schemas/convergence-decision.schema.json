@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.convergence-decision.v0.1",
+  "type": "object",
+  "required": [
+    "run_id",
+    "objective_id",
+    "decision",
+    "reason",
+    "active_packet_id",
+    "decomposition_depth",
+    "active_work_packet_count",
+    "split_attempt_count",
+    "revision_attempt_count",
+    "p0_acceptance",
+    "deferred_items",
+    "blocked_items",
+    "next_allowed_action",
+    "reset_required"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "objective_id": {
+      "type": "string"
+    },
+    "affected_objective": {
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "admit_packet",
+        "reject_split",
+        "defer_item",
+        "close_done",
+        "block",
+        "human_review_required"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "active_packet_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decomposition_depth": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "active_work_packet_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "split_attempt_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "revision_attempt_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "p0_acceptance": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "deferred_items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blocked_items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_allowed_action": {
+      "type": "string"
+    },
+    "reset_required": {
+      "type": "boolean"
+    },
+    "recent_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "context_status": {
+      "enum": [
+        "ok",
+        "degraded",
+        "requires_reentry"
+      ]
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "max_decomposition_depth": {
+          "const": 3
+        },
+        "max_active_work_packets": {
+          "const": 1
+        },
+        "max_split_attempts_per_packet": {
+          "const": 2
+        },
+        "max_preparation_steps_before_delivery": {
+          "const": 1
+        },
+        "max_revision_attempts_before_human_review": {
+          "const": 3
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-quality-bootstrap.work-packet.v0.1",
+  "type": "object",
+  "required": [
+    "work_packet_id",
+    "objective_id",
+    "acceptance_links",
+    "allowed_files",
+    "forbidden_files",
+    "required_evidence",
+    "exit_rule"
+  ],
+  "properties": {
+    "work_packet_id": {
+      "type": "string"
+    },
+    "objective_id": {
+      "type": "string"
+    },
+    "acceptance_links": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "forbidden_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exit_rule": {
+      "type": "object",
+      "required": [
+        "complete_when",
+        "defer_when",
+        "stop_when"
+      ],
+      "properties": {
+        "complete_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defer_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stop_when": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
