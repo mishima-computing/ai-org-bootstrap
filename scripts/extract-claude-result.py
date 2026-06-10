@@ -2,10 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import sys
 from pathlib import Path
 from typing import Any
+
+CLOSURE_REPAIR_SUFFIX_CHARS = '"}]'
+CLOSURE_REPAIR_MAX_SUFFIX_LENGTH = 6
 
 
 def fail(message: str) -> int:
@@ -23,8 +27,22 @@ def parse_json_object(value: str) -> tuple[dict[str, Any] | None, str | None]:
     return parsed, None
 
 
+def repair_truncated_json(value: str) -> tuple[dict[str, Any] | None, str | None]:
+    # 3^1 + ... + 3^6 = 1092 bounded parse attempts.
+    last_error: str | None = None
+    for length in range(1, CLOSURE_REPAIR_MAX_SUFFIX_LENGTH + 1):
+        for suffix_chars in itertools.product(CLOSURE_REPAIR_SUFFIX_CHARS, repeat=length):
+            parsed, error = parse_json_object(value + "".join(suffix_chars))
+            if parsed is not None:
+                return parsed, None
+            last_error = error
+    return None, last_error or "closure_repair_failed"
+
+
 def salvage_json_object(value: str) -> tuple[dict[str, Any] | None, str | None]:
     decoder = json.JSONDecoder()
+    largest: dict[str, Any] | None = None
+    largest_size = -1
     for index, char in enumerate(value):
         if char != "{":
             continue
@@ -33,15 +51,179 @@ def salvage_json_object(value: str) -> tuple[dict[str, Any] | None, str | None]:
         except json.JSONDecodeError:
             continue
         if isinstance(parsed, dict):
-            return parsed, None
+            size = len(json.dumps(parsed, ensure_ascii=False))
+            if size > largest_size:
+                largest = parsed
+                largest_size = size
+    if largest is not None:
+        return largest, None
     return None, "no_json_object_found"
 
 
-def main() -> int:
+def extract_result_string(value: str) -> tuple[dict[str, Any] | None, str, str | None]:
+    extracted, parse_error = parse_json_object(value)
+    if extracted is not None:
+        return extracted, "result", None
+
+    extracted, repair_error = repair_truncated_json(value)
+    if extracted is not None:
+        return extracted, "result_closure_repaired", None
+
+    extracted, salvage_error = salvage_json_object(value)
+    if extracted is not None:
+        return extracted, "result_salvaged", None
+
+    return (
+        None,
+        "result",
+        f"result_field_is_not_json: {parse_error}; repair_error: {repair_error}; salvage_error: {salvage_error}",
+    )
+
+
+def extract_envelope(envelope: object) -> tuple[dict[str, Any] | None, str, str | None]:
+    if not isinstance(envelope, dict):
+        return None, "result", "cli_output_must_be_object"
+
+    if envelope.get("type") != "result":
+        return None, "result", "cli_output_type_must_be_result"
+
+    if envelope.get("is_error") is True:
+        return None, "result", f"carrier_error: {envelope.get('result', 'unknown_error')}"
+
+    if "result" not in envelope:
+        return None, "result", "cli_output_missing_result"
+
+    result = envelope["result"]
+    if isinstance(result, str):
+        extracted, extraction_mode, error = extract_result_string(result)
+        if extracted is not None:
+            return extracted, extraction_mode, None
+
+        structured_output = envelope.get("structured_output")
+        if isinstance(structured_output, dict):
+            return structured_output, "structured_output_fallback", None
+        return None, extraction_mode, error
+
+    if isinstance(result, dict):
+        return result, "result", None
+
+    structured_output = envelope.get("structured_output")
+    if isinstance(structured_output, dict):
+        return structured_output, "structured_output_fallback", None
+    return None, "result", "result_field_must_be_json_object_or_json_string"
+
+
+def _assert_equal(actual: object, expected: object, message: str) -> None:
+    if actual != expected:
+        raise AssertionError(f"{message}: expected {expected!r}, got {actual!r}")
+
+
+def _assert(condition: bool, message: str) -> None:
+    if not condition:
+        raise AssertionError(message)
+
+
+def _self_test_missing_single_closing_brace() -> None:
+    extracted, extraction_mode, error = extract_envelope({
+        "type": "result",
+        "is_error": False,
+        "result": '{"outer":{"inner":1}',
+    })
+    _assert_equal(error, None, "missing single closing brace error")
+    _assert_equal(extraction_mode, "result_closure_repaired", "missing single closing brace mode")
+    _assert_equal(extracted, {"outer": {"inner": 1}}, "missing single closing brace extraction")
+
+
+def _self_test_missing_closing_quote_plus_brace() -> None:
+    extracted, extraction_mode, error = extract_envelope({
+        "type": "result",
+        "is_error": False,
+        "result": '{"message":"hello',
+    })
+    _assert_equal(error, None, "missing closing quote plus brace error")
+    _assert_equal(extraction_mode, "result_closure_repaired", "missing closing quote plus brace mode")
+    _assert_equal(extracted, {"message": "hello"}, "missing closing quote plus brace extraction")
+
+
+def _self_test_decoy_small_object_larger_real_object() -> None:
+    real = {"real": True, "items": [1, 2, 3], "nested": {"value": "kept"}}
+    result = 'prefix {"decoy":true} middle ' + json.dumps(real)
+    extracted, extraction_mode, error = extract_envelope({
+        "type": "result",
+        "is_error": False,
+        "result": result,
+    })
+    _assert_equal(error, None, "decoy object salvage error")
+    _assert_equal(extraction_mode, "result_salvaged", "decoy object salvage mode")
+    _assert_equal(extracted, real, "decoy object salvage extraction")
+
+
+def _self_test_irreparable_garbage_fails() -> None:
+    import contextlib
+    import io
+
+    extracted, _, error = extract_envelope({
+        "type": "result",
+        "is_error": False,
+        "result": "not json at all",
+    })
+    _assert_equal(extracted, None, "irreparable garbage extraction")
+    _assert(error is not None, "irreparable garbage error")
+
+    stderr = io.StringIO()
+    with contextlib.redirect_stderr(stderr):
+        exit_code = fail(error or "missing_error")
+    _assert_equal(exit_code, 1, "irreparable garbage exit code")
+    status = json.loads(stderr.getvalue())
+    _assert_equal(status.get("status"), "fail", "irreparable garbage stderr status")
+
+
+def _self_test_intact_json_unchanged() -> None:
+    expected = {"role_id": "implementer", "items": [1, 2], "nested": {"ok": True}}
+    extracted, extraction_mode, error = extract_envelope({
+        "type": "result",
+        "is_error": False,
+        "result": json.dumps(expected),
+    })
+    _assert_equal(error, None, "intact JSON error")
+    _assert_equal(extraction_mode, "result", "intact JSON mode")
+    _assert_equal(extracted, expected, "intact JSON extraction")
+
+
+def run_self_tests() -> int:
+    cases = [
+        ("missing_single_closing_brace", _self_test_missing_single_closing_brace),
+        ("missing_closing_quote_plus_brace", _self_test_missing_closing_quote_plus_brace),
+        ("decoy_small_object_larger_real_object", _self_test_decoy_small_object_larger_real_object),
+        ("irreparable_garbage_fails", _self_test_irreparable_garbage_fails),
+        ("intact_json_unchanged", _self_test_intact_json_unchanged),
+    ]
+    results = []
+    for name, test in cases:
+        try:
+            test()
+        except AssertionError as exc:
+            results.append({"name": name, "status": "fail", "error": str(exc)})
+        else:
+            results.append({"name": name, "status": "pass"})
+
+    errors = [item for item in results if item["status"] != "pass"]
+    print(json.dumps({"status": "pass" if not errors else "fail", "cases": results}, indent=2, ensure_ascii=False))
+    return 0 if not errors else 1
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Extract role JSON from Claude CLI JSON output.")
-    parser.add_argument("--cli-output", required=True, help="Claude --output-format json file.")
-    parser.add_argument("--out", required=True, help="Destination for extracted role JSON.")
-    args = parser.parse_args()
+    parser.add_argument("--cli-output", help="Claude --output-format json file.")
+    parser.add_argument("--out", help="Destination for extracted role JSON.")
+    parser.add_argument("--self-test", action="store_true", help="Run extractor self-tests.")
+    args = parser.parse_args(argv)
+
+    if args.self_test:
+        return run_self_tests()
+
+    if not args.cli_output or not args.out:
+        parser.error("--cli-output and --out are required unless --self-test is used")
 
     cli_output_path = Path(args.cli_output)
     out_path = Path(args.out)
@@ -51,40 +233,9 @@ def main() -> int:
     except Exception as exc:  # noqa: BLE001
         return fail(f"cli_output_parse_error: {exc}")
 
-    if not isinstance(envelope, dict):
-        return fail("cli_output_must_be_object")
-
-    if envelope.get("type") != "result":
-        return fail("cli_output_type_must_be_result")
-
-    if envelope.get("is_error") is True:
-        return fail(f"carrier_error: {envelope.get('result', 'unknown_error')}")
-
-    if "result" not in envelope:
-        return fail("cli_output_missing_result")
-
-    result = envelope["result"]
-    extraction_mode = "result"
-    if isinstance(result, str):
-        extracted, parse_error = parse_json_object(result)
-        if extracted is None:
-            extracted, salvage_error = salvage_json_object(result)
-            if extracted is not None:
-                extraction_mode = "result_salvaged"
-            elif isinstance(envelope.get("structured_output"), dict):
-                extracted = envelope["structured_output"]
-                extraction_mode = "structured_output_fallback"
-            else:
-                return fail(f"result_field_is_not_json: {parse_error}; salvage_error: {salvage_error}")
-    elif isinstance(result, dict):
-        extracted = result
-    else:
-        structured_output = envelope.get("structured_output")
-        if isinstance(structured_output, dict):
-            extracted = structured_output
-            extraction_mode = "structured_output_fallback"
-        else:
-            return fail("result_field_must_be_json_object_or_json_string")
+    extracted, extraction_mode, error = extract_envelope(envelope)
+    if extracted is None:
+        return fail(error or "extraction_failed")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(extracted, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
