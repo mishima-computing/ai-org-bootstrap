@@ -114,6 +114,7 @@ SCHEMA_SAMPLE_INSTANCES = {
     },
     "schemas/implementation-contract.schema.json": {
         "role_id": "aufheben-designer",
+        "contract_id": "contract-example",
         "objective": "example objective",
         "selected_direction": "example direction",
         "rejected_parts": [
@@ -520,6 +521,8 @@ def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
 
     carrier = text(ROOT / ".agent-org/carrier-invocation.md")
     for phrase in [
+        "codex exec",
+        "developer_instructions",
         "--agent \"<agent>\"",
         "cli-output.json",
         "result.json",
@@ -527,6 +530,9 @@ def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
         "claude_api_unreachable",
         "claude_auth_unavailable",
         "Claude carrier requires network access",
+        "structured_output",
+        "carrier_output_invalid",
+        "Retry with concise JSON only",
         "--allowedTools",
         "--json-schema",
     ]:
@@ -535,6 +541,14 @@ def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
     forbidden_prompt_flag = "--append-system" + "-prompt"
     if forbidden_prompt_flag in carrier:
         errors.append(f".agent-org/carrier-invocation.md must not invoke Claude adapters through {forbidden_prompt_flag}")
+
+    contract_schema = text(ROOT / "schemas/implementation-contract.schema.json")
+    if "contract_id" not in contract_schema:
+        errors.append("schemas/implementation-contract.schema.json must include contract_id")
+
+    implementer_role = text(ROOT / "roles/implementer.md")
+    if "contract_id" not in implementer_role or "implementation_contract_id" not in implementer_role:
+        errors.append("roles/implementer.md must map contract_id to implementation_contract_id")
 
     bootstrap = text(ROOT / "bootstrap/codex-bootstrap.md")
     for phrase in [

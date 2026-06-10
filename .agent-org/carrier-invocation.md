@@ -18,6 +18,44 @@ Codex output should be captured under:
 
 ```text
 .agent-runs/<run_id>/carriers/codex/<agent>/
+  input.md
+  result.json
+  stderr.log
+  carrier-status.json
+```
+
+Codex `exec` does not directly select project custom agents as a persona. The invocation input must therefore include the matching `.codex/agents/<agent>.toml` `developer_instructions`, canonical `roles/<agent>.md`, schema path, objective, allowed files, forbidden files, and expected output path.
+
+Read-only invocation template:
+
+```bash
+codex exec \
+  -C "<target_repo_root>" \
+  --sandbox read-only \
+  --output-schema "schemas/<schema>.schema.json" \
+  -o ".agent-runs/<run_id>/carriers/codex/<agent>/result.json" \
+  "$(cat .agent-runs/<run_id>/carriers/codex/<agent>/input.md)" \
+  2> ".agent-runs/<run_id>/carriers/codex/<agent>/stderr.log"
+```
+
+Write-capable invocation template:
+
+```bash
+codex exec \
+  -C "<target_repo_root>" \
+  --sandbox workspace-write \
+  --output-schema "schemas/<schema>.schema.json" \
+  -o ".agent-runs/<run_id>/carriers/codex/<agent>/result.json" \
+  "$(cat .agent-runs/<run_id>/carriers/codex/<agent>/input.md)" \
+  2> ".agent-runs/<run_id>/carriers/codex/<agent>/stderr.log"
+```
+
+Then validate:
+
+```bash
+python3 scripts/validate-bootstrap-pack.py \
+  --schema "schemas/<schema>.schema.json" \
+  --instance ".agent-runs/<run_id>/carriers/codex/<agent>/result.json"
 ```
 
 ## Claude Code Invocation
@@ -60,7 +98,7 @@ Read-only Claude roles are `aggressive-designer`, `genius`, and `aufheben-design
 
 Invocation template:
 
-```sh
+```bash
 schema_path="schemas/<schema>.schema.json"
 schema_json="$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$schema_path")"
 
@@ -94,7 +132,7 @@ Write-capable Claude roles are `security-ci-action-writer` and secondary `implem
 
 Invocation template:
 
-```sh
+```bash
 schema_path="schemas/<schema>.schema.json"
 schema_json="$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1]))))' "$schema_path")"
 model_args=()
@@ -141,6 +179,25 @@ Claude output is valid only after:
 4. `result.json` parses as JSON
 5. `result.json` conforms to the role schema
 6. `carrier-status.json` records the CLI command, exit status, adapter path, role path, schema path, network/auth status, and fallback status
+
+`--json-schema` is an output constraint, not the validation source of truth. In tool-using runs, `structured_output` may be absent or null. Treat `result` parsing plus schema validation as the main path. `structured_output` is only a fallback when it is present and `result` cannot be parsed.
+
+The invocation templates require Bash because the write-capable template uses an array for optional model arguments.
+
+### Output Repair
+
+If extraction or schema validation fails because the carrier returned non-JSON, truncated JSON, or JSON wrapped in explanatory text:
+
+1. Preserve the failing attempt artifacts.
+2. Retry the same carrier once with this extra instruction:
+
+```text
+Retry with concise JSON only. Each string must be 400 characters or fewer. Each array must contain 12 items or fewer. Do not include Markdown, code fences, or explanatory text.
+```
+
+3. If the retry fails, stop with `carrier_output_invalid`.
+
+`scripts/extract-claude-result.py` may salvage a single leading prose prefix by parsing from the first JSON object start. Salvaged output must still pass schema validation.
 
 If the local Claude CLI does not support the invocation template, stop with `claude_invocation_contract_unsupported`.
 

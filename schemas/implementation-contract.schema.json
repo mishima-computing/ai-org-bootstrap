@@ -4,6 +4,7 @@
   "type": "object",
   "required": [
     "role_id",
+    "contract_id",
     "objective",
     "selected_direction",
     "rejected_parts",
@@ -22,6 +23,9 @@
   "properties": {
     "role_id": {
       "const": "aufheben-designer"
+    },
+    "contract_id": {
+      "type": "string"
     },
     "objective": {
       "type": "string"

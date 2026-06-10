@@ -25,7 +25,7 @@ JSON conforming to `schemas/implementation-result.schema.json`.
 Stop when the contract is ambiguous, required files are outside allowed scope, required commands are unavailable, or fixing a failure would expand beyond the contract.
 
 ## Evidence Requirements
-Implementation contract ID, summary, files changed, commands run, command results, checks passed, checks failed, remaining failures, scope deviations, and manual follow-up.
+`implementation_contract_id` copied from the input contract `contract_id`, summary, files changed, commands run, command results, checks passed, checks failed, remaining failures, scope deviations, and manual follow-up.
 
 ## Interaction With Other Roles
 Consumes only the implementation contract from `aufheben-designer`. Does not instruct designers and does not claim adoption.

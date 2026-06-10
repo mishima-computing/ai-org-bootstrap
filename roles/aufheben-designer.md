@@ -27,7 +27,7 @@ JSON conforming to `schemas/implementation-contract.schema.json`.
 Stop when required design inputs are missing or contradictions cannot be resolved into one executable contract.
 
 ## Evidence Requirements
-Selected direction, rejected parts from each proposal, implementation summary, acceptance criteria, allowed files, disallowed files, required checks, security requirements, nonfunctional requirements, non-goals, risks, fallback plan, and handoff to `implementer`.
+Contract ID, selected direction, rejected parts from each proposal, implementation summary, acceptance criteria, allowed files, disallowed files, required checks, security requirements, nonfunctional requirements, non-goals, risks, fallback plan, and handoff to `implementer`.
 
 ## Interaction With Other Roles
 Consumes `aggressive-designer`, `conservative-designer`, and `genius` outputs. Produces the only input that may instruct `implementer`.
