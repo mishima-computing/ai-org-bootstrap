@@ -82,3 +82,4 @@ Final report must include:
 - checks failed
 - gaps
 - warnings
+- controller may distill adopted-cycle facts into `.agent-org/knowledge/cards/` per `.agent-org/knowledge/README.md`

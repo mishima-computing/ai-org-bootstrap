@@ -437,6 +437,7 @@ def check_required_files() -> list[str]:
         ROOT / "bootstrap/README.md",
         ROOT / ".agent-org/runtime-registry.yaml",
         ROOT / ".agent-org/execution-substrate.md",
+        ROOT / ".agent-org/knowledge/README.md",
         ROOT / ".agent-org/worktree-policy.md",
         ROOT / ".agent-org/artifact-policy.md",
         ROOT / ".agent-org/pack-materialization.md",
@@ -454,6 +455,32 @@ def check_required_files() -> list[str]:
     required.extend(ROOT / ".claude/agents" / f"{agent}.md" for agent in CLAUDE_ADAPTERS)
     required.extend(ROOT / "schemas" / name for name in REQUIRED_SCHEMAS)
     return [rel(path) for path in required if not path.is_file()]
+
+
+def check_knowledge_cards() -> list[str]:
+    errors: list[str] = []
+    cards_dir = ROOT / ".agent-org/knowledge/cards"
+    if not cards_dir.is_dir():
+        return errors
+
+    required_keys = {"name", "type", "source", "status"}
+    allowed_types = {"constraint", "pitfall", "mechanism", "decision"}
+    allowed_statuses = {"active", "superseded"}
+
+    for path in sorted(cards_dir.glob("*.md")):
+        frontmatter, _body, error = parse_frontmatter(path)
+        if error:
+            errors.append(f"{rel(path)} {error}")
+            continue
+        for key in sorted(required_keys - set(frontmatter)):
+            errors.append(f"{rel(path)} missing frontmatter key: {key}")
+        card_type = frontmatter.get("type")
+        if card_type is not None and card_type not in allowed_types:
+            errors.append(f"{rel(path)} type must be one of {sorted(allowed_types)}")
+        status = frontmatter.get("status")
+        if status is not None and status not in allowed_statuses:
+            errors.append(f"{rel(path)} status must be one of {sorted(allowed_statuses)}")
+    return errors
 
 
 def check_active_directories() -> list[str]:
@@ -686,6 +713,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(f"schema_conformance_error: {item}" for item in check_schema_samples())
     errors.extend(f"schema_explicit_type_error: {item}" for item in check_schema_explicit_types())
     errors.extend(f"toml_parse_error: {item}" for item in toml_errors)
+    errors.extend(check_knowledge_cards())
     errors.extend(check_active_directories())
     errors.extend(check_roles())
     errors.extend(check_codex_adapters(toml_data))
