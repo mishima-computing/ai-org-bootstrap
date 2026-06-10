@@ -1,0 +1,32 @@
+name: Security CI
+
+on:
+  push:
+    branches:
+      - main
+      - pack-ci
+      - genius-v2-phase0
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository (full history for secret scan)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Complements GitHub native secret scanning (a repo setting, not a
+      # workflow). Note: this repo contains agent prompt/schema text; if a
+      # documented placeholder ever trips a rule, add a .gitleaks.toml
+      # allowlist via the owning role — do not weaken the scan here.
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
