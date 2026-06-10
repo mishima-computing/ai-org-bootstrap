@@ -5,6 +5,7 @@ gate_profile="${GATE_PROFILE:-bootstrap-final-minimal}"
 run_id="${RUN_ID:-not_provided}"
 candidate_id="${CANDIDATE_ID:-not_provided}"
 candidate_output="${CANDIDATE_OUTPUT:-}"
+output_schema="${OUTPUT_SCHEMA:-}"
 forbidden_regex="${FORBIDDEN_PATH_REGEX:-^\\.agent-runs/|^\\.git/}"
 
 status="pass"
@@ -33,7 +34,21 @@ candidate_output_schema_check="not_configured"
 if [ -n "${candidate_output}" ]; then
   if [ -f "${candidate_output}" ]; then
     if python3 -m json.tool "${candidate_output}" >/dev/null 2>&1; then
-      candidate_output_schema_check="pass"
+      if [ -z "${output_schema}" ]; then
+        candidate_output_schema_check="fail"
+        status="fail"
+        notes+=("candidate_output_schema_missing")
+      elif [ ! -f "${output_schema}" ]; then
+        candidate_output_schema_check="fail"
+        status="fail"
+        notes+=("candidate_output_schema_file_missing")
+      elif python3 scripts/validate-bootstrap-pack.py --schema "${output_schema}" --instance "${candidate_output}" >/dev/null 2>&1; then
+        candidate_output_schema_check="pass"
+      else
+        candidate_output_schema_check="fail"
+        status="fail"
+        notes+=("candidate_output_schema_invalid")
+      fi
     else
       candidate_output_schema_check="fail"
       status="fail"
@@ -80,6 +95,7 @@ cat <<EOF
     changed_files: pass
     forbidden_path_check: ${forbidden_path_check}
     candidate_output_schema_check: ${candidate_output_schema_check}
+    candidate_output_schema: ${output_schema:-not_configured}
     secret_scan: optional_not_configured
     lint: optional_not_configured
     typecheck: optional_not_configured

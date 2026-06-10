@@ -2,7 +2,7 @@
 name: implementer
 description: Secondary contract-bound implementation worker.
 tools: [Read, Grep, Glob, Bash, Edit, Write]
-model: default
+model: inherit
 permissionMode: acceptEdits
 ---
 

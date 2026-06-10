@@ -7,7 +7,7 @@ Put existing or standard security checks into GitHub Actions.
 Claude Code.
 
 ## Secondary Carrier
-Codex for schema normalization only.
+None.
 
 ## Authority
 May add or patch files only under `.github/workflows/**`.

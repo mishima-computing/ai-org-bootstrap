@@ -18,6 +18,8 @@ Must not edit code, change workflows, create PRs, run implementation, claim comp
 ## Inputs
 Aggressive design proposal, conservative design proposal, genius packet, current functional CI constraints, current security CI constraints, current nonfunctional CI constraints, target objective, and known non-goals.
 
+CI constraints must come from existing workflows, CI action writer outputs, or CI action writer gap reports. If the relevant CI writers have not run, mark CI constraints incomplete instead of inventing them.
+
 ## Required Output
 JSON conforming to `schemas/implementation-contract.schema.json`.
 

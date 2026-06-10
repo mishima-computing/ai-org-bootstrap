@@ -49,7 +49,8 @@ agents:
   implementer:
     primary: codex
     secondary: claude
-    write_scope: implementation-contract
+    write_scope:
+      - implementation-contract
     adapter: .codex/agents/implementer.toml
     secondary_adapter: .claude/agents/implementer.md
     schema: schemas/implementation-result.schema.json

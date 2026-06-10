@@ -1,8 +1,8 @@
 ---
 name: aggressive-designer
 description: Read-only bold design proposal producer.
-tools: [Read, Grep, Glob, Bash]
-model: default
+tools: [Read, Grep, Glob]
+model: inherit
 permissionMode: plan
 ---
 

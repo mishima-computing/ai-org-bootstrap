@@ -74,6 +74,8 @@ Carrier adapters live in:
 
 Runtime artifacts belong under `.agent-runs/<run_id>/` and must remain ignored.
 
+During approved pack materialization, Codex main may add exactly `.agent-runs/` to the target root `.gitignore` if it is absent.
+
 ## 6. CI Action Writers
 
 Use these agents only to add or patch GitHub Actions workflows:
@@ -90,7 +92,7 @@ They may write only:
 
 They must not edit application code, tests, package manifests, lockfiles, dependencies, secrets, deployments, or branch protection.
 
-If a command exists but is not run in GitHub Actions, add it.
+If a command exists but is not run in GitHub Actions, delegate the workflow change to the relevant CI action writer. Codex main must not directly edit workflows unless it is executing that writer role through its adapter.
 
 If no command exists, report a gap. Do not invent commands.
 
@@ -124,6 +126,14 @@ Use `aufheben-designer` to synthesize:
 - current nonfunctional CI constraints
 - target objective
 - known non-goals
+
+CI constraints must come from:
+
+- existing GitHub Actions workflows
+- CI action writer outputs
+- CI action writer gap reports
+
+If the relevant CI writers have not run, mark CI constraints incomplete. Do not invent CI constraints.
 
 It must produce exactly one implementation contract for `implementer`.
 

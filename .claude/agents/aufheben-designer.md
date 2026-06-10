@@ -1,8 +1,8 @@
 ---
 name: aufheben-designer
 description: Read-only synthesizer that creates one implementation contract.
-tools: [Read, Grep, Glob, Bash]
-model: default
+tools: [Read, Grep, Glob]
+model: inherit
 permissionMode: plan
 ---
 

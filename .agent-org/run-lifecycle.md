@@ -30,6 +30,8 @@ Initialize:
 
 `.agent-runs/` must remain ignored by Git.
 
+Codex main is responsible for confirming the ignore rule during approved pack materialization. It may add exactly `.agent-runs/` to the target root `.gitignore` if absent.
+
 ## Default Sequence
 
 1. Run CI action writer agents when the objective is CI automation.

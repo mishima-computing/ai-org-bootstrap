@@ -33,12 +33,13 @@ If pack files are missing:
 1. Do not invent or generate missing pack files.
 2. Check whether `gh`, `git`, or network fetch is available.
 3. If explicit materialization approval is present and tooling is available, vendor the source pack from GitHub into the target repository.
-4. If approval or tooling is missing, print exact manual sync commands and stop with `bootstrap_pack_not_materialized`.
+4. During approved materialization, Codex main may add exactly `.agent-runs/` to the target root `.gitignore` if it is absent.
+5. If approval or tooling is missing, print exact manual sync commands and stop with `bootstrap_pack_not_materialized`.
 
 Explicit materialization approval phrase:
 
 ```text
-APPROVE BOOTSTRAP PACK MATERIALIZATION <run_id> <target_repo_root>
+APPROVE BOOTSTRAP PACK MATERIALIZATION <source_repo> <target_repo>
 ```
 
 ## Stop Conditions
