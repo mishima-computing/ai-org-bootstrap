@@ -1,0 +1,55 @@
+name: Security CI
+
+on:
+  push:
+    branches:
+      - main
+      - pack-ci
+      - genius-v2-phase0
+  pull_request:
+  schedule:
+    - cron: "41 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    env:
+      # Pinned gitleaks release. The gitleaks/gitleaks-action@v2 action is NOT
+      # used because it requires a GITLEAKS_LICENSE secret for organization
+      # accounts; invoking the release binary directly needs no license and no
+      # repository secrets.
+      GITLEAKS_VERSION: "8.24.2"
+
+    steps:
+      - name: Check out repository (full history for secret scan)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download and verify pinned gitleaks release binary
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          curl -fsSLO "${base}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -fsSLO "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          grep " gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz\$" \
+            "gitleaks_${GITLEAKS_VERSION}_checksums.txt" | sha256sum --check -
+          tar -xzf "gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" gitleaks
+          ./gitleaks version
+
+      # Complements GitHub native secret scanning (a repo setting, not a
+      # workflow). `gitleaks git` scans the full commit history of the
+      # checked-out repository (fetch-depth: 0 above). Note: this repo
+      # contains agent prompt/schema text; if a documented placeholder ever
+      # trips a rule, add a .gitleaks.toml allowlist via the owning role —
+      # do not weaken the scan here.
+      - name: Run gitleaks over full git history
+        run: '"${RUNNER_TEMP}/gitleaks" git --no-banner --redact --verbose .'

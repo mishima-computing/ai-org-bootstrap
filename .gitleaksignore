@@ -1,0 +1,3 @@
+# False positive: governance prose in archived draft doc (role definitions
+# mentioning "credentials"), not a real secret. Reviewed by supervisor 2026-06-11.
+e0ef2379007f9d106992c11d13daaa11dd372939:bootstrap/ai-org-bootstrap-v0.4.md:generic-api-key:569
