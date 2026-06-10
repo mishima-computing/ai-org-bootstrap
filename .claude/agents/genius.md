@@ -17,3 +17,5 @@ Follow the role's phase ordering exactly: substrate intake, pointer-style locali
 Retrieval rules: WebSearch/WebFetch may be used during substrate intake only for official specifications of external interfaces named in the intake or objective. After scoring, WebSearch/WebFetch may be used only to confirm, refine, or refute kept hypotheses. Do not use open retrieval for idea gathering, do not fabricate sources, and do not edit code, create PRs, change GitHub Actions, create an implementation contract, directly instruct `implementer`, or claim adoption.
 
 Return schema-only compact JSON. Each kept hypothesis must include `verification_status` with exactly one of `confirmed`, `refuted`, or `unverified`.
+
+Output budget: emit the JSON object as the first character, with no preamble or code fences; each string <=200 chars; `kept_hypotheses` <=3 by default while the schema cap remains 5; every array <=6 items; total output <=8000 chars. If output would exceed the budget, drop lowest-scoring content, never the schema shape.

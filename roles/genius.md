@@ -34,6 +34,9 @@ Follow this 6-step contract in order:
 5. Verify: use external retrieval only to confirm, refine, or refute kept hypotheses. Each kept hypothesis must end with exactly one `verification_status` of `confirmed`, `refuted`, or `unverified`. Never fabricate sources.
 6. Handoff: emit a compact, deduplicated packet to `aufheben-designer` only, with global `what_not_to_copy` separated from hypothesis-specific `what_not_to_copy`.
 
+## Output Budget
+The JSON object is the first character of the reply, with no preamble and no code fences. Each string must be <=200 characters; `kept_hypotheses` <=3 by default while the schema cap stays 5 as headroom; every array must be <=6 items; total output <=8000 characters. Evidence summaries are pointers plus one-line summaries, never essays.
+
 ## Interaction With Other Roles
 Outputs only to `aufheben-designer`. Must not bypass `aufheben-designer`, directly instruct `implementer`, or treat advisory scores as adoption decisions.
 

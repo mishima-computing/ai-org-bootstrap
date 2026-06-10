@@ -477,6 +477,10 @@ def check_roles() -> list[str]:
         for phrase in ["Outputs only to `aufheben-designer`", "directly instruct `implementer`"]:
             if phrase.lower() not in content.lower():
                 errors.append(f"roles/{agent}.md missing designer boundary: {phrase}")
+        if agent == "genius":
+            for phrase in ["Output Budget", "8000"]:
+                if phrase.lower() not in content.lower():
+                    errors.append(f"roles/{agent}.md missing genius budget phrase: {phrase}")
     return errors
 
 
@@ -543,6 +547,8 @@ def check_claude_adapters() -> list[str]:
                     errors.append(f"{rel(path)} missing external research tool: {tool}")
             if "verification_status" not in body:
                 errors.append(f"{rel(path)} must define verification_status behavior")
+            if "8000" not in body:
+                errors.append(f"{rel(path)} missing genius budget phrase: 8000")
     return errors
 
 
