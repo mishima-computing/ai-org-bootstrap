@@ -73,6 +73,27 @@
       "required": false
     },
     {
+      "path": ".agent-org/knowledge/ui/anchors/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ui/anchors/typography-cjk-latin.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ui/ui-bilingual-typography.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/ui/ui-gacha-genre.md",
       "type": "file",
       "tier": "pack_level",

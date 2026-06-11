@@ -1,6 +1,6 @@
 # UI/UX Knowledge Authoring Program
 
-Status: Cycle 1 plan only. No anchor, handbook, card, manifest, validator, workflow, or existing pack file changes are authorized by this document.
+Status: Cycle 1 plan, with typography anchor/card/manifest/validator deltas authorized by contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography`; no workflow, handbook, adoption, or downstream-sync change is authorized here.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [absorption ledger](absorption-ledger.md).
 
@@ -19,7 +19,7 @@ Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-ar
 
 | Order | Cycle | Areas | Primary outputs | Acceptance evidence |
 | --- | --- | --- | --- | --- |
-| 1 | Typography | Typography: CJK+Latin; Typography: Latin systems | Anchor index for CJK+Latin; revise/confirm `ui-bilingual-typography.md` only in that later cycle; decide if Latin remains stub or becomes committed. | JLREQ, jlreq-d watch, CLREQ Draft 2026-05, WCAG 2.2/ISO 40500:2025, Bringhurst pointers verified; mixed-script checks decidable. |
+| 1 | Typography | Typography: CJK+Latin; Typography: Latin systems | Authorized by `contract-20260612-075757-bd7c42c-uiux-cycle1-typography`: CJK+Latin anchor index, `ui-bilingual-typography.md` anchor citations, manifest entries, validator anchor family; Latin systems remains stub. | JLREQ, jlreq-d watch, CLREQ Draft 2026-05, WCAG 2.2/ISO 40500:2025, Bringhurst pointers verified; mixed-script checks decidable. |
 | 2 | Hierarchy and layout | Hierarchy and Gestalt; Grid and Layout | Anchor indexes for grouping and layout constraints; card citation plan for composition/information-design dependencies. | NN/g hierarchy guidance, named visual perception literature, dated HIG/M3 layout sections, and computable layout checks verified. |
 | 3 | Color and accessibility | Color; Accessibility | Anchor indexes for color roles and WCAG mapping; accessibility citation rules for future cards. | WCAG 2.2 Recommendation and ISO/IEC 40500:2025 verified; no draft successor material used as canonical acceptance. |
 | 4 | IA and information design | Information Architecture; Information Design | Anchor indexes for IA decisions and representation choice; future information-design card citation update. | NN/g IA/navigation, Rosenfeld/Morville/Arango, Tufte/Cairo/Few, and WCAG text-alternative pointers verified. |

@@ -1,6 +1,6 @@
 # UI/UX Absorption Ledger
 
-Status: Cycle 1 mapping only. No existing UI card is edited, deleted, or superseded here.
+Status: Cycle 1 mapping plus authorized typography absorption. Contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography` authorizes the CJK+Latin anchor, card, validator, and manifest deltas only.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [authoring program](authoring-program.md).
 
@@ -42,18 +42,18 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | Source lines | Current rule | Target area | Status | Graduation annotation |
 | --- | --- | --- | --- | --- |
 | `ui-bilingual-typography.md:3-7` | Scope, coverage, freshness, supersede trigger, and evidence refs for CJK+Latin surfaces. | Typography: CJK+Latin | absorbed | Structural check: future card cites CJK/Latin anchor IDs and keeps freshness trigger. |
-| `ui-bilingual-typography.md:10` | CJK glyph density changes visual mass relative to Latin. | Typography: CJK+Latin | absorbed | Positive rewrite: per-script rhythm and density decision in anchor. |
-| `ui-bilingual-typography.md:11` | Choose one lead language per view. | Typography: CJK+Latin | absorbed | Structural check: lead script declared per view. |
+| `ui-bilingual-typography.md:10` | CJK glyph density changes visual mass relative to Latin. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#jlreq-line-composition`; positive rewrite keeps per-script validation. |
+| `ui-bilingual-typography.md:11` | Choose one lead language per view. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#jlreq-line-composition`; structural check: lead script declared per view. |
 | `ui-bilingual-typography.md:11` | Use support-language treatment by default. | Typography: CJK+Latin | absorbed | Positive rewrite: secondary language role named in layout spec. |
 | `ui-bilingual-typography.md:11` | Forbid both-prominent treatment with no focal point. | Hierarchy and Gestalt | superseded-later | Structural check: hierarchy audit rejects equal top-priority scripts without declared focal decision. |
-| `ui-bilingual-typography.md:12` | Maintain per-script size, leading, and measure token sets. | Typography: CJK+Latin | absorbed | Structural check: token audit requires script-specific values. |
-| `ui-bilingual-typography.md:12` | Never share one token set across CJK and Latin. | Typography: CJK+Latin | superseded-later | Positive rewrite: "provide per-script token sets"; delete negative wording after anchor lands. |
+| `ui-bilingual-typography.md:12` | Maintain per-script size, leading, and measure token sets. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#bringhurst-measure-rhythm` plus `anchor:typography-cjk-latin#jlreq-line-composition`; structural check: token audit requires script-specific values. |
+| `ui-bilingual-typography.md:12` | Never share one token set across CJK and Latin. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#bringhurst-measure-rhythm`; positive rewrite landed as "provide per-script token sets." |
 | `ui-bilingual-typography.md:13` | English and Japanese measure ranges are research budgets, not constants. | Typography: CJK+Latin | absorbed | Positive rewrite: cite anchor ranges and require product validation. |
 | `ui-bilingual-typography.md:13` | One container cannot serve both scripts. | Grid and Layout | superseded-later | Structural check: mixed-script container declares separate measure behavior or exception. |
 | `ui-bilingual-typography.md:14` | Correct mixed-script spacing and punctuation squeeze per Heti/JLREQ/CLREQ convention. | Typography: CJK+Latin | absorbed | Positive rewrite: anchor IDs for spacing classes replace local detail. |
 | `ui-bilingual-typography.md:15` | Enforce contrast floors by script and display size. | Accessibility | absorbed | Structural check: WCAG 2.2 contrast criteria cited and tested on worst-case image region. |
 | `ui-bilingual-typography.md:16` | Translation-only preserves structure; localization may change IA and visual design. | Information Architecture | absorbed | Positive rewrite: localization divergence decision record. |
-| `ui-bilingual-typography.md:17` | Bind micro-rules to JLREQ/CLREQ instead of restating exceptions in cards. | Typography: CJK+Latin | superseded-later | Delete local exceptions once anchor IDs exist. |
+| `ui-bilingual-typography.md:17` | Bind micro-rules to JLREQ/CLREQ instead of restating exceptions in cards. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#jlreq-line-composition` and `anchor:typography-cjk-latin#clreq-mixed-spacing`; local pointer prose superseded by anchor citations. |
 | `ui-bilingual-typography.md:18` | Claim legibility/focus effects only; never conversion, engagement, or SEO. | Evaluation Instruments | absorbed | Positive rewrite: allowed-claim field lists supported effect class; delete phrase after validator enforces claim class. |
 | `ui-bilingual-typography.md:19` | Pointers list CJK, cross-cultural, line length, text-over-images, and spacing sources. | Typography: CJK+Latin | absorbed | Supersede raw pointer list with anchor citations during typography cycle. |
 
