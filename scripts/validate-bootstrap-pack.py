@@ -641,6 +641,11 @@ def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
         "Retry with concise JSON only",
         "--allowedTools",
         "--json-schema",
+        "< /dev/null",
+        "F7 silent hang: 0% CPU, empty stdout",
+        "--raw-text",
+        "direct parse, then bounded closure repair, then largest-object salvage",
+        "invoked command, exit status, sandbox mode, first stderr line on failure, and timeout/fallback status",
     ]:
         if phrase not in carrier:
             errors.append(f".agent-org/carrier-invocation.md missing phrase: {phrase}")
@@ -655,6 +660,18 @@ def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
     implementer_role = text(ROOT / "roles/implementer.md")
     if "contract_id" not in implementer_role or "implementation_contract_id" not in implementer_role:
         errors.append("roles/implementer.md must map contract_id to implementation_contract_id")
+
+    lifecycle = text(ROOT / ".agent-org/run-lifecycle.md")
+    for phrase in [
+        "Default carrier execution timeout is 30 minutes",
+        "carrier_timeout",
+        "Silent hangs are detectable only by timeout",
+        "## Resume",
+        "Do not redesign. Verify existing work against the original contract. Run required_checks. Emit the required report.",
+        "preserve the dead attempt's artifacts unmodified",
+    ]:
+        if phrase not in lifecycle:
+            errors.append(f".agent-org/run-lifecycle.md missing phrase: {phrase}")
 
     bootstrap = text(ROOT / "bootstrap/codex-bootstrap.md")
     for phrase in [

@@ -66,6 +66,24 @@ Optional if not configured:
 
 Unavailable project-specific checks must be reported as gaps.
 
+## Carrier Execution Timeout
+
+Default carrier execution timeout is 30 minutes of wall-clock time per carrier process.
+
+On expiry, the controller kills the carrier process and records `carrier_timeout` in `carrier-status.json`. Silent hangs are detectable only by timeout; the default may be raised per invocation when the controller expects a legitimately longer run.
+
+## Resume
+
+If a carrier dies or hangs after writing workspace changes but before reporting, preserve the dead attempt's artifacts unmodified and re-invoke the same role with the original file scope and contract.
+
+The resume prompt must be verify-and-report only:
+
+```text
+Resume the same role from the existing workspace state. Do not redesign. Verify existing work against the original contract. Run required_checks. Emit the required report.
+```
+
+The resumed role must not receive wider file scope than its original contract.
+
 ## Closeout
 
 Final report must include:
