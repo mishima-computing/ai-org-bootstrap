@@ -41,6 +41,17 @@ Codex main is responsible for confirming the ignore rule during approved pack ma
 5. Run deterministic local tooling when configured.
 6. Report changed files, commands run, checks, gaps, and remaining work.
 
+Aufheben verdict handling:
+
+- After designers, the controller runs `aufheben-designer`.
+- On "proceed", continue with the unchanged implementation contract path.
+- On "redo", the controller re-invokes only the named designers with redo_brief appended as input, then re-runs `aufheben-designer`.
+- MAX 2 redo rounds.
+- If still not "proceed" after 2 rounds, treat as "escalate".
+- On "escalate", stop and surface to controller/human.
+- Record redo rounds and verdicts in run notes.
+- redo_max=2 is provisional, set to gather data; revise when thrash or premature-escalation patterns emerge.
+
 ## Gate Profile
 
 Default gate profile:
