@@ -17,10 +17,12 @@
   "properties": {
     "role_id": {
       "type": "string",
-      "const": "genius"
+      "const": "genius",
+      "maxLength": 400
     },
     "objective": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 600
     },
     "substrate_inputs": {
       "type": "array",
@@ -41,13 +43,16 @@
               "paper",
               "mature_implementation",
               "run_artifact"
-            ]
+            ],
+            "maxLength": 400
           },
           "locator": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "summary": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           }
         },
         "additionalProperties": false
@@ -72,13 +77,16 @@
               "paper",
               "mature_implementation",
               "run_artifact"
-            ]
+            ],
+            "maxLength": 400
           },
           "locator": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "summary": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           }
         },
         "additionalProperties": false
@@ -103,13 +111,16 @@
               "paper",
               "mature_implementation",
               "run_artifact"
-            ]
+            ],
+            "maxLength": 400
           },
           "locator": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "summary": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           }
         },
         "additionalProperties": false
@@ -134,10 +145,12 @@
         ],
         "properties": {
           "hypothesis_id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "mechanism": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "score": {
             "type": "number",
@@ -149,7 +162,8 @@
               "confirmed",
               "refuted",
               "unverified"
-            ]
+            ],
+            "maxLength": 400
           },
           "repo_evidence_refs": {
             "type": "array",
@@ -170,17 +184,21 @@
                     "paper",
                     "mature_implementation",
                     "run_artifact"
-                  ]
+                  ],
+                  "maxLength": 400
                 },
                 "locator": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 },
                 "summary": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 }
               },
               "additionalProperties": false
-            }
+            },
+            "maxItems": 6
           },
           "external_refs": {
             "type": "array",
@@ -201,39 +219,50 @@
                     "paper",
                     "mature_implementation",
                     "run_artifact"
-                  ]
+                  ],
+                  "maxLength": 400
                 },
                 "locator": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 },
                 "summary": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 }
               },
               "additionalProperties": false
-            }
+            },
+            "maxItems": 6
           },
           "expected_benefit": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "risks": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           },
           "rejection_conditions": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           },
           "what_not_to_copy": {
             "type": "array",
             "description": "Hypothesis-specific anti-patterns, distinct from the top-level global anti-patterns for the objective.",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           }
         },
         "additionalProperties": false
@@ -257,10 +286,12 @@
         ],
         "properties": {
           "hypothesis_id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "mechanism": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "score": {
             "type": "number",
@@ -272,7 +303,8 @@
               "confirmed",
               "refuted",
               "unverified"
-            ]
+            ],
+            "maxLength": 400
           },
           "repo_evidence_refs": {
             "type": "array",
@@ -293,17 +325,21 @@
                     "paper",
                     "mature_implementation",
                     "run_artifact"
-                  ]
+                  ],
+                  "maxLength": 400
                 },
                 "locator": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 },
                 "summary": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 }
               },
               "additionalProperties": false
-            }
+            },
+            "maxItems": 6
           },
           "external_refs": {
             "type": "array",
@@ -324,39 +360,50 @@
                     "paper",
                     "mature_implementation",
                     "run_artifact"
-                  ]
+                  ],
+                  "maxLength": 400
                 },
                 "locator": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 },
                 "summary": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 }
               },
               "additionalProperties": false
-            }
+            },
+            "maxItems": 6
           },
           "expected_benefit": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "risks": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           },
           "rejection_conditions": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           },
           "what_not_to_copy": {
             "type": "array",
             "description": "Hypothesis-specific anti-patterns, distinct from the top-level global anti-patterns for the objective.",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           }
         },
         "additionalProperties": false
@@ -380,10 +427,12 @@
         ],
         "properties": {
           "hypothesis_id": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "mechanism": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "score": {
             "type": "number",
@@ -395,7 +444,8 @@
               "confirmed",
               "refuted",
               "unverified"
-            ]
+            ],
+            "maxLength": 400
           },
           "repo_evidence_refs": {
             "type": "array",
@@ -416,17 +466,21 @@
                     "paper",
                     "mature_implementation",
                     "run_artifact"
-                  ]
+                  ],
+                  "maxLength": 400
                 },
                 "locator": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 },
                 "summary": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 }
               },
               "additionalProperties": false
-            }
+            },
+            "maxItems": 6
           },
           "external_refs": {
             "type": "array",
@@ -447,39 +501,50 @@
                     "paper",
                     "mature_implementation",
                     "run_artifact"
-                  ]
+                  ],
+                  "maxLength": 400
                 },
                 "locator": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 },
                 "summary": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 400
                 }
               },
               "additionalProperties": false
-            }
+            },
+            "maxItems": 6
           },
           "expected_benefit": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 400
           },
           "risks": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           },
           "rejection_conditions": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           },
           "what_not_to_copy": {
             "type": "array",
             "description": "Hypothesis-specific anti-patterns, distinct from the top-level global anti-patterns for the objective.",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "maxLength": 400
+            },
+            "maxItems": 6
           }
         },
         "additionalProperties": false
@@ -489,11 +554,13 @@
       "type": "array",
       "description": "Global anti-patterns for this objective, distinct from hypothesis-specific what_not_to_copy fields.",
       "items": {
-        "type": "string"
+        "type": "string",
+        "maxLength": 400
       }
     },
     "handoff_to_aufheben": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 600
     }
   },
   "additionalProperties": false
