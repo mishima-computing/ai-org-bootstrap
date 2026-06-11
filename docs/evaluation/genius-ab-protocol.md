@@ -81,6 +81,14 @@ Computation: for each future cycle, count only declared conflict points that car
 
 Rationale: the metric tracks whether aggressive-designer is producing falsifiable disagreement for synthesis instead of silent convergence or performative novelty.
 
+### `budget_compliance`
+
+Definition: controller-measured `result.json` byte size for each genius packet, compared with a 16000-byte threshold, plus an extraction-path field recorded as `intact`, `closure-repaired`, or `salvaged`.
+
+Computation: for each future genius run, the controller records the emitted `result.json` size in bytes and the extraction path that produced the artifact. Measure it forward only; do not retroactively rebucket prior cycles. The model does not report, estimate, or add any budget field to its JSON packet.
+
+Rationale: models cannot reliably count characters or bytes in generated output. Byte size is therefore measured by the controller with zero model burden, and the unit is explicitly bytes so the threshold is comparable across carriers and repair paths.
+
 ### `load_bearing_rate`
 
 Definition: items cited as requirements or acceptance criteria over items handed off.
@@ -116,6 +124,12 @@ Each A/B pair compares packets for the same objective. The normal comparison is 
 The judge is post-hoc LLM/manual matching over run artifacts. The judge reads the packet artifacts and the downstream contract, enumerates distinct handed-off items, and assigns `USED`, `REJECTED`, or `IGNORED`. Paraphrase counts only when the mechanism is unmistakably the same.
 
 The contract schema is never extended for tracing. Traceability comes from artifact comparison and this protocol's metric definitions, not from adding fields to the implementation-contract schema.
+
+### Repaired-tail loss method
+
+When a genius artifact reaches judgment only after closure repair or salvage, record tail loss by comparing the repaired artifact with the required `schemas/genius-packet.schema.json` shape. Count each schema-required field that is absent and each required array item or object visibly cut off by repair. For arrays, count missing required object fields and any obviously truncated item text; do not infer unseen intended items beyond the schema shape and visible artifact boundary.
+
+This method is read-only over committed artifacts and requires no extractor, controller-spec, or closure-repair change. Lane-1 closure-repaired artifacts may be external to this repository, so this protocol records the method plus in-repo measurables only: artifact byte size, extraction path, schema validation result, missing required fields, and visible truncation counts when such artifacts are present locally.
 
 Protocol records must include:
 

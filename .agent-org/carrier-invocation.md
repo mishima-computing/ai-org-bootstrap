@@ -179,7 +179,7 @@ Write-capable Claude roles may write only the scope allowed by their role and in
 
 If web/search/fetch tools are unavailable, `genius` must produce a schema-shaped output whose handoff states `external_research_unavailable`. It must not fabricate sources.
 
-For `genius`, `input.md` MUST restate this budget line: `Output budget: JSON object first character, no preamble or code fences; each string <=200 chars; kept_hypotheses <=3 by default with schema cap 5; every array <=6 items; total output <=8000 chars; evidence summaries are pointers plus one-line summaries, never essays.` Verified failure mode: unconstrained output reached 22KB and truncated beyond closure repair.
+For `genius`, `input.md` MUST restate this budget line: `Output budget: JSON object first character, no preamble or code fences; each string <=200 chars with schema hard caps of 400 chars for leaf strings and 600 chars for objective/handoff; kept_hypotheses <=3 by default with schema cap 5; every array <=6 items; total output controller-measured <=16000 bytes; evidence summaries are pointers plus one-line summaries, never essays.` Verified failure mode: unconstrained output reached 22KB and truncated beyond closure repair.
 
 ### Aufheben Input Embedding
 
