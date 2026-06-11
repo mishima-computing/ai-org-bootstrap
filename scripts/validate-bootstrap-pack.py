@@ -42,6 +42,7 @@ REQUIRED_SCHEMAS = [
     "genius-packet.schema.json",
     "implementation-contract.schema.json",
     "implementation-result.schema.json",
+    "aufheben-verdict.schema.json",
 ]
 
 ROLE_HEADINGS = [
@@ -201,6 +202,21 @@ SCHEMA_SAMPLE_INSTANCES = {
         "remaining_failures": [],
         "scope_deviations": [],
         "manual_followup": [],
+    },
+    "schemas/aufheben-verdict.schema.json": {
+        "role_id": "aufheben-designer",
+        "decision": "redo",
+        "situation_read": "Completeness is partial, reversibility is low, and confidence is speculative without repo evidence.",
+        "redo_brief": {
+            "targets": [
+                "aggressive-designer",
+                "genius",
+            ],
+            "diagnosis": "Missing a grounded alternative for an irreversible choice.",
+            "new_info_or_angle_needed": [
+                "Verify whether existing repo evidence supports the proposed boundary.",
+            ],
+        },
     },
 }
 
@@ -534,6 +550,15 @@ def check_roles() -> list[str]:
             for phrase in ["Output Budget", "8000"]:
                 if phrase.lower() not in content.lower():
                     errors.append(f"roles/{agent}.md missing genius budget phrase: {phrase}")
+    aufheben_content = text(ROOT / "roles/aufheben-designer.md")
+    for phrase in [
+        '"proceed"',
+        '"redo"',
+        '"escalate"',
+        "schemas/aufheben-verdict.schema.json",
+    ]:
+        if phrase.lower() not in aufheben_content.lower():
+            errors.append(f"roles/aufheben-designer.md missing aufheben verdict phrase: {phrase}")
     return errors
 
 
@@ -672,6 +697,13 @@ def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
     ]:
         if phrase not in lifecycle:
             errors.append(f".agent-org/run-lifecycle.md missing phrase: {phrase}")
+    for phrase in [
+        "MAX 2 redo rounds",
+        "redo_brief",
+        "redo_max=2 is provisional",
+    ]:
+        if phrase not in lifecycle:
+            errors.append(f".agent-org/run-lifecycle.md missing redo loop phrase: {phrase}")
 
     bootstrap = text(ROOT / "bootstrap/codex-bootstrap.md")
     for phrase in [
