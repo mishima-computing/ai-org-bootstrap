@@ -65,6 +65,14 @@ Computation: for each packet, enumerate the handed-off items, then judge each it
 
 Rationale: this preserves continuity with the measured v1 baseline of 90.9% nominal survival and ~81% full-fidelity survival.
 
+### `confidence_vs_survival`
+
+Definition: handed-off designer items are bucketed by declared posture, per role and per carrier.
+
+Computation: for each future cycle, record whether each aggressive-designer or conservative-designer item came from a `grounded` or `speculative` proposal, then compute survival per posture. This is a two-bin calibration curve, not a numeric confidence score. Measure it forward only; do not retroactively rebucket the 10-cycle v1 baseline. Keep nominal survival buckets separate from full-fidelity survival buckets.
+
+Rationale: the curve tests whether first-class confidence posture predicts downstream survival without conflating Claude/Codex carriers, designer roles, or nominal and full-fidelity outcomes.
+
 ### `load_bearing_rate`
 
 Definition: items cited as requirements or acceptance criteria over items handed off.

@@ -96,6 +96,18 @@ SCHEMA_SAMPLE_INSTANCES = {
         "constraints": [],
         "things_to_avoid": [],
         "handoff_notes": "example handoff",
+        "confidence": {
+            "overall_posture": "grounded",
+            "grounded_claims": [
+                {
+                    "claim": "Design proposals are validated by a local schema.",
+                    "evidence_ref": "schemas/design-proposal.schema.json",
+                }
+            ],
+            "speculative_claims": [
+                "A future proposal may need more repo evidence."
+            ],
+        },
     },
     "schemas/genius-packet.schema.json": {
         "role_id": "genius",
@@ -546,6 +558,9 @@ def check_roles() -> list[str]:
         for phrase in ["Outputs only to `aufheben-designer`", "directly instruct `implementer`"]:
             if phrase.lower() not in content.lower():
                 errors.append(f"roles/{agent}.md missing designer boundary: {phrase}")
+        if agent in {"aggressive-designer", "conservative-designer"}:
+            for phrase in contains_all(content, ["confidence", "evidence pointer"]):
+                errors.append(f"roles/{agent}.md missing designer confidence phrase: {phrase}")
         if agent == "genius":
             for phrase in ["Output Budget", "8000"]:
                 if phrase.lower() not in content.lower():
@@ -559,6 +574,12 @@ def check_roles() -> list[str]:
     ]:
         if phrase.lower() not in aufheben_content.lower():
             errors.append(f"roles/aufheben-designer.md missing aufheben verdict phrase: {phrase}")
+    for phrase in contains_all(aufheben_content, [
+        "low-confidence convergence",
+        "high-confidence convergence",
+        "high-confidence disagreement",
+    ]):
+        errors.append(f"roles/aufheben-designer.md missing confidence quadrant phrase: {phrase}")
     return errors
 
 
@@ -589,6 +610,9 @@ def check_codex_adapters(toml_data: dict[Path, dict]) -> list[str]:
             errors.append(f"{rel(path)} must reference {SCHEMA_BY_AGENT[agent]}")
         if "No adoption authority" not in instructions:
             errors.append(f"{rel(path)} must state no adoption authority")
+        if agent == "conservative-designer":
+            for phrase in contains_all(instructions, ["confidence", "evidence pointer"]):
+                errors.append(f"{rel(path)} missing designer confidence phrase: {phrase}")
     return errors
 
 
@@ -609,6 +633,16 @@ def check_claude_adapters() -> list[str]:
             errors.append(f"{rel(path)} must reference {SCHEMA_BY_AGENT[agent]}")
         if "No adoption authority" not in body:
             errors.append(f"{rel(path)} must state no adoption authority")
+        if agent == "aggressive-designer":
+            for phrase in contains_all(body, ["confidence", "evidence pointer"]):
+                errors.append(f"{rel(path)} missing designer confidence phrase: {phrase}")
+        if agent == "aufheben-designer":
+            for phrase in contains_all(body, [
+                "low-confidence convergence",
+                "high-confidence convergence",
+                "high-confidence disagreement",
+            ]):
+                errors.append(f"{rel(path)} missing confidence quadrant phrase: {phrase}")
         tools = frontmatter.get("tools", "")
         read_only_agents = {"aggressive-designer", "genius", "aufheben-designer"}
         if agent in read_only_agents and any(tool in tools for tool in ["Bash", "Edit", "Write"]):

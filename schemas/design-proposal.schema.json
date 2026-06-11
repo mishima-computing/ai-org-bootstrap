@@ -12,7 +12,8 @@
     "assumptions",
     "constraints",
     "things_to_avoid",
-    "handoff_notes"
+    "handoff_notes",
+    "confidence"
   ],
   "properties": {
     "role_id": {
@@ -63,6 +64,49 @@
     },
     "handoff_notes": {
       "type": "string"
+    },
+    "confidence": {
+      "type": "object",
+      "required": [
+        "overall_posture",
+        "grounded_claims",
+        "speculative_claims"
+      ],
+      "properties": {
+        "overall_posture": {
+          "type": "string",
+          "enum": [
+            "grounded",
+            "speculative"
+          ]
+        },
+        "grounded_claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "claim",
+              "evidence_ref"
+            ],
+            "properties": {
+              "claim": {
+                "type": "string"
+              },
+              "evidence_ref": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "speculative_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false
