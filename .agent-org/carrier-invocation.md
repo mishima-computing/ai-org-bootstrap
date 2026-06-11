@@ -64,6 +64,20 @@ python3 scripts/validate-bootstrap-pack.py \
 
 Codex `--output-schema` requires every property schema that declares `const` or `enum` to also declare an explicit `type`, because OpenAI structured_output validation rejects typeless const/enum properties. If `--output-schema` fails before model execution, for example with HTTP 400, re-run without `--output-schema`, instruct final-message-JSON-only output, and validate the captured result post-hoc with `python3 scripts/validate-bootstrap-pack.py --schema "schemas/<schema>.schema.json" --instance ".agent-runs/<run_id>/carriers/codex/<agent>/result.json"`.
 
+### F12 Optional-Property Schema Shape
+
+For any role schema where `properties` contains keys omitted from `required`, such as `schemas/design-proposal.schema.json`, the primary Codex route is no `--output-schema`. Invoke `codex exec` with the same sandbox, target directory, input, output path, stderr capture, and `< /dev/null`, but omit the `--output-schema "schemas/<schema>.schema.json"` argument.
+
+The result must still be JSON-only and must pass mandatory post-hoc validation:
+
+```bash
+python3 scripts/validate-bootstrap-pack.py \
+  --schema "schemas/<schema>.schema.json" \
+  --instance ".agent-runs/<run_id>/carriers/codex/<agent>/result.json"
+```
+
+Do not rewrite schemas into null-union form to satisfy structured output. The schema file remains the source of truth; the no `--output-schema` route only avoids a carrier-side schema-shape rejection before model execution.
+
 Codex `carrier-status.json` must record the invoked command, exit status, sandbox mode, first stderr line on failure, and timeout/fallback status. Do not capture tokens, credentials, or the full environment.
 
 If the Codex `-o result.json` file fails JSON parse or schema validation, run `scripts/extract-claude-result.py --raw-text ".agent-runs/<run_id>/carriers/codex/<agent>/result.json" --out ".agent-runs/<run_id>/carriers/codex/<agent>/result.json"` before any carrier retry. The raw-text fallback uses the same pipeline as Claude string results: direct parse, then bounded closure repair, then largest-object salvage. The extracted result must still pass schema validation.
