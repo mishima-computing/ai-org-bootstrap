@@ -20,6 +20,15 @@ Use when the current Git repository is the human target repository and the requi
 
 Validate the local pack files before routing agents.
 
+If `.agent-org/pack-version` exists and validates, Mode B may be re-materialized from a local upstream without repeating the approval phrase:
+
+```bash
+python3 scripts/sync-pack.py "<local_upstream_ai_org_bootstrap_path>"
+python3 scripts/validate-bootstrap-pack.py --mode target
+```
+
+This path is only for updating a target that already carries a valid stamp written by a prior approved materialization. If the stamp is absent, malformed, or fails validation, the repository is treated as an unstamped target and the full initial materialization approval regime still applies.
+
 ### Mode C: target repo without vendored pack
 
 Use when the current Git repository is the human target repository and required pack files are missing.
@@ -50,4 +59,4 @@ Stop with `bootstrap_pack_not_materialized` when:
 - explicit materialization approval is absent
 - required tooling is unavailable
 - the target repo is ambiguous
-- materialization would overwrite existing target content
+- unstamped materialization would overwrite existing target content

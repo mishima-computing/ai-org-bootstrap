@@ -1,0 +1,438 @@
+{
+  "manifest_version": 1,
+  "entries": [
+    {
+      "path": "pack-manifest.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "bootstrap/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "bootstrap/README.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "bootstrap/codex-bootstrap.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/runtime-registry.yaml",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/execution-substrate.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/knowledge/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/README.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/knowledge/ecosystems/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/domains/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/worktree-policy.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/artifact-policy.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/pack-materialization.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/carrier-invocation.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/run-lifecycle.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".codex/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".codex/config.toml",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".codex/agents/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".codex/agents/.gitkeep",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".codex/agents/conservative-designer.toml",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".codex/agents/functional-ci-action-writer.toml",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".codex/agents/implementer.toml",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".codex/agents/nonfunctional-ci-action-writer.toml",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".claude/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".claude/settings.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".claude/agents/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".claude/agents/.gitkeep",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".claude/agents/aggressive-designer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".claude/agents/aufheben-designer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".claude/agents/genius.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".claude/agents/implementer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".claude/agents/security-ci-action-writer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".claude/skills/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".claude/skills/.gitkeep",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "scripts/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "scripts/run-gates.sh",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "scripts/extract-claude-result.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "scripts/hash-artifacts.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "scripts/validate-bootstrap-pack.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "scripts/sync-pack.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "roles/aggressive-designer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/aufheben-designer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/conservative-designer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/controller.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/functional-ci-action-writer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/genius.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/implementer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/nonfunctional-ci-action-writer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "roles/security-ci-action-writer.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "schemas/aufheben-verdict.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/ci-action-writer-result.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/controller-disclosure.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/design-proposal.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/genius-packet.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/implementation-contract.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/implementation-result.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/knowledge/cards/",
+      "type": "dir",
+      "tier": "repo_local",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/cards/aufheben-redo-loop.md",
+      "type": "file",
+      "tier": "repo_local",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/project/",
+      "type": "dir",
+      "tier": "repo_local",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/history/",
+      "type": "dir",
+      "tier": "repo_local",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/history/.gitkeep",
+      "type": "file",
+      "tier": "repo_local",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-runs/",
+      "type": "dir",
+      "tier": "repo_local",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "README.md",
+      "type": "file",
+      "tier": "repo_local",
+      "check_applicability": "source_only",
+      "required": false
+    },
+    {
+      "path": "docs/evaluation/",
+      "type": "dir",
+      "tier": "repo_local",
+      "check_applicability": "source_only",
+      "required": false
+    },
+    {
+      "path": "docs/evaluation/genius-ab-protocol.md",
+      "type": "file",
+      "tier": "repo_local",
+      "check_applicability": "source_only",
+      "required": false
+    }
+  ]
+}

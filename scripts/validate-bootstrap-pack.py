@@ -3,12 +3,17 @@ from __future__ import annotations
 
 import json
 import argparse
+import hashlib
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PACK_MANIFEST = ROOT / "pack-manifest.json"
+PACK_VERSION = ROOT / ".agent-org/pack-version"
+SOURCE_REPO_SLUG = "mishima-computing/ai-org-bootstrap"
 
 FINAL_AGENTS = [
     "functional-ci-action-writer",
@@ -44,6 +49,11 @@ REQUIRED_SCHEMAS = [
     "implementation-contract.schema.json",
     "implementation-result.schema.json",
     "aufheben-verdict.schema.json",
+]
+
+DISTRIBUTION_REQUIRED_FILES = [
+    "pack-manifest.json",
+    "scripts/sync-pack.py",
 ]
 
 ROLE_HEADINGS = [
@@ -269,12 +279,39 @@ SCHEMA_SAMPLE_INSTANCES = {
 }
 
 
+class ValidationReadError(Exception):
+    def __init__(self, path: Path, detail: str):
+        self.path = path
+        self.detail = detail
+        super().__init__(f"{rel(path)}: {detail}")
+
+
 def rel(path: Path) -> str:
     return str(path.relative_to(ROOT))
 
 
 def text(path: Path) -> str:
-    return path.read_text(encoding="utf-8")
+    try:
+        return path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        raise ValidationReadError(path, "missing") from None
+    except IsADirectoryError:
+        raise ValidationReadError(path, "is a directory") from None
+    except OSError as exc:
+        raise ValidationReadError(path, str(exc)) from None
+    except UnicodeDecodeError as exc:
+        raise ValidationReadError(path, f"utf8_decode_error: {exc}") from None
+
+
+def format_read_error(exc: ValidationReadError) -> str:
+    return f"file_read_error: {rel(exc.path)}: {exc.detail}"
+
+
+def guarded(check_name: str, func, *args) -> list[str]:
+    try:
+        return func(*args)
+    except ValidationReadError as exc:
+        return [f"{check_name}: {format_read_error(exc)}"]
 
 
 def contains_all(content: str, phrases: list[str]) -> list[str]:
@@ -283,13 +320,14 @@ def contains_all(content: str, phrases: list[str]) -> list[str]:
 
 
 def parse_frontmatter(path: Path) -> tuple[dict[str, str], str, str | None]:
-    lines = text(path).splitlines()
+    content = text(path)
+    lines = content.splitlines()
     if not lines or lines[0].strip() != "---":
-        return {}, text(path), "missing opening frontmatter fence"
+        return {}, content, "missing opening frontmatter fence"
     try:
         end_index = lines[1:].index("---") + 1
     except ValueError:
-        return {}, text(path), "missing closing frontmatter fence"
+        return {}, content, "missing closing frontmatter fence"
     frontmatter: dict[str, str] = {}
     for line in lines[1:end_index]:
         if ":" in line:
@@ -325,8 +363,137 @@ def parse_json_files() -> list[str]:
 def load_json(path: Path) -> tuple[object | None, str | None]:
     try:
         return json.loads(text(path)), None
+    except ValidationReadError as exc:
+        return None, format_read_error(exc)
     except Exception as exc:  # noqa: BLE001
         return None, str(exc)
+
+
+def invalid_manifest_path(path: object) -> str | None:
+    if not isinstance(path, str) or not path:
+        return "path must be a non-empty string"
+    if path.startswith(("/", "\\")) or re.match(r"^[A-Za-z]:", path):
+        return "path must be relative"
+    stripped = path.rstrip("/")
+    if not stripped:
+        return "path must not be repository root"
+    parts = stripped.split("/")
+    if any(part in {"", ".", ".."} for part in parts):
+        return "path must not contain empty, '.', or '..' segments"
+    return None
+
+
+def load_pack_manifest() -> tuple[dict | None, list[str]]:
+    loaded, error = load_json(PACK_MANIFEST)
+    if error:
+        return None, [f"manifest_parse_error: pack-manifest.json: {error}"]
+    if not isinstance(loaded, dict):
+        return None, ["manifest_parse_error: pack-manifest.json: root must be object"]
+    entries = loaded.get("entries")
+    if not isinstance(entries, list):
+        return None, ["manifest_parse_error: pack-manifest.json: entries must be array"]
+
+    errors: list[str] = []
+    seen: set[str] = set()
+    for index, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            errors.append(f"manifest_parse_error: entries[{index}] must be object")
+            continue
+        raw_path = entry.get("path")
+        path_error = invalid_manifest_path(raw_path)
+        if path_error:
+            errors.append(f"manifest_parse_error: entries[{index}].path: {path_error}")
+            continue
+        normalized = str(raw_path).rstrip("/") + ("/" if str(raw_path).endswith("/") else "")
+        if normalized in seen:
+            errors.append(f"manifest_parse_error: duplicate path: {normalized}")
+        seen.add(normalized)
+        if entry.get("type") not in {"file", "dir"}:
+            errors.append(f"manifest_parse_error: {raw_path}: type must be file or dir")
+        if entry.get("tier") not in {"pack_level", "repo_local"}:
+            errors.append(f"manifest_parse_error: {raw_path}: tier must be pack_level or repo_local")
+        if entry.get("check_applicability") not in {"source_only", "everywhere"}:
+            errors.append(f"manifest_parse_error: {raw_path}: check_applicability must be source_only or everywhere")
+        if entry.get("type") == "dir" and not str(raw_path).endswith("/"):
+            errors.append(f"manifest_parse_error: {raw_path}: dir paths must end with /")
+        if entry.get("type") == "file" and str(raw_path).endswith("/"):
+            errors.append(f"manifest_parse_error: {raw_path}: file paths must not end with /")
+
+    return (None, errors) if errors else (loaded, [])
+
+
+def manifest_required_files(manifest: dict) -> list[str]:
+    required: list[str] = []
+    for entry in manifest.get("entries", []):
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("tier") != "pack_level" or entry.get("type") != "file":
+            continue
+        if entry.get("required") is False:
+            continue
+        required.append(str(entry["path"]))
+    return sorted(required)
+
+
+def manifest_pack_files(manifest: dict) -> list[str]:
+    files: list[str] = []
+    for entry in manifest.get("entries", []):
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("tier") == "pack_level" and entry.get("type") == "file":
+            files.append(str(entry["path"]))
+    return sorted(files)
+
+
+def legacy_required_files() -> list[str]:
+    required = [
+        "bootstrap/codex-bootstrap.md",
+        "bootstrap/README.md",
+        ".agent-org/runtime-registry.yaml",
+        ".agent-org/execution-substrate.md",
+        ".agent-org/knowledge/README.md",
+        ".agent-org/worktree-policy.md",
+        ".agent-org/artifact-policy.md",
+        ".agent-org/pack-materialization.md",
+        ".agent-org/carrier-invocation.md",
+        ".agent-org/run-lifecycle.md",
+        ".codex/config.toml",
+        ".claude/settings.json",
+        "scripts/run-gates.sh",
+        "scripts/extract-claude-result.py",
+        "scripts/hash-artifacts.py",
+        "scripts/validate-bootstrap-pack.py",
+    ]
+    required.extend(DISTRIBUTION_REQUIRED_FILES)
+    required.extend(f"roles/{agent}.md" for agent in FINAL_AGENTS + ["controller"])
+    required.extend(f".codex/agents/{agent}.toml" for agent in CODEX_ADAPTERS)
+    required.extend(f".claude/agents/{agent}.md" for agent in CLAUDE_ADAPTERS)
+    required.extend(f"schemas/{name}" for name in REQUIRED_SCHEMAS)
+    return sorted(required)
+
+
+def check_pack_manifest_self_test(manifest: dict) -> list[str]:
+    errors: list[str] = []
+    expected = set(legacy_required_files())
+    actual = set(manifest_required_files(manifest))
+    missing = sorted(expected - actual)
+    extra = sorted(actual - expected)
+    if missing:
+        errors.append(f"manifest_required_files_mismatch: missing legacy entries: {missing}")
+    if extra:
+        errors.append(f"manifest_required_files_mismatch: extra entries: {extra}")
+
+    entries = manifest.get("entries", [])
+    ecosystems = next((entry for entry in entries if isinstance(entry, dict) and entry.get("path") == ".agent-org/knowledge/ecosystems/"), None)
+    domains = next((entry for entry in entries if isinstance(entry, dict) and entry.get("path") == ".agent-org/knowledge/domains/"), None)
+    for name, entry in [("ecosystems", ecosystems), ("domains", domains)]:
+        if not entry or entry.get("tier") != "pack_level" or entry.get("type") != "dir":
+            errors.append(f"manifest_boundary_error: .agent-org/knowledge/{name}/ must be a pack_level dir")
+    for path in [".agent-org/knowledge/cards/", ".agent-org/knowledge/project/", ".agent-org/history/", ".agent-runs/"]:
+        entry = next((item for item in entries if isinstance(item, dict) and item.get("path") == path), None)
+        if not entry or entry.get("tier") != "repo_local":
+            errors.append(f"manifest_boundary_error: {path} must be repo_local")
+    return errors
 
 
 def matches_json_type(value: object, expected: str) -> bool:
@@ -516,30 +683,13 @@ def load_toml(paths: list[Path]) -> tuple[dict[Path, dict], list[str], list[str]
     return parsed, errors, warnings
 
 
-def check_required_files() -> list[str]:
-    required = [
-        ROOT / "bootstrap/codex-bootstrap.md",
-        ROOT / "bootstrap/README.md",
-        ROOT / ".agent-org/runtime-registry.yaml",
-        ROOT / ".agent-org/execution-substrate.md",
-        ROOT / ".agent-org/knowledge/README.md",
-        ROOT / ".agent-org/worktree-policy.md",
-        ROOT / ".agent-org/artifact-policy.md",
-        ROOT / ".agent-org/pack-materialization.md",
-        ROOT / ".agent-org/carrier-invocation.md",
-        ROOT / ".agent-org/run-lifecycle.md",
-        ROOT / ".codex/config.toml",
-        ROOT / ".claude/settings.json",
-        ROOT / "scripts/run-gates.sh",
-        ROOT / "scripts/extract-claude-result.py",
-        ROOT / "scripts/hash-artifacts.py",
-        ROOT / "scripts/validate-bootstrap-pack.py",
-    ]
-    required.extend(ROOT / "roles" / f"{agent}.md" for agent in FINAL_AGENTS)
-    required.extend(ROOT / ".codex/agents" / f"{agent}.toml" for agent in CODEX_ADAPTERS)
-    required.extend(ROOT / ".claude/agents" / f"{agent}.md" for agent in CLAUDE_ADAPTERS)
-    required.extend(ROOT / "schemas" / name for name in REQUIRED_SCHEMAS)
-    return [rel(path) for path in required if not path.is_file()]
+def check_required_files(manifest: dict) -> list[str]:
+    errors: list[str] = []
+    for item in manifest_required_files(manifest):
+        path = ROOT / item
+        if not path.is_file():
+            errors.append(f"required_file_missing: {item}")
+    return errors
 
 
 def check_knowledge_cards() -> list[str]:
@@ -886,10 +1036,117 @@ def check_bootstrap() -> list[str]:
     return errors
 
 
+def infer_pack_mode(override: str | None, stamp_exists: bool) -> str:
+    if override:
+        return override
+    return "target" if stamp_exists else "source"
+
+
+def check_mode_detection_samples() -> list[str]:
+    errors: list[str] = []
+    cases = [
+        (None, False, "source"),
+        (None, True, "target"),
+        ("source", True, "source"),
+        ("target", False, "target"),
+    ]
+    for override, stamp_exists, expected in cases:
+        actual = infer_pack_mode(override, stamp_exists)
+        if actual != expected:
+            errors.append(f"mode_detection_sample_failed: override={override!r} stamp_exists={stamp_exists!r}")
+    return errors
+
+
+def is_source_repo() -> bool:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(ROOT), "remote", "-v"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+    except (OSError, subprocess.SubprocessError):
+        result = None
+    if result and SOURCE_REPO_SLUG in result.stdout:
+        return True
+    return (
+        ROOT.name == "ai-org-bootstrap"
+        and (ROOT / "docs/evaluation/genius-ab-protocol.md").is_file()
+        and (ROOT / "bootstrap/codex-bootstrap.md").is_file()
+    )
+
+
+def check_mode(mode: str, stamp_exists: bool) -> list[str]:
+    errors: list[str] = []
+    if stamp_exists and (mode == "source" or is_source_repo()):
+        errors.append("stamp_in_source_repo: .agent-org/pack-version exists while validating the source pack")
+    return errors
+
+
+def check_pack_stamp(manifest: dict, mode: str, stamp_exists: bool) -> list[str]:
+    if mode != "target" or not stamp_exists:
+        return []
+
+    loaded, error = load_json(PACK_VERSION)
+    if error or not isinstance(loaded, dict):
+        return [f"pack_stamp_invalid: .agent-org/pack-version: {error or 'stamp must be object'}"]
+
+    errors: list[str] = []
+    for key in ["upstream_commit", "synced_at", "manifest_sha256", "files"]:
+        if key not in loaded:
+            errors.append(f"pack_stamp_invalid: missing field {key}")
+    manifest_hash = sha256_file(PACK_MANIFEST)
+    if loaded.get("manifest_sha256") != manifest_hash:
+        errors.append("pack_stamp_invalid: manifest_sha256 does not match pack-manifest.json")
+    if not isinstance(loaded.get("files"), dict):
+        errors.append("pack_stamp_invalid: files must be object")
+    elif manifest:
+        expected_files = set(manifest_required_files(manifest))
+        pack_files = set(manifest_pack_files(manifest))
+        stamped_files = set(str(item) for item in loaded["files"])
+        missing = sorted(expected_files - stamped_files)
+        if missing:
+            errors.append(f"pack_stamp_invalid: missing file hashes: {missing}")
+        extra = sorted(stamped_files - pack_files)
+        if extra:
+            errors.append(f"pack_stamp_invalid: non-manifest file hashes: {extra}")
+        for stamped_path, stamped_hash in sorted(loaded["files"].items()):
+            path_error = invalid_manifest_path(stamped_path)
+            if path_error:
+                errors.append(f"pack_stamp_invalid: {stamped_path}: {path_error}")
+                continue
+            if not isinstance(stamped_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", stamped_hash):
+                errors.append(f"pack_stamp_invalid: {stamped_path}: sha256 must be lowercase hex")
+                continue
+            current_path = ROOT / stamped_path
+            if not current_path.is_file():
+                errors.append(f"pack_stamp_drift: {stamped_path}: missing")
+                continue
+            current_hash = sha256_file(current_path)
+            if current_hash != stamped_hash:
+                errors.append(f"pack_stamp_drift: {stamped_path}: sha256 mismatch")
+    return errors
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    try:
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+    except FileNotFoundError:
+        raise ValidationReadError(path, "missing") from None
+    except OSError as exc:
+        raise ValidationReadError(path, str(exc)) from None
+    return digest.hexdigest()
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate the AI Quality Bootstrap pack.")
     parser.add_argument("--schema", help="Schema file for validating one JSON instance.")
     parser.add_argument("--instance", help="JSON instance file to validate against --schema.")
+    parser.add_argument("--mode", choices=["source", "target"], help="Override source/target pack validation mode.")
     args = parser.parse_args(argv)
 
     if args.schema or args.instance:
@@ -901,28 +1158,41 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         return validate_instance_cli(args.schema, args.instance)
 
+    stamp_exists = PACK_VERSION.is_file()
+    mode = infer_pack_mode(args.mode, stamp_exists)
+    manifest, manifest_errors = load_pack_manifest()
+
     toml_paths = [ROOT / ".codex/config.toml"] + sorted((ROOT / ".codex/agents").glob("*.toml"))
     toml_data, toml_errors, warnings = load_toml(toml_paths)
 
     errors: list[str] = []
-    errors.extend(f"missing: {item}" for item in check_required_files())
-    errors.extend(f"json_parse_error: {item}" for item in parse_json_files())
-    errors.extend(f"schema_conformance_error: {item}" for item in check_schema_samples())
-    errors.extend(f"schema_explicit_type_error: {item}" for item in check_schema_explicit_types())
+    errors.extend(manifest_errors)
+    errors.extend(check_mode(mode, stamp_exists))
+    errors.extend(check_mode_detection_samples())
+    if manifest is not None:
+        errors.extend(check_pack_manifest_self_test(manifest))
+        errors.extend(check_required_files(manifest))
+        errors.extend(guarded("check_pack_stamp", check_pack_stamp, manifest, mode, stamp_exists))
+    errors.extend(f"json_parse_error: {item}" for item in guarded("parse_json_files", parse_json_files))
+    errors.extend(f"schema_conformance_error: {item}" for item in guarded("check_schema_samples", check_schema_samples))
+    errors.extend(f"schema_explicit_type_error: {item}" for item in guarded("check_schema_explicit_types", check_schema_explicit_types))
     errors.extend(f"toml_parse_error: {item}" for item in toml_errors)
-    errors.extend(check_knowledge_cards())
-    errors.extend(check_active_directories())
-    errors.extend(check_controller_role())
-    errors.extend(check_roles())
-    errors.extend(check_codex_adapters(toml_data))
-    errors.extend(check_claude_adapters())
-    errors.extend(check_evaluation_docs())
-    errors.extend(check_registry())
-    errors.extend(check_pack_policies(toml_data))
-    errors.extend(check_bootstrap())
+    errors.extend(guarded("check_knowledge_cards", check_knowledge_cards))
+    errors.extend(guarded("check_active_directories", check_active_directories))
+    errors.extend(guarded("check_controller_role", check_controller_role))
+    errors.extend(guarded("check_roles", check_roles))
+    errors.extend(guarded("check_codex_adapters", check_codex_adapters, toml_data))
+    errors.extend(guarded("check_claude_adapters", check_claude_adapters))
+    if mode == "source":
+        errors.extend(guarded("check_evaluation_docs", check_evaluation_docs))
+    errors.extend(guarded("check_registry", check_registry))
+    errors.extend(guarded("check_pack_policies", check_pack_policies, toml_data))
+    if mode == "source":
+        errors.extend(guarded("check_bootstrap", check_bootstrap))
 
     payload = {
         "status": "pass" if not errors else "fail",
+        "mode": mode,
         "errors": errors,
         "warnings": warnings,
     }
