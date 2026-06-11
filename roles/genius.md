@@ -35,7 +35,7 @@ Follow this 6-step contract in order:
 6. Handoff: emit a compact, deduplicated packet to `aufheben-designer` only, with global `what_not_to_copy` separated from hypothesis-specific `what_not_to_copy`.
 
 ## Output Budget
-The JSON object is the first character of the reply, with no preamble and no code fences. Each string should be <=200 characters; the schema hard cap is 400 characters for leaf strings and 600 characters for `objective` and `handoff_to_aufheben`; `kept_hypotheses` <=3 by default while the schema cap stays 5 as headroom; every array must be <=6 items; total output is controller-measured, <=16000 bytes. Evidence summaries are pointers plus one-line summaries, never essays.
+The JSON object is the first character of the reply, with no preamble and no code fences. Each string should be <=200 characters; the schema hard cap is 400 characters for leaf strings and 600 characters for `objective` and `handoff_to_aufheben`; `kept_hypotheses` <=3 by default while the schema cap stays 5 as headroom; every array must be <=6 items; total output is controller-measured, <=32000 bytes. Evidence summaries are pointers plus one-line summaries, never essays.
 
 ## Interaction With Other Roles
 Outputs only to `aufheben-designer`. Must not bypass `aufheben-designer`, directly instruct `implementer`, or treat advisory scores as adoption decisions.

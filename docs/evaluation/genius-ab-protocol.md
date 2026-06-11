@@ -83,7 +83,7 @@ Rationale: the metric tracks whether aggressive-designer is producing falsifiabl
 
 ### `budget_compliance`
 
-Definition: controller-measured `result.json` byte size for each genius packet, compared with a 16000-byte threshold, plus an extraction-path field recorded as `intact`, `closure-repaired`, or `salvaged`.
+Definition: controller-measured `result.json` byte size for each genius packet, compared with a 32000-byte threshold, plus an extraction-path field recorded as `intact`, `closure-repaired`, or `salvaged`.
 
 Computation: for each future genius run, the controller records the emitted `result.json` size in bytes and the extraction path that produced the artifact. Measure it forward only; do not retroactively rebucket prior cycles. The model does not report, estimate, or add any budget field to its JSON packet.
 

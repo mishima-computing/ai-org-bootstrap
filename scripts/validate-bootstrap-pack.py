@@ -663,7 +663,7 @@ def check_roles() -> list[str]:
             if not re.search(r"select.{0,40}(~?3|three)", content, re.IGNORECASE | re.DOTALL):
                 errors.append(f"roles/{agent}.md missing aggressive phrase: select near 3")
         if agent == "genius":
-            for phrase in ["Output Budget", "16000"]:
+            for phrase in ["Output Budget", "32000"]:
                 if phrase.lower() not in content.lower():
                     errors.append(f"roles/{agent}.md missing genius budget phrase: {phrase}")
     aufheben_content = text(ROOT / "roles/aufheben-designer.md")
@@ -763,8 +763,8 @@ def check_claude_adapters() -> list[str]:
                     errors.append(f"{rel(path)} missing external research tool: {tool}")
             if "verification_status" not in body:
                 errors.append(f"{rel(path)} must define verification_status behavior")
-            if "16000" not in body:
-                errors.append(f"{rel(path)} missing genius budget phrase: 16000")
+            if "32000" not in body:
+                errors.append(f"{rel(path)} missing genius budget phrase: 32000")
     return errors
 
 
