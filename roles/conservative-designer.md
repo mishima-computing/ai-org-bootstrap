@@ -27,6 +27,8 @@ Stop when current constraints cannot be observed or the proposal would require i
 ## Evidence Requirements
 Proposal summary, safe path, constraints, risks, checks that must remain green, things not to change, and handoff notes for `aufheben-designer`.
 
+Declare `confidence` with `overall_posture` and 3-7 total claims. Every grounded claim needs an evidence pointer, using a repo path or external ref only, not quoted content; keep unsupported claims in `speculative_claims`.
+
 ## Interaction With Other Roles
 Outputs only to `aufheben-designer`.
 

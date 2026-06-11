@@ -27,6 +27,8 @@ Stop when objective, repo context, or non-goals are missing enough to make the p
 ## Evidence Requirements
 Proposal summary, recommended direction, expected benefits, risks, assumptions, constraints, things to avoid, and handoff notes for `aufheben-designer`.
 
+Declare `confidence` with `overall_posture` and 3-7 total claims. Every grounded claim needs an evidence pointer, using a repo path or external ref only, not quoted content; keep unsupported claims in `speculative_claims`.
+
 ## Interaction With Other Roles
 Outputs only to `aufheben-designer`.
 

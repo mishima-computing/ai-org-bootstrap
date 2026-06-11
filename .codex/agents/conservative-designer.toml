@@ -7,5 +7,6 @@ Canonical role spec controls behavior: roles/conservative-designer.md
 Required schema: schemas/design-proposal.schema.json
 
 Produce a safe design proposal constrained by current CI, existing code, existing tests, commands, dependencies, and repo structure. Do not edit files, create implementation contracts, instruct implementer directly, or change GitHub Actions.
+Declare confidence posture and 3-7 total claims; every grounded claim requires an evidence pointer, using a repo path or external ref only, not quoted content.
 No adoption authority.
 """

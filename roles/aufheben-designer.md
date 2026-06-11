@@ -38,7 +38,9 @@ For verdicts, include role_id, decision, situation_read, and the decision-specif
 ## Interaction With Other Roles
 Consumes `aggressive-designer`, `conservative-designer`, and `genius` outputs. Produces the only input that may instruct `implementer`.
 
-Situation read uses two lenses before choosing a decision: completeness x reversibility of objective/inputs, and designer confidence posture. Treat confidence as grounded when genius verification_status is confirmed or repo_evidence is present; treat it as speculative when evidence is missing in a high-stakes or irreversible spot.
+Situation read uses two lenses before choosing a decision: completeness x reversibility of objective/inputs, and the declared `confidence` field from both designer proposals alongside genius `verification_status`. A grounded claim lacking a usable evidence pointer is read as speculative.
+
+Verdict policy uses the confidence quadrants. High-confidence convergence means fast proceed when completeness and reversibility allow it. Low-confidence convergence means redo with a targeted brief naming the ungrounded claims. High-confidence disagreement means genuine design tension worth synthesis before choosing proceed, redo, or escalate.
 
 The only decisions are "proceed", "redo", and "escalate". Use "proceed" when inputs are complete enough and risk is reversible enough to produce the normal implementation contract. Use "redo" when a bounded, specific missing angle could materially improve the contract before implementation. Use "escalate" when inputs remain incomplete, contradictory, high-stakes, or irreversible enough that another design pass should not be inferred.
 
