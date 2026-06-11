@@ -781,7 +781,10 @@ def check_ui_profile_cards() -> list[str]:
         "evidence_refs",
         "evidence_refs cap: 6 pointers",
         "body cap: 12 nonblank lines",
-        "F11 boundary",
+        "exemplars",
+        "exemplars cap: 4 pointers",
+        "locale-pinned-URL@YYYY-MM-DD -> pattern-slug",
+        "#32 pack/repo boundary",
         "Product-specific worldview cards",
         ".agent-org/knowledge/cards/",
         "#32 boundary",
@@ -789,7 +792,15 @@ def check_ui_profile_cards() -> list[str]:
         errors.append(f".agent-org/knowledge/ui/README.md missing UI profile phrase: {phrase}")
 
     required_keys = {"profile_id", "scope", "covers", "freshness", "supersede_trigger", "evidence_refs"}
-    required_cards = ["ui-feel-foundations.md", "ui-gacha-genre.md"]
+    optional_keys = {"exemplars"}
+    required_cards = [
+        "ui-feel-foundations.md",
+        "ui-gacha-genre.md",
+        "ui-bilingual-typography.md",
+        "ui-composition-patterns.md",
+        "ui-information-design.md",
+        "ui-corporate-trust-genre.md",
+    ]
     for filename in required_cards:
         path = ui_dir / filename
         if not path.is_file():
@@ -802,7 +813,7 @@ def check_ui_profile_cards() -> list[str]:
         actual_keys = set(frontmatter)
         for key in sorted(required_keys - actual_keys):
             errors.append(f"{rel(path)} missing UI profile frontmatter key: {key}")
-        for key in sorted(actual_keys - required_keys):
+        for key in sorted(actual_keys - required_keys - optional_keys):
             errors.append(f"{rel(path)} unexpected UI profile frontmatter key: {key}")
         for key in sorted(required_keys & actual_keys):
             if not frontmatter[key]:
@@ -814,6 +825,15 @@ def check_ui_profile_cards() -> list[str]:
             errors.append(f"{rel(path)} evidence_refs must contain at least one pointer")
         if len(evidence_refs) > 6:
             errors.append(f"{rel(path)} evidence_refs must contain at most 6 pointers")
+        if "exemplars" in frontmatter:
+            exemplars = [item.strip() for item in frontmatter["exemplars"].split(";") if item.strip()]
+            if not exemplars:
+                errors.append(f"{rel(path)} exemplars must contain at least one pointer when present")
+            if len(exemplars) > 4:
+                errors.append(f"{rel(path)} exemplars must contain at most 4 pointers")
+            for item in exemplars:
+                if not re.match(r"^https?://[^\s;]+@\d{4}-\d{2}-\d{2} -> [a-z0-9-]+$", item):
+                    errors.append(f"{rel(path)} invalid exemplar pointer: {item}")
         nonblank_body_lines = [line for line in body.splitlines() if line.strip()]
         if len(nonblank_body_lines) > 12:
             errors.append(f"{rel(path)} body must be at most 12 nonblank lines")
@@ -841,6 +861,47 @@ def check_ui_profile_cards() -> list[str]:
                 "yatai Stage-A pilot",
             ]):
                 errors.append(f"{rel(path)} missing gacha profile phrase: {phrase}")
+        if filename == "ui-bilingual-typography.md":
+            for phrase in contains_all(body, [
+                "one lead language per view",
+                "CJK glyph density",
+                "per-script size",
+                "Translation-only preserves structure",
+                "Claim limit: Claim legibility and focus effects only; never claim conversion, engagement, or SEO outcomes.",
+            ]):
+                errors.append(f"{rel(path)} missing bilingual profile phrase: {phrase}")
+        if filename == "ui-composition-patterns.md":
+            for phrase in contains_all(body, [
+                "Decidable check",
+                "Advisory check",
+                "proof-artifact density per view",
+                "consecutive same-type section cap",
+                "one lead language per view",
+                "plain-problem lead",
+                "jargon lead",
+                "Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.",
+            ]):
+                errors.append(f"{rel(path)} missing composition profile phrase: {phrase}")
+        if filename == "ui-information-design.md":
+            for phrase in contains_all(body, [
+                "図解",
+                "A list must become a figure",
+                "anti-monotony rules",
+                "Label",
+                "Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.",
+            ]):
+                errors.append(f"{rel(path)} missing information-design profile phrase: {phrase}")
+        if filename == "ui-corporate-trust-genre.md":
+            for phrase in contains_all(body, [
+                "K.K.-engagement provenance",
+                "decision register",
+                "決算公告 gravity",
+                "company personhood",
+                "trust-vs-LP register",
+                "short-horizon",
+                "Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.",
+            ]):
+                errors.append(f"{rel(path)} missing corporate-trust profile phrase: {phrase}")
     return errors
 
 
@@ -958,6 +1019,9 @@ def check_intake_template() -> list[str]:
         "UI/UX profiles",
         "aufheben escalate-on-missing-section convention",
         "not validator runtime inspection",
+        "## design-thesis",
+        "## interpretation-scope",
+        "## composition acceptance propositions",
     ]):
         errors.append(f"{rel(path)} missing intake phrase: {phrase}")
     return errors

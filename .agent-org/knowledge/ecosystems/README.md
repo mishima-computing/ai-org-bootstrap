@@ -14,4 +14,4 @@ Basename contract: card filename stem must equal `profile_id`; renames are selec
 
 Selection: `detect-ecosystem-profiles.py` may select these cards from manifest, config, runtime, or dependency-pin facts only. The initial HTML/CSS route is `pin:tailwindcss`; plain-CSS or CDN Tailwind repos without a package pin are a declared knowledge gap, not a selector guess.
 
-F11 boundary: cards carry conservative implementation-craft constraints, not tutorials, product worldview, or lint implementation.
+#32 pack/repo boundary: cards carry conservative implementation-craft constraints, not tutorials, product worldview, or lint implementation.
