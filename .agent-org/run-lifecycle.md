@@ -97,6 +97,8 @@ The resumed role must not receive wider file scope than its original contract.
 
 ## Closeout
 
+Controller disclosure is a closeout artifact only. `gates/controller-disclosure.json` is written post-verdict/closeout only, never before the `aufheben-designer` verdict, and must disclose each handoff against the leak classes recorded in `roles/controller.md`.
+
 Final report must include:
 
 - run_id
@@ -111,4 +113,6 @@ Final report must include:
 - checks failed
 - gaps
 - warnings
+- `.agent-runs/<run_id>/gates/aufheben-input-embed.json`
+- `.agent-runs/<run_id>/gates/controller-disclosure.json` when controller disclosure is written
 - controller may distill adopted-cycle facts into `.agent-org/knowledge/cards/` per `.agent-org/knowledge/README.md`

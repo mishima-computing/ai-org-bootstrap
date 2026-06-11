@@ -38,6 +38,7 @@ CLAUDE_ADAPTERS = [
 
 REQUIRED_SCHEMAS = [
     "ci-action-writer-result.schema.json",
+    "controller-disclosure.schema.json",
     "design-proposal.schema.json",
     "genius-packet.schema.json",
     "implementation-contract.schema.json",
@@ -84,6 +85,18 @@ SCHEMA_SAMPLE_INSTANCES = {
         "checks_already_present": [],
         "gaps": [],
         "files_changed": [],
+    },
+    "schemas/controller-disclosure.schema.json": {
+        "run_id": "20260611-112527-abcdef0",
+        "handoffs": [
+            {
+                "handoff": "designer-results-to-aufheben",
+                "forwarded_verbatim": True,
+                "source_sha256": "0" * 64,
+                "controller_authored_text": [],
+                "evaluative_language_added": [],
+            }
+        ],
     },
     "schemas/design-proposal.schema.json": {
         "role_id": "aggressive-designer",
@@ -514,8 +527,9 @@ def check_knowledge_cards() -> list[str]:
 def check_active_directories() -> list[str]:
     errors: list[str] = []
     role_files = sorted(path.stem for path in (ROOT / "roles").glob("*.md"))
-    if role_files != sorted(FINAL_AGENTS):
-        errors.append(f"roles directory must contain only final agents: {role_files}")
+    expected_roles = sorted(FINAL_AGENTS + ["controller"])
+    if role_files != expected_roles:
+        errors.append(f"roles directory must contain only final agents plus controller: {role_files}")
     codex_files = sorted(path.stem for path in (ROOT / ".codex/agents").glob("*.toml"))
     if codex_files != sorted(CODEX_ADAPTERS):
         errors.append(f".codex/agents must contain only expected adapters: {codex_files}")
@@ -525,6 +539,40 @@ def check_active_directories() -> list[str]:
     antigravity_files = sorted(path.name for path in (ROOT / ".antigravity/agents").glob("*.md"))
     if antigravity_files:
         errors.append(f".antigravity/agents must not contain active adapters: {antigravity_files}")
+    return errors
+
+
+def check_controller_role() -> list[str]:
+    errors: list[str] = []
+    path = ROOT / "roles/controller.md"
+    if not path.is_file():
+        return [f"missing: {rel(path)}"]
+    content = text(path)
+    for heading in ROLE_HEADINGS:
+        if heading not in content:
+            errors.append(f"{rel(path)} missing heading: {heading}")
+    for phrase in contains_all(content, [
+        "Primary Carrier",
+        "None. The controller is not a carrier agent.",
+        "invoke",
+        "retry",
+        "timeout",
+        "round-count",
+        "escalate-to-human",
+        "preference injection",
+        "evidence curation",
+        "framing",
+        "trust-weighting disguised as meta info",
+        "content-grounded loop decisions",
+        "forwarded verbatim",
+        "intake",
+        "post-adoption",
+        "verbatim transcription of contract-specified text",
+        "sandbox cannot write a file",
+        "verify findings limited to mechanical fact-checking against repo evidence",
+        "no adoption authority",
+    ]):
+        errors.append(f"{rel(path)} missing controller phrase: {phrase}")
     return errors
 
 
@@ -798,6 +846,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(f"toml_parse_error: {item}" for item in toml_errors)
     errors.extend(check_knowledge_cards())
     errors.extend(check_active_directories())
+    errors.extend(check_controller_role())
     errors.extend(check_roles())
     errors.extend(check_codex_adapters(toml_data))
     errors.extend(check_claude_adapters())
