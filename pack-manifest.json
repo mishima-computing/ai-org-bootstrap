@@ -59,6 +59,34 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": ".agent-org/knowledge/ui/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ui/README.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ui/ui-gacha-genre.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ui/ui-feel-foundations.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/ecosystems/",
       "type": "dir",
       "tier": "pack_level",
@@ -101,6 +129,13 @@
       "type": "file",
       "tier": "pack_level",
       "check_applicability": "everywhere"
+    },
+    {
+      "path": ".agent-org/intake-template.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
     },
     {
       "path": ".codex/",
