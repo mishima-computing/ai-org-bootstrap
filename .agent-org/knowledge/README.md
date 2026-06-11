@@ -4,6 +4,7 @@
 
 - `repo-map.md`: one compact pointer-style architecture map for the target repository.
 - `cards/*.md`: one durable fact per card; targets create this directory when cards exist.
+- `ui/*.md`: pack-level UI/UX profile cards available only when an objective names them.
 
 ## Card Format
 
@@ -31,6 +32,10 @@ Pointers: `.agent-org/knowledge/README.md`, `scripts/validate-bootstrap-pack.py`
 ## Ownership
 
 The controller or supervisor writes cards through post-adoption distillation. `genius` and designers read cards. `genius` may propose card-worthy facts in handoff text, but never writes cards.
+
+## UI Profile Cards
+
+`cards/` and `ui/` intentionally use different frontmatter grammars. Repo-local `cards/` store durable adopted facts. Pack-level `ui/` cards store objective-declared UI/UX capability pointers for `conservative-designer`; see `.agent-org/knowledge/ui/README.md`.
 
 ## Updates
 

@@ -764,6 +764,109 @@ def check_knowledge_cards() -> list[str]:
     return errors
 
 
+def check_ui_profile_cards() -> list[str]:
+    errors: list[str] = []
+    ui_dir = ROOT / ".agent-org/knowledge/ui"
+    if not ui_dir.is_dir():
+        return [".agent-org/knowledge/ui/ missing"]
+
+    readme = text(ui_dir / "README.md")
+    for phrase in contains_all(readme, [
+        "Profile Card Format",
+        "profile_id",
+        "scope",
+        "covers",
+        "freshness",
+        "supersede_trigger",
+        "evidence_refs",
+        "evidence_refs cap: 6 pointers",
+        "body cap: 12 nonblank lines",
+        "F11 boundary",
+        "Product-specific worldview cards",
+        ".agent-org/knowledge/cards/",
+        "#32 boundary",
+    ]):
+        errors.append(f".agent-org/knowledge/ui/README.md missing UI profile phrase: {phrase}")
+
+    required_keys = {"profile_id", "scope", "covers", "freshness", "supersede_trigger", "evidence_refs"}
+    required_cards = ["ui-feel-foundations.md", "ui-gacha-genre.md"]
+    for filename in required_cards:
+        path = ui_dir / filename
+        if not path.is_file():
+            errors.append(f"missing UI profile card: {rel(path)}")
+            continue
+        frontmatter, body, error = parse_frontmatter(path)
+        if error:
+            errors.append(f"{rel(path)} {error}")
+            continue
+        actual_keys = set(frontmatter)
+        for key in sorted(required_keys - actual_keys):
+            errors.append(f"{rel(path)} missing UI profile frontmatter key: {key}")
+        for key in sorted(actual_keys - required_keys):
+            errors.append(f"{rel(path)} unexpected UI profile frontmatter key: {key}")
+        for key in sorted(required_keys & actual_keys):
+            if not frontmatter[key]:
+                errors.append(f"{rel(path)} empty UI profile frontmatter key: {key}")
+        if frontmatter.get("profile_id") != path.stem:
+            errors.append(f"{rel(path)} profile_id must match filename stem")
+        evidence_refs = [item.strip() for item in frontmatter.get("evidence_refs", "").split(";") if item.strip()]
+        if not evidence_refs:
+            errors.append(f"{rel(path)} evidence_refs must contain at least one pointer")
+        if len(evidence_refs) > 6:
+            errors.append(f"{rel(path)} evidence_refs must contain at most 6 pointers")
+        nonblank_body_lines = [line for line in body.splitlines() if line.strip()]
+        if len(nonblank_body_lines) > 12:
+            errors.append(f"{rel(path)} body must be at most 12 nonblank lines")
+
+        card_text = body.lower()
+        if filename == "ui-feel-foundations.md":
+            for phrase in contains_all(body, [
+                "feel surfaces",
+                "proves:",
+                "timing-ranges",
+                "multimodal cue",
+                "silent fallback",
+                "do not claim usability or performance gains",
+                "Hicks et al.",
+            ]):
+                errors.append(f"{rel(path)} missing feel profile phrase: {phrase}")
+            if re.search(r"(?<![-/])\b\d+\s*ms\b(?!\s*[-/])", card_text):
+                errors.append(f"{rel(path)} must not encode fixed ms constants")
+        if filename == "ui-gacha-genre.md":
+            for phrase in contains_all(body, [
+                "rarity signaled before item",
+                "rarity language",
+                "anticipation",
+                "short-horizon",
+                "yatai Stage-A pilot",
+            ]):
+                errors.append(f"{rel(path)} missing gacha profile phrase: {phrase}")
+    return errors
+
+
+def check_intake_template() -> list[str]:
+    errors: list[str] = []
+    path = ROOT / ".agent-org/intake-template.md"
+    content = text(path)
+    for phrase in contains_all(content, [
+        "## Experience Constraints",
+        "Required for human-facing deliverables",
+        "strategy",
+        "scope",
+        "structure",
+        "frame",
+        "presentation",
+        "Feel surfaces",
+        "proves:",
+        "timing-ranges",
+        "UI/UX profiles",
+        "aufheben escalate-on-missing-section convention",
+        "not validator runtime inspection",
+    ]):
+        errors.append(f"{rel(path)} missing intake phrase: {phrase}")
+    return errors
+
+
 def check_active_directories() -> list[str]:
     errors: list[str] = []
     role_files = sorted(path.stem for path in (ROOT / "roles").glob("*.md"))
@@ -1050,6 +1153,11 @@ def check_pack_policies(toml_data: dict[Path, dict]) -> list[str]:
         "## Resume",
         "Do not redesign. Verify existing work against the original contract. Run required_checks. Emit the required report.",
         "preserve the dead attempt's artifacts unmodified",
+        "Stage-A UI/UX SPEC",
+        "Stage-B intake",
+        "docs-only UI/UX SPEC cycle",
+        "CI-constraints rank",
+        ".agent-org/intake-template.md",
     ]:
         if phrase not in lifecycle:
             errors.append(f".agent-org/run-lifecycle.md missing phrase: {phrase}")
@@ -1236,6 +1344,8 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(f"schema_explicit_type_error: {item}" for item in guarded("check_schema_explicit_types", check_schema_explicit_types))
     errors.extend(f"toml_parse_error: {item}" for item in toml_errors)
     errors.extend(guarded("check_knowledge_cards", check_knowledge_cards))
+    errors.extend(guarded("check_ui_profile_cards", check_ui_profile_cards))
+    errors.extend(guarded("check_intake_template", check_intake_template))
     errors.extend(guarded("check_active_directories", check_active_directories))
     errors.extend(guarded("check_controller_role", check_controller_role))
     errors.extend(guarded("check_roles", check_roles))

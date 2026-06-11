@@ -25,7 +25,7 @@ JSON conforming to `schemas/design-proposal.schema.json`.
 
 Emit the normal proposal fields plus `continuity` when continuity is evaluable. `continuity` is a compact preservation contract for `aufheben-designer`, not a generic blocker list:
 
-- `selected_profiles`: up to 5 profile/card identifiers from selector `selected_profile_cards` first, then `repo_local_cards`, then ecosystem names when cards are absent.
+- `selected_profiles`: up to 5 profile/card identifiers from objective-declared profiles first when controller-forwarded verbatim, then selector `selected_profile_cards`, then `repo_local_cards`, then ecosystem names when cards are absent; the deterministic selector never guesses design intent.
 - `version_constraints`: up to 6 version, runtime, framework, command, or dependency constraints evidenced by selector references or repo paths.
 - `ecosystem_facts_used`: up to 8 concrete facts used to shape the recommendation. Selector `evidence_refs` may contain up to 12 items; preserve the most safety-relevant 8 before lower-impact context.
 - `forbidden_expansions`: up to 6 expansions that would violate current continuity, such as new frameworks, new infrastructure, broad migrations, workflow changes, or production behavior changes.

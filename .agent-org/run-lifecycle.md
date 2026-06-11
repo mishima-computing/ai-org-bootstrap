@@ -41,6 +41,12 @@ Codex main is responsible for confirming the ignore rule during approved pack ma
 5. Run deterministic local tooling when configured.
 6. Report changed files, commands run, checks, gaps, and remaining work.
 
+Stage-A/Stage-B for UI/UX:
+
+- Stage-A UI/UX SPEC: for human-facing surfaces, run a docs-only UI/UX SPEC cycle and ratify it by merge before implementation cycles.
+- Stage-B intake: the ratified spec enters implementation intake at CI-constraints rank.
+- Experience Constraints live in `.agent-org/intake-template.md`; this lifecycle only orders Stage-A and Stage-B.
+
 Aufheben verdict handling:
 
 - After designers, the controller runs `aufheben-designer`.
