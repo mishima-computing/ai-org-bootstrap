@@ -1,6 +1,6 @@
 # UI/UX Absorption Ledger
 
-Status: Cycle 1 mapping plus authorized typography absorption. Contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography` authorizes the CJK+Latin anchor, card, validator, and manifest deltas only.
+Status: Cycle 2 mapping plus authorized hierarchy/layout absorption. Contract `contract-20260612-082659-d74b37f-uiux-cycle2-hierarchy-layout` authorizes the Hierarchy and Gestalt plus Grid and Layout anchors, bilingual retirements, validator, ledger, manifest, and planning-doc deltas only.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [authoring program](authoring-program.md).
 
@@ -45,11 +45,11 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-bilingual-typography.md:10` | CJK glyph density changes visual mass relative to Latin. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#jlreq-line-composition`; positive rewrite keeps per-script validation. |
 | `ui-bilingual-typography.md:11` | Choose one lead language per view. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#jlreq-line-composition`; structural check: lead script declared per view. |
 | `ui-bilingual-typography.md:11` | Use support-language treatment by default. | Typography: CJK+Latin | absorbed | Positive rewrite: secondary language role named in layout spec. |
-| `ui-bilingual-typography.md:11` | Forbid both-prominent treatment with no focal point. | Hierarchy and Gestalt | superseded-later | Structural check: hierarchy audit rejects equal top-priority scripts without declared focal decision. |
+| `ui-bilingual-typography.md:11` | Forbid both-prominent treatment with no focal point. | Hierarchy and Gestalt | absorbed | Destination: `anchor:hierarchy-gestalt#nng-visual-hierarchy`; positive rewrite requires a declared focal decision before assigning equal prominence. |
 | `ui-bilingual-typography.md:12` | Maintain per-script size, leading, and measure token sets. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#bringhurst-measure-rhythm` plus `anchor:typography-cjk-latin#jlreq-line-composition`; structural check: token audit requires script-specific values. |
 | `ui-bilingual-typography.md:12` | Never share one token set across CJK and Latin. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#bringhurst-measure-rhythm`; positive rewrite landed as "provide per-script token sets." |
 | `ui-bilingual-typography.md:13` | English and Japanese measure ranges are research budgets, not constants. | Typography: CJK+Latin | absorbed | Positive rewrite: cite anchor ranges and require product validation. |
-| `ui-bilingual-typography.md:13` | One container cannot serve both scripts. | Grid and Layout | superseded-later | Structural check: mixed-script container declares separate measure behavior or exception. |
+| `ui-bilingual-typography.md:13` | One container cannot serve both scripts. | Grid and Layout | absorbed | Destination: `anchor:grid-layout#css-grid-2`; positive rewrite requires mixed containers to declare per-script behavior and layout constraints. |
 | `ui-bilingual-typography.md:14` | Correct mixed-script spacing and punctuation squeeze per Heti/JLREQ/CLREQ convention. | Typography: CJK+Latin | absorbed | Positive rewrite: anchor IDs for spacing classes replace local detail. |
 | `ui-bilingual-typography.md:15` | Enforce contrast floors by script and display size. | Accessibility | absorbed | Structural check: WCAG 2.2 contrast criteria cited and tested on worst-case image region. |
 | `ui-bilingual-typography.md:16` | Translation-only preserves structure; localization may change IA and visual design. | Information Architecture | absorbed | Positive rewrite: localization divergence decision record. |
@@ -66,8 +66,8 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-composition-patterns.md:11` | Proof-artifact density is never a pack constant. | Composition | superseded-later | Positive rewrite: "objective declares proof density band"; delete negative wording after validator checks threshold source. |
 | `ui-composition-patterns.md:12` | Reject token proof-objects. | Composition | superseded-later | Structural check: proof object must map to visible state, institutional fact, or capability. |
 | `ui-composition-patterns.md:12` | Proof explains a user-visible state, institutional fact, or capability. | Composition | absorbed | Positive rewrite: proof-object inventory field. |
-| `ui-composition-patterns.md:13` | Consecutive same-type section cap is objective-declared. | Grid and Layout | absorbed | Structural check: section-sequence scan. |
-| `ui-composition-patterns.md:13` | Cap prevents monotony while preserving narrative grouping. | Hierarchy and Gestalt | absorbed | Positive rewrite: repeated sections require grouping rationale. |
+| `ui-composition-patterns.md:13` | Consecutive same-type section cap is objective-declared. | Grid and Layout | absorbed | Citation-plan Destination for cycle 6: `anchor:grid-layout#m3-layout-overview`; structural check: section-sequence scan. |
+| `ui-composition-patterns.md:13` | Cap prevents monotony while preserving narrative grouping. | Hierarchy and Gestalt | absorbed | Citation-plan Destination for cycle 6: `anchor:hierarchy-gestalt#upod-gestalt-principles`; positive rewrite: repeated sections require grouping rationale. |
 | `ui-composition-patterns.md:14` | Repeated sections earn rhythm through changed task, evidence, or decision function. | Composition | absorbed | Structural check: each repeated section names function. |
 | `ui-composition-patterns.md:15` | One lead language per view declares focus script and secondary support. | Typography: CJK+Latin | absorbed | Structural check: lead-language field. |
 | `ui-composition-patterns.md:16` | Plain-problem lead vs jargon lead follows audience fluency and risk, not internal preference. | UX Writing | absorbed | Positive rewrite: lead-copy choice records audience fluency and risk. |
@@ -124,7 +124,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-information-design.md:10` | Diagrams are warranted when relations, flow, containment, or comparison are the object. | Information Design | absorbed | Structural check: representation decision records relation type. |
 | `ui-information-design.md:11` | A list becomes a figure when scan order hides dependency, hierarchy, sequence, or tradeoff. | Information Design | absorbed | Structural check: list-vs-figure decision test. |
 | `ui-information-design.md:12` | Keep a list when items are independent and selection is the reader job. | Information Design | absorbed | Positive rewrite: selection job maps to list representation. |
-| `ui-information-design.md:13` | Anti-monotony rules declare allowed section-shape ranges before layout. | Grid and Layout | absorbed | Structural check: section-shape ranges in intake. |
+| `ui-information-design.md:13` | Anti-monotony rules declare allowed section-shape ranges before layout. | Grid and Layout | absorbed | Citation-plan Destination for cycle 4: `anchor:grid-layout#m3-layout-overview`; structural check: section-shape ranges in intake. |
 | `ui-information-design.md:13` | Validate variation by role, not decoration. | Composition | absorbed | Positive rewrite: each variation names role. |
 | `ui-information-design.md:14` | Labels name the relation being shown. | Information Design | absorbed | Structural check: label relation field. |
 | `ui-information-design.md:14` | Decorative captions do not count as information design. | Information Design | superseded-later | Structural check: caption must name relation or source; delete negative wording after check lands. |

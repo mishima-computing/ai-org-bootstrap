@@ -370,7 +370,6 @@ PROHIBITION_RE = re.compile(r"\b(?:never|do not|avoid|forbid)\b", re.IGNORECASE)
 UI_PROHIBITION_ALLOWLIST = [
     (".agent-org/knowledge/ui/README.md", "do not authorize selector inference"),
     (".agent-org/knowledge/ui/exemplars.md", "never cite bare domain"),
-    (".agent-org/knowledge/ui/ui-bilingual-typography.md", "forbid both-prominent treatment"),
     (".agent-org/knowledge/ui/ui-bilingual-typography.md", "never claim conversion, engagement, or SEO outcomes"),
     (".agent-org/knowledge/ui/ui-composition-patterns.md", "never a pack constant"),
     (".agent-org/knowledge/ui/ui-composition-patterns.md", "never conversion, engagement, or SEO"),
@@ -956,6 +955,20 @@ def check_ui_profile_cards() -> list[str]:
                     for slug, anchor_id in citations
                 ):
                     errors.append(f"{rel(path)} must cite a resolving anchor:typography-cjk-latin# ID")
+            if "hierarchy-gestalt" in anchors:
+                citations = ANCHOR_CITATION_RE.findall(text(path))
+                if not any(
+                    slug == "hierarchy-gestalt" and anchor_id in anchors[slug]
+                    for slug, anchor_id in citations
+                ):
+                    errors.append(f"{rel(path)} must cite a resolving anchor:hierarchy-gestalt# ID")
+            if "grid-layout" in anchors:
+                citations = ANCHOR_CITATION_RE.findall(text(path))
+                if not any(
+                    slug == "grid-layout" and anchor_id in anchors[slug]
+                    for slug, anchor_id in citations
+                ):
+                    errors.append(f"{rel(path)} must cite a resolving anchor:grid-layout# ID")
         if filename == "ui-composition-patterns.md":
             for phrase in contains_all(body, [
                 "Decidable check",

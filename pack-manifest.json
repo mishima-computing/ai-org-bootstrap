@@ -87,6 +87,20 @@
       "required": false
     },
     {
+      "path": ".agent-org/knowledge/ui/anchors/hierarchy-gestalt.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ui/anchors/grid-layout.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/ui/ui-bilingual-typography.md",
       "type": "file",
       "tier": "pack_level",

@@ -1,6 +1,6 @@
 # UI/UX Knowledge Architecture
 
-Status: Cycle 1 architecture, with the first typography anchor/card/manifest/validator delta authorized by contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
+Status: Cycle 2 architecture, with hierarchy/layout anchors, bilingual retirements, manifest, and validator delta authorized by contract `contract-20260612-082659-d74b37f-uiux-cycle2-hierarchy-layout`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
 
 Related docs: [domain map](domain-map.md), [absorption ledger](absorption-ledger.md), [authoring program](authoring-program.md).
 
