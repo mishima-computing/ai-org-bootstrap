@@ -844,6 +844,102 @@ def check_ui_profile_cards() -> list[str]:
     return errors
 
 
+def check_ecosystem_profile_cards() -> list[str]:
+    errors: list[str] = []
+    ecosystems_dir = ROOT / ".agent-org/knowledge/ecosystems"
+    if not ecosystems_dir.is_dir():
+        return [".agent-org/knowledge/ecosystems/ missing"]
+
+    readme = text(ecosystems_dir / "README.md")
+    for phrase in contains_all(readme, [
+        "Ecosystem craft cards",
+        "profile_id",
+        "scope",
+        "covers",
+        "freshness",
+        "supersede_trigger",
+        "evidence_refs",
+        "evidence_refs cap: 6 pointers",
+        "body cap: 12 nonblank lines",
+        "filename stem must equal `profile_id`",
+        "mechanical repository evidence only",
+        "pin:tailwindcss",
+        "plain-CSS or CDN Tailwind repos without a package pin are a declared knowledge gap",
+    ]):
+        errors.append(f".agent-org/knowledge/ecosystems/README.md missing ecosystem profile phrase: {phrase}")
+
+    required_keys = {"profile_id", "scope", "covers", "freshness", "supersede_trigger", "evidence_refs"}
+    required_cards = [
+        "htmlcss-computable-spatial.md",
+        "htmlcss-modern-layout.md",
+        "htmlcss-motion-implementation.md",
+    ]
+    for filename in required_cards:
+        path = ecosystems_dir / filename
+        if not path.is_file():
+            errors.append(f"missing ecosystem profile card: {rel(path)}")
+            continue
+        frontmatter, body, error = parse_frontmatter(path)
+        if error:
+            errors.append(f"{rel(path)} {error}")
+            continue
+        actual_keys = set(frontmatter)
+        for key in sorted(required_keys - actual_keys):
+            errors.append(f"{rel(path)} missing ecosystem profile frontmatter key: {key}")
+        for key in sorted(actual_keys - required_keys):
+            errors.append(f"{rel(path)} unexpected ecosystem profile frontmatter key: {key}")
+        for key in sorted(required_keys & actual_keys):
+            if not frontmatter[key]:
+                errors.append(f"{rel(path)} empty ecosystem profile frontmatter key: {key}")
+        if frontmatter.get("profile_id") != path.stem:
+            errors.append(f"{rel(path)} profile_id must match filename stem")
+        evidence_refs = [item.strip() for item in frontmatter.get("evidence_refs", "").split(";") if item.strip()]
+        if not evidence_refs:
+            errors.append(f"{rel(path)} evidence_refs must contain at least one pointer")
+        if len(evidence_refs) > 6:
+            errors.append(f"{rel(path)} evidence_refs must contain at most 6 pointers")
+        nonblank_body_lines = [line for line in body.splitlines() if line.strip()]
+        if len(nonblank_body_lines) > 12:
+            errors.append(f"{rel(path)} body must be at most 12 nonblank lines")
+
+        if filename == "htmlcss-computable-spatial.md":
+            for phrase in contains_all(body, [
+                "contrast-ratio math",
+                ">=4.5:1 for text",
+                ">=3:1 for large text",
+                ">=3:1 for graphical objects and component states",
+                ">=24x24 CSS px",
+                "Decidable check",
+                "Advisory check",
+                "repo-token convention",
+            ]):
+                errors.append(f"{rel(path)} missing computable spatial profile phrase: {phrase}")
+        if filename == "htmlcss-modern-layout.md":
+            for phrase in contains_all(body, [
+                "CSS grid",
+                "flexbox",
+                "Container queries",
+                "Baseline widely available",
+                "Cascade layers",
+                "logical properties",
+                "`clamp()`",
+                "Tailwind v4",
+                "`@theme`",
+            ]):
+                errors.append(f"{rel(path)} missing modern layout profile phrase: {phrase}")
+        if filename == "htmlcss-motion-implementation.md":
+            for phrase in contains_all(body, [
+                "transform and opacity",
+                "`prefers-reduced-motion`",
+                ".agent-org/knowledge/ui/ui-feel-foundations.md",
+                "must not encode fixed constants",
+            ]):
+                errors.append(f"{rel(path)} missing motion implementation profile phrase: {phrase}")
+            if re.search(r"(?<![-/])\b\d+\s*ms\b(?!\s*[-/])", body.lower()):
+                errors.append(f"{rel(path)} must not encode fixed ms constants")
+    return errors
+
+
 def check_intake_template() -> list[str]:
     errors: list[str] = []
     path = ROOT / ".agent-org/intake-template.md"
@@ -1345,6 +1441,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(f"toml_parse_error: {item}" for item in toml_errors)
     errors.extend(guarded("check_knowledge_cards", check_knowledge_cards))
     errors.extend(guarded("check_ui_profile_cards", check_ui_profile_cards))
+    errors.extend(guarded("check_ecosystem_profile_cards", check_ecosystem_profile_cards))
     errors.extend(guarded("check_intake_template", check_intake_template))
     errors.extend(guarded("check_active_directories", check_active_directories))
     errors.extend(guarded("check_controller_role", check_controller_role))

@@ -94,6 +94,34 @@
       "required": false
     },
     {
+      "path": ".agent-org/knowledge/ecosystems/README.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ecosystems/htmlcss-computable-spatial.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ecosystems/htmlcss-modern-layout.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ecosystems/htmlcss-motion-implementation.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/domains/",
       "type": "dir",
       "tier": "pack_level",

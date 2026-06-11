@@ -36,6 +36,11 @@ PROFILE_TABLE = {
     "config:pytest-config": [{"profile_id": "python-testing", "priority": 18}],
     "pin:next": [{"profile_id": "nextjs", "priority": 8}],
     "pin:react": [{"profile_id": "react", "priority": 16}],
+    "pin:tailwindcss": [
+        {"profile_id": "htmlcss-computable-spatial", "priority": 17},
+        {"profile_id": "htmlcss-modern-layout", "priority": 18},
+        {"profile_id": "htmlcss-motion-implementation", "priority": 19},
+    ],
     "runtime:python-version-file": [{"profile_id": "python", "priority": 9}],
     "runtime:node-version-file": [{"profile_id": "node-js", "priority": 9}],
 }
