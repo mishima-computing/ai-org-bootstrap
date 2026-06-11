@@ -83,6 +83,11 @@ SCHEMA_BY_AGENT = {
     "implementer": "schemas/implementation-result.schema.json",
 }
 
+
+def sample_string(prefix: str, max_length: int = 200) -> str:
+    return (prefix + " " + ("x" * max_length))[:max_length]
+
+
 SCHEMA_SAMPLE_INSTANCES = {
     "schemas/ci-action-writer-result.schema.json": {
         "role_id": "functional-ci-action-writer",
@@ -109,7 +114,7 @@ SCHEMA_SAMPLE_INSTANCES = {
         ],
     },
     "schemas/design-proposal.schema.json": {
-        "role_id": "aggressive-designer",
+        "role_id": "conservative-designer",
         "objective": "example objective",
         "proposal_summary": "example summary",
         "recommended_direction": "example direction",
@@ -131,29 +136,16 @@ SCHEMA_SAMPLE_INSTANCES = {
                 "A future proposal may need more repo evidence."
             ],
         },
-        "questioning_targets_selected": [
-            {
-                "target": "schema validation surface",
-                "selection_reason": "The local validator is the binding enforcement path for proposal samples.",
-            }
-        ],
-        "structural_hypotheses": [
-            {
-                "broken_assumption": "Schema declaration alone enforces every budget.",
-                "alternative_structure": "Mirror declared caps in the local validation engine.",
-                "leverage": "Local checks catch malformed proposal artifacts before handoff.",
-                "what_breaks": "Schemas with unsupported keywords can appear stricter than the pack enforces.",
-                "rejection_conditions": [
-                    "Reject if the local validator already enforces the declared cap."
-                ],
-            }
-        ],
-        "conflict_points": [
-            {
-                "point": "Optional schema fields still need role-level presence discipline for aggressive proposals.",
-                "evidence_ref": "schemas/design-proposal.schema.json",
-            }
-        ],
+        "continuity": {
+            "selected_profiles": [sample_string(f"profile-{index}") for index in range(5)],
+            "version_constraints": [sample_string(f"version-{index}") for index in range(6)],
+            "ecosystem_facts_used": [sample_string(f"fact-{index}") for index in range(8)],
+            "forbidden_expansions": [sample_string(f"forbidden-{index}") for index in range(6)],
+            "safe_change_path": "s" * 600,
+            "reversibility_plan": "r" * 600,
+            "missing_safety_checks": [sample_string(f"check-{index}") for index in range(6)],
+            "knowledge_gaps": [sample_string(f"gap-{index}") for index in range(6)],
+        },
     },
     "schemas/genius-packet.schema.json": {
         "role_id": "genius",
@@ -610,6 +602,22 @@ def validate_schema_instance(schema: dict, instance: object, path: str = "$") ->
     return errors
 
 
+def check_design_proposal_role_conditionals(instance: object, path: str = "$") -> list[str]:
+    if not isinstance(instance, dict):
+        return []
+
+    errors: list[str] = []
+    if instance.get("role_id") == "conservative-designer" and "continuity" not in instance:
+        errors.append(f"{path}: conservative-designer proposals must include continuity")
+    return errors
+
+
+def check_role_conditionals(schema_path: Path, instance: object, path: str = "$") -> list[str]:
+    if rel(schema_path) == "schemas/design-proposal.schema.json":
+        return check_design_proposal_role_conditionals(instance, path)
+    return []
+
+
 def check_schema_samples() -> list[str]:
     errors: list[str] = []
     for rel_schema, sample in SCHEMA_SAMPLE_INSTANCES.items():
@@ -621,6 +629,10 @@ def check_schema_samples() -> list[str]:
 
         sample_errors = validate_schema_instance(loaded, sample)
         for item in sample_errors:
+            errors.append(f"{rel_schema}: sample invalid: {item}")
+
+        conditional_errors = check_role_conditionals(schema_path, sample)
+        for item in conditional_errors:
             errors.append(f"{rel_schema}: sample invalid: {item}")
 
         required = loaded.get("required", [])
@@ -688,6 +700,7 @@ def validate_instance_cli(schema_arg: str, instance_arg: str) -> int:
 
     if not errors and isinstance(schema, dict):
         errors.extend(validate_schema_instance(schema, instance))
+        errors.extend(check_role_conditionals(schema_path, instance))
 
     payload = {
         "status": "pass" if not errors else "fail",
@@ -898,6 +911,18 @@ def check_codex_adapters(toml_data: dict[Path, dict]) -> list[str]:
         if agent == "conservative-designer":
             for phrase in contains_all(instructions, ["confidence", "evidence pointer"]):
                 errors.append(f"{rel(path)} missing designer confidence phrase: {phrase}")
+            for phrase in contains_all(instructions, [
+                "selected_profiles max 5",
+                "version_constraints max 6",
+                "ecosystem_facts_used max 8",
+                "forbidden_expansions max 6",
+                "safe_change_path maxLength 600",
+                "reversibility_plan maxLength 600",
+                "missing_safety_checks max 6",
+                "knowledge_gaps max 6",
+                "omit the entire continuity object",
+            ]):
+                errors.append(f"{rel(path)} missing continuity adapter phrase: {phrase}")
     return errors
 
 
