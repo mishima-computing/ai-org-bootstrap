@@ -57,6 +57,8 @@ The paired finding is that v1 supplied broad external precedent vocabulary for r
 
 Future comparisons must use a composite metric rather than raw survival alone.
 
+Reading note: `confidence_vs_survival` and `divergence_rate` are read against profile-grounded conservative output under the conservative-only-emission measurement assumption; no new metric is introduced.
+
 ### `survival_rate`
 
 Definition: items judged `USED`, including explicitly partial uses, divided by total items handed off.
