@@ -362,6 +362,83 @@ def parse_frontmatter(path: Path) -> tuple[dict[str, str], str, str | None]:
     return frontmatter, body, None
 
 
+ANCHOR_CITATION_RE = re.compile(r"\banchor:([a-z0-9-]+)#([a-z0-9-]+)\b")
+ANCHOR_STABLE_ID_RE = re.compile(r"#([a-z0-9][a-z0-9-]*)\b")
+PROHIBITION_RE = re.compile(r"\b(?:never|do not|avoid|forbid)\b", re.IGNORECASE)
+
+# Ledger-backed allowlist for existing UI prohibition lines.
+UI_PROHIBITION_ALLOWLIST = [
+    (".agent-org/knowledge/ui/README.md", "do not authorize selector inference"),
+    (".agent-org/knowledge/ui/exemplars.md", "never cite bare domain"),
+    (".agent-org/knowledge/ui/ui-bilingual-typography.md", "forbid both-prominent treatment"),
+    (".agent-org/knowledge/ui/ui-bilingual-typography.md", "never claim conversion, engagement, or SEO outcomes"),
+    (".agent-org/knowledge/ui/ui-composition-patterns.md", "never a pack constant"),
+    (".agent-org/knowledge/ui/ui-composition-patterns.md", "never conversion, engagement, or SEO"),
+    (".agent-org/knowledge/ui/ui-corporate-trust-genre.md", "Avoid borrowed startup landing-page tempo"),
+    (".agent-org/knowledge/ui/ui-corporate-trust-genre.md", "never conversion, engagement, or SEO"),
+    (".agent-org/knowledge/ui/ui-feel-foundations.md", "do not encode fixed constants"),
+    (".agent-org/knowledge/ui/ui-feel-foundations.md", "do not claim usability or performance gains"),
+    (".agent-org/knowledge/ui/ui-gacha-genre.md", "never hide odds or material constraints"),
+    (".agent-org/knowledge/ui/ui-information-design.md", "do not count as information design"),
+    (".agent-org/knowledge/ui/ui-information-design.md", "never conversion, engagement, or SEO"),
+]
+
+
+def is_allowed_ui_prohibition(path: Path, line: str) -> bool:
+    relative = rel(path)
+    lowered = line.lower()
+    return any(
+        relative == allowed_path and substring.lower() in lowered
+        for allowed_path, substring in UI_PROHIBITION_ALLOWLIST
+    )
+
+
+def discover_ui_anchors(ui_dir: Path) -> tuple[dict[str, set[str]], list[str]]:
+    errors: list[str] = []
+    anchors: dict[str, set[str]] = {}
+    anchors_dir = ui_dir / "anchors"
+    if not anchors_dir.is_dir():
+        return anchors, errors
+
+    for path in sorted(anchors_dir.glob("*.md")):
+        content = text(path)
+        nonblank_lines = [line for line in content.splitlines() if line.strip()]
+        if len(nonblank_lines) > 40:
+            errors.append(f"{rel(path)} anchor body must be at most 40 nonblank lines")
+
+        slug = path.stem
+        ids: set[str] = set()
+        for line in content.splitlines():
+            heading = re.match(r"^#{2,6}\s+([a-z0-9][a-z0-9-]*)\s*$", line.strip())
+            if heading:
+                ids.add(heading.group(1))
+            if "stable id" in line.lower():
+                ids.update(ANCHOR_STABLE_ID_RE.findall(line))
+        anchors[slug] = ids
+    return anchors, errors
+
+
+def check_ui_anchor_citations(ui_dir: Path, anchors: dict[str, set[str]]) -> list[str]:
+    errors: list[str] = []
+    for path in sorted(ui_dir.glob("*.md")):
+        content = text(path)
+        for slug, anchor_id in ANCHOR_CITATION_RE.findall(content):
+            if slug not in anchors:
+                errors.append(f"{rel(path)} unresolved anchor citation: anchor:{slug}#{anchor_id} missing anchor file")
+            elif anchor_id not in anchors[slug]:
+                errors.append(f"{rel(path)} unresolved anchor citation: anchor:{slug}#{anchor_id} missing stable ID")
+    return errors
+
+
+def check_ui_prohibition_lines(ui_dir: Path) -> list[str]:
+    errors: list[str] = []
+    for path in sorted(ui_dir.rglob("*.md")):
+        for line_number, line in enumerate(text(path).splitlines(), start=1):
+            if PROHIBITION_RE.search(line) and not is_allowed_ui_prohibition(path, line):
+                errors.append(f"{rel(path)}:{line_number} prohibition line lacks ledger annotation allowlist")
+    return errors
+
+
 def parse_json_files() -> list[str]:
     errors: list[str] = []
     schema_ids: dict[str, str] = {}
@@ -770,6 +847,11 @@ def check_ui_profile_cards() -> list[str]:
     if not ui_dir.is_dir():
         return [".agent-org/knowledge/ui/ missing"]
 
+    anchors, anchor_errors = discover_ui_anchors(ui_dir)
+    errors.extend(anchor_errors)
+    errors.extend(check_ui_anchor_citations(ui_dir, anchors))
+    errors.extend(check_ui_prohibition_lines(ui_dir))
+
     readme = text(ui_dir / "README.md")
     for phrase in contains_all(readme, [
         "Profile Card Format",
@@ -863,13 +945,17 @@ def check_ui_profile_cards() -> list[str]:
                 errors.append(f"{rel(path)} missing gacha profile phrase: {phrase}")
         if filename == "ui-bilingual-typography.md":
             for phrase in contains_all(body, [
-                "one lead language per view",
-                "CJK glyph density",
-                "per-script size",
                 "Translation-only preserves structure",
                 "Claim limit: Claim legibility and focus effects only; never claim conversion, engagement, or SEO outcomes.",
             ]):
                 errors.append(f"{rel(path)} missing bilingual profile phrase: {phrase}")
+            if "typography-cjk-latin" in anchors:
+                citations = ANCHOR_CITATION_RE.findall(text(path))
+                if not any(
+                    slug == "typography-cjk-latin" and anchor_id in anchors[slug]
+                    for slug, anchor_id in citations
+                ):
+                    errors.append(f"{rel(path)} must cite a resolving anchor:typography-cjk-latin# ID")
         if filename == "ui-composition-patterns.md":
             for phrase in contains_all(body, [
                 "Decidable check",

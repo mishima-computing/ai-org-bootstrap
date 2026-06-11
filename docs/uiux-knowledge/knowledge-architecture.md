@@ -1,6 +1,6 @@
 # UI/UX Knowledge Architecture
 
-Status: Cycle 1 docs-only decision. This file specifies future pack changes but does not edit `.agent-org/knowledge/ui/`, `pack-manifest.json`, scripts, CI, or workflows.
+Status: Cycle 1 architecture, with the first typography anchor/card/manifest/validator delta authorized by contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
 
 Related docs: [domain map](domain-map.md), [absorption ledger](absorption-ledger.md), [authoring program](authoring-program.md).
 
@@ -9,8 +9,8 @@ Related docs: [domain map](domain-map.md), [absorption ledger](absorption-ledger
 | Layer | Location | Purpose | Authored this cycle |
 | --- | --- | --- | --- |
 | L1 domain-map ledger | `docs/uiux-knowledge/domain-map.md` | Full UI/UX ontology, status, sourcing plan, and coverage honesty. | Yes |
-| L2 anchor index | Future `.agent-org/knowledge/ui/anchors/*.md` | Pointer-first canonical-source maps by area. Default reusable knowledge layer. | No |
-| L3 profile cards | Existing `.agent-org/knowledge/ui/*.md` | Sharp 12-line cards selected explicitly by objectives. Cards cite anchor IDs after authoring cycles. | No changes |
+| L2 anchor index | `.agent-org/knowledge/ui/anchors/*.md` | Pointer-first canonical-source maps by area. Default reusable knowledge layer. | Yes for CJK+Latin typography under the contract above |
+| L3 profile cards | Existing `.agent-org/knowledge/ui/*.md` | Sharp 12-line cards selected explicitly by objectives. Cards cite anchor IDs after authoring cycles. | Typography card only under the contract above |
 | Demand-promoted handbooks | Future `.agent-org/knowledge/ui/handbooks/*.md` | Owned synthesis only when anchor/card compression fails. | No |
 
 ## Anchor Index Format
@@ -20,7 +20,7 @@ Future anchor files under `.agent-org/knowledge/ui/anchors/` use this format:
 | Field | Rule |
 | --- | --- |
 | Filename | One area slug, for example `typography-cjk-latin.md`. |
-| Length cap | Approximately 40 nonblank lines; exceeding the cap is a compression-failure signal. |
+| Length cap | Hard cap of 40 nonblank lines; exceeding the cap is a compression-failure signal. |
 | Stable section IDs | Every canonical body gets a stable ID such as `#wcag22-contrast` or `#jlreq-line-composition`. |
 | Content model | Public canonical pointer, date/version, scope note, local use boundary, and card-facing citation ID. No copied excerpts. |
 | Fast-moving sources | Apple HIG, Material 3, market convention sources, and similar guidance must be dated in the anchor entry. |
@@ -62,13 +62,13 @@ This law applies to:
 
 ## Manifest Delta
 
-Future authoring cycles should land this manifest delta after the first anchor index is authored:
+The first authoring contract lands this manifest delta after the first anchor index is authored:
 
 | Manifest item | Future value |
 | --- | --- |
 | Path | `.agent-org/knowledge/ui/anchors/` |
 | Tier | Pack-level reusable knowledge, same UI/UX pack boundary as `.agent-org/knowledge/ui/`. |
-| Requiredness | Required once at least one authored anchor exists. |
+| Requiredness | `required:false` for target-mode green before sync, matching sibling UI knowledge entries. |
 | Distribution | Included in pack sync so downstream repos receive anchor IDs cited by UI profile cards. |
 | Boundary | Product-specific worldview knowledge remains repo-local under `.agent-org/knowledge/cards/` per the existing #32 boundary. |
 
@@ -80,9 +80,9 @@ Optional later delta after demand promotion:
 | Tier | Pack-level reusable knowledge, demand-promoted only. |
 | Requiredness | Required only if any card cites a handbook ID. |
 
-## Validator Future State
+## Validator State
 
-No validator change lands in Cycle 1. The future validator state is:
+Contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography` authorizes the first Cycle 1 validator delta for anchor discovery, citation resolution, anchor cap enforcement, and ledger-backed prohibition checks. The continuing validator state is:
 
 | Check family | Future behavior |
 | --- | --- |
