@@ -181,6 +181,24 @@ If web/search/fetch tools are unavailable, `genius` must produce a schema-shaped
 
 For `genius`, `input.md` MUST restate this budget line: `Output budget: JSON object first character, no preamble or code fences; each string <=200 chars; kept_hypotheses <=3 by default with schema cap 5; every array <=6 items; total output <=8000 chars; evidence summaries are pointers plus one-line summaries, never essays.` Verified failure mode: unconstrained output reached 22KB and truncated beyond closure repair.
 
+### Aufheben Input Embedding
+
+Before invoking `aufheben-designer`, the controller must compose the aufheben `input.md` so each designer `result.json` is embedded verbatim as raw bytes. The controller must not summarize, reserialize, reorder, or filter the designer JSON inside the aufheben input.
+
+The controller runs the handoff gate before invoking `aufheben-designer`:
+
+```bash
+python3 scripts/hash-artifacts.py \
+  --verify-embed \
+  --composed ".agent-runs/<run_id>/carriers/<carrier>/aufheben-designer/input.md" \
+  --source ".agent-runs/<run_id>/carriers/<carrier>/aggressive-designer/result.json" \
+  --source ".agent-runs/<run_id>/carriers/<carrier>/conservative-designer/result.json" \
+  --source ".agent-runs/<run_id>/carriers/<carrier>/genius/result.json" \
+  > ".agent-runs/<run_id>/gates/aufheben-input-embed.json"
+```
+
+The gate is raw-byte containment with exactly one trailing-newline difference tolerated per source. A failing report stops the aufheben invocation until the input is recomposed with byte-identical designer results.
+
 ### Output Capture
 
 Claude output is valid only after:
