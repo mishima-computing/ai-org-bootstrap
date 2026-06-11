@@ -261,6 +261,39 @@ SCHEMA_SAMPLE_INSTANCES = {
         "scope_deviations": [],
         "manual_followup": [],
     },
+    "schemas/ecosystem-profile-selection.schema.json": {
+        "primary_ecosystem": [
+            "python"
+        ],
+        "supporting_profiles": [
+            "python-testing"
+        ],
+        "selected_profile_cards": [],
+        "repo_local_cards": [
+            ".agent-org/knowledge/cards/example.md"
+        ],
+        "evidence_refs": [
+            "manifest:python-project-manifest: pyproject.toml"
+        ],
+        "selection_warnings": [],
+        "knowledge_gaps": [
+            "No pack ecosystem/domain profile cards were found under .agent-org/knowledge/ecosystems/ or .agent-org/knowledge/domains/."
+        ],
+    },
+    "schemas/security-ci-profile-selection.schema.json": {
+        "general_profile_enabled": True,
+        "supporting_profiles": [
+            "github-actions-general"
+        ],
+        "selected_profile_cards": [],
+        "evidence_refs": [
+            "workflow:present: .github/workflows/functional-ci.yml"
+        ],
+        "selection_warnings": [],
+        "security_gaps": [
+            "No security-ci profile cards were found under .agent-org/knowledge/security-ci/."
+        ],
+    },
     "schemas/aufheben-verdict.schema.json": {
         "role_id": "aufheben-designer",
         "decision": "redo",

@@ -244,6 +244,27 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "scripts/collect-repo-evidence.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "scripts/detect-ecosystem-profiles.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "scripts/detect-security-ci-profiles.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": "scripts/hash-artifacts.py",
       "type": "file",
       "tier": "pack_level",
@@ -354,6 +375,13 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "schemas/ecosystem-profile-selection.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": "schemas/genius-packet.schema.json",
       "type": "file",
       "tier": "pack_level",
@@ -370,6 +398,13 @@
       "type": "file",
       "tier": "pack_level",
       "check_applicability": "everywhere"
+    },
+    {
+      "path": "schemas/security-ci-profile-selection.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
     },
     {
       "path": ".agent-org/knowledge/cards/",
