@@ -6,11 +6,13 @@ UI/UX profile cards are pack-level knowledge pointers for objectives that explic
 
 ## Profile Card Format
 
-Each card has exactly these frontmatter keys: `profile_id`, `scope`, `covers`, `freshness`, `supersede_trigger`, and `evidence_refs`.
+Each card has exactly these required frontmatter keys: `profile_id`, `scope`, `covers`, `freshness`, `supersede_trigger`, and `evidence_refs`; cards may add optional `exemplars`.
 
 Caps: evidence_refs cap: 6 pointers, separated by semicolons; body cap: 12 nonblank lines; no embedded research excerpts.
 
-F11 boundary: profile cards carry reusable UI/UX constraints only. Product-specific worldview cards, for example `yatai`, stay repo-local under `.agent-org/knowledge/cards/` per the #32 boundary.
+Exemplars: optional `exemplars` key, exemplars cap: 4 pointers, separated by semicolons; entry format is `locale-pinned-URL@YYYY-MM-DD -> pattern-slug`. Cap 4 keeps examples subordinate to evidence_refs while still wiring date-pinned corpus pointers.
+
+#32 pack/repo boundary: profile cards carry reusable UI/UX constraints only. Product-specific worldview cards, for example `yatai`, stay repo-local under `.agent-org/knowledge/cards/` per the #32 boundary.
 
 ## Use
 
