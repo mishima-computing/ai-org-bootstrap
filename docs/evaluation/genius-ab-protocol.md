@@ -73,6 +73,14 @@ Computation: for each future cycle, record whether each aggressive-designer or c
 
 Rationale: the curve tests whether first-class confidence posture predicts downstream survival without conflating Claude/Codex carriers, designer roles, or nominal and full-fidelity outcomes.
 
+### `divergence_rate`
+
+Definition: evidence-backed declared `conflict_points` per designer cycle, counted from aggressive-designer proposal artifacts.
+
+Computation: for each future cycle, count only declared conflict points that carry an `evidence_ref`. Measure it forward only; do not retroactively rebucket prior cycles. A zero count across consecutive cycles is a role-function alarm because the aggressive role should surface structural disagreement when assumptions, reversibility, or change cost are genuinely contested.
+
+Rationale: the metric tracks whether aggressive-designer is producing falsifiable disagreement for synthesis instead of silent convergence or performative novelty.
+
 ### `load_bearing_rate`
 
 Definition: items cited as requirements or acceptance criteria over items handed off.

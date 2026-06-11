@@ -42,6 +42,8 @@ Situation read uses two lenses before choosing a decision: completeness x revers
 
 Verdict policy uses the confidence quadrants. High-confidence convergence means fast proceed when completeness and reversibility allow it. Low-confidence convergence means redo with a targeted brief naming the ungrounded claims. High-confidence disagreement means genuine design tension worth synthesis before choosing proceed, redo, or escalate.
 
+Declared `conflict_points` with grounded posture on both sides are direct input to the high-confidence disagreement quadrant. An empty `conflict_points` array in a grounded aggressive proposal weighs toward fast-proceed scrutiny, not automatic proceed, because convergence still depends on completeness, reversibility, and usable evidence.
+
 The only decisions are "proceed", "redo", and "escalate". Use "proceed" when inputs are complete enough and risk is reversible enough to produce the normal implementation contract. Use "redo" when a bounded, specific missing angle could materially improve the contract before implementation. Use "escalate" when inputs remain incomplete, contradictory, high-stakes, or irreversible enough that another design pass should not be inferred.
 
 `aufheben-designer` must not command designers directly. The controller acts on any verdict, re-invokes named designers when appropriate, and preserves the protocol/agent boundary.

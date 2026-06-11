@@ -121,6 +121,29 @@ SCHEMA_SAMPLE_INSTANCES = {
                 "A future proposal may need more repo evidence."
             ],
         },
+        "questioning_targets_selected": [
+            {
+                "target": "schema validation surface",
+                "selection_reason": "The local validator is the binding enforcement path for proposal samples.",
+            }
+        ],
+        "structural_hypotheses": [
+            {
+                "broken_assumption": "Schema declaration alone enforces every budget.",
+                "alternative_structure": "Mirror declared caps in the local validation engine.",
+                "leverage": "Local checks catch malformed proposal artifacts before handoff.",
+                "what_breaks": "Schemas with unsupported keywords can appear stricter than the pack enforces.",
+                "rejection_conditions": [
+                    "Reject if the local validator already enforces the declared cap."
+                ],
+            }
+        ],
+        "conflict_points": [
+            {
+                "point": "Optional schema fields still need role-level presence discipline for aggressive proposals.",
+                "evidence_ref": "schemas/design-proposal.schema.json",
+            }
+        ],
     },
     "schemas/genius-packet.schema.json": {
         "role_id": "genius",
@@ -362,10 +385,22 @@ def validate_schema_instance(schema: dict, instance: object, path: str = "$") ->
                         errors.append(f"{path}: additional property {key} is not allowed")
 
     if isinstance(instance, list):
+        max_items = schema.get("maxItems")
+        if isinstance(max_items, int) and len(instance) > max_items:
+            errors.append(f"{path}: expected at most {max_items} items")
+
+        min_items = schema.get("minItems")
+        if isinstance(min_items, int) and len(instance) < min_items:
+            errors.append(f"{path}: expected at least {min_items} items")
+
         item_schema = schema.get("items")
         if isinstance(item_schema, dict):
             for index, item in enumerate(instance):
                 errors.extend(validate_schema_instance(item_schema, item, f"{path}[{index}]"))
+
+    max_length = schema.get("maxLength")
+    if isinstance(max_length, int) and isinstance(instance, str) and len(instance) > max_length:
+        errors.append(f"{path}: expected string length at most {max_length}")
 
     pattern = schema.get("pattern")
     if isinstance(pattern, str) and isinstance(instance, str):
@@ -395,6 +430,15 @@ def check_schema_samples() -> list[str]:
             missing_errors = validate_schema_instance(loaded, missing_sample)
             if not missing_errors:
                 errors.append(f"{rel_schema}: required field validation did not fail for {required[0]}")
+
+    keyword_cases = [
+        ({"type": "array", "maxItems": 1}, ["one", "two"], "maxItems"),
+        ({"type": "array", "minItems": 1}, [], "minItems"),
+        ({"type": "string", "maxLength": 3}, "four", "maxLength"),
+    ]
+    for schema, instance, keyword in keyword_cases:
+        if not validate_schema_instance(schema, instance):
+            errors.append(f"validate_schema_instance did not reject {keyword} violation")
     return errors
 
 
@@ -609,6 +653,15 @@ def check_roles() -> list[str]:
         if agent in {"aggressive-designer", "conservative-designer"}:
             for phrase in contains_all(content, ["confidence", "evidence pointer"]):
                 errors.append(f"roles/{agent}.md missing designer confidence phrase: {phrase}")
+        if agent == "aggressive-designer":
+            for phrase in contains_all(content, [
+                "rejection_conditions",
+                "conflict_points",
+                "questioning targets",
+            ]):
+                errors.append(f"roles/{agent}.md missing aggressive phrase: {phrase}")
+            if not re.search(r"select.{0,40}(~?3|three)", content, re.IGNORECASE | re.DOTALL):
+                errors.append(f"roles/{agent}.md missing aggressive phrase: select near 3")
         if agent == "genius":
             for phrase in ["Output Budget", "8000"]:
                 if phrase.lower() not in content.lower():
@@ -626,6 +679,7 @@ def check_roles() -> list[str]:
         "low-confidence convergence",
         "high-confidence convergence",
         "high-confidence disagreement",
+        "conflict_points",
     ]):
         errors.append(f"roles/aufheben-designer.md missing confidence quadrant phrase: {phrase}")
     return errors
@@ -684,6 +738,8 @@ def check_claude_adapters() -> list[str]:
         if agent == "aggressive-designer":
             for phrase in contains_all(body, ["confidence", "evidence pointer"]):
                 errors.append(f"{rel(path)} missing designer confidence phrase: {phrase}")
+            for phrase in contains_all(body, ["rejection_conditions", "conflict_points"]):
+                errors.append(f"{rel(path)} missing aggressive phrase: {phrase}")
         if agent == "aufheben-designer":
             for phrase in contains_all(body, [
                 "low-confidence convergence",
@@ -709,6 +765,16 @@ def check_claude_adapters() -> list[str]:
                 errors.append(f"{rel(path)} must define verification_status behavior")
             if "8000" not in body:
                 errors.append(f"{rel(path)} missing genius budget phrase: 8000")
+    return errors
+
+
+def check_evaluation_docs() -> list[str]:
+    errors: list[str] = []
+    path = ROOT / "docs/evaluation/genius-ab-protocol.md"
+    content = text(path)
+    for phrase in ["divergence_rate", "forward"]:
+        if phrase.lower() not in content.lower():
+            errors.append(f"{rel(path)} missing evaluation phrase: {phrase}")
     return errors
 
 
@@ -850,6 +916,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(check_roles())
     errors.extend(check_codex_adapters(toml_data))
     errors.extend(check_claude_adapters())
+    errors.extend(check_evaluation_docs())
     errors.extend(check_registry())
     errors.extend(check_pack_policies(toml_data))
     errors.extend(check_bootstrap())
