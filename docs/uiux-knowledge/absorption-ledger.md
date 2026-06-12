@@ -1,6 +1,6 @@
 # UI/UX Absorption Ledger
 
-Status: Cycle 2 mapping plus authorized hierarchy/layout absorption. Contract `contract-20260612-082659-d74b37f-uiux-cycle2-hierarchy-layout` authorizes the Hierarchy and Gestalt plus Grid and Layout anchors, bilingual retirements, validator, ledger, manifest, and planning-doc deltas only.
+Status: Cycle 3 mapping plus authorized color/accessibility absorption. Contract `contract-20260612-910b9c2-cycle3-color-accessibility` authorizes Color and Accessibility anchors, citation plans, validator, ledger, manifest, and planning-doc deltas only.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [authoring program](authoring-program.md).
 
@@ -135,3 +135,14 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 ## Unmapped Rules
 
 Zero. Every line-bearing README rule and every line-bearing rule from the seven existing UI files has a target area and status above.
+
+## Cycle 3 Color and Accessibility Decisions
+
+| Item | Status | Graduation annotation |
+| --- | --- | --- |
+| `ui-bilingual-typography.md:15` accessibility citation plan | citation-plan | Destination: `anchor:accessibility#wcag22-recommendation`; contrast criteria stay scope-owned by `anchor:color#wcag22-contrast-criteria`; structural check: future WCAG mapping table names criterion ID and test method. |
+| `ui-feel-foundations.md:14` accessibility citation plan | citation-plan | Destination: `anchor:accessibility#wcag22-recommendation` plus component planning through `anchor:accessibility#wai-aria-apg`; structural check: future fallback/reduced-motion matrix names test method. |
+| `ui-information-design.md:15` accessibility citation plan | citation-plan | Destination: `anchor:accessibility#wcag22-recommendation`; use `anchor:accessibility#wcag2ict` only when non-web ICT scope is explicit; structural check: future representation record names alt/source-copy acceptance evidence. |
+| Scope-keyed federation ownership | ownership-decision | WCAG IDs remain area-owned when the decision scope is criterion-specific: typography owns `anchor:typography-cjk-latin#wcag22-visual-presentation`, hierarchy owns `anchor:hierarchy-gestalt#wcag22-focus-appearance`, color owns `anchor:color#wcag22-contrast-criteria`; accessibility owns conformance-planning pointers only. |
+| ISO status migration | migration-plan | `anchor:typography-cjk-latin#iso40500-status` remains typography-owned this cycle; migration is deferred to the typography cycle, with the same-ID URL corrected to `https://www.iso.org/standard/91029.html` after controller verification that `91933` returned 404 and `91029` returned 200 on 2026-06-12. |
+| Card-body retirement count | retirement-record | Zero card-body lines retired in cycle 3; existing cards keep their current bodies until a future contract authorizes citation retargeting. |

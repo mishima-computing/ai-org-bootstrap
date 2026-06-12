@@ -15,7 +15,7 @@ Pointer: https://www.w3.org/TR/2026/DNOTE-clreq-20260503/ | Date/version: W3C Gr
 Pointer: https://www.w3.org/TR/WCAG22/ | Date/version: W3C Recommendation latest revision 2024-12-12 | Scope note: accessibility criteria affecting visual presentation, contrast, text spacing, and images of text. | Local use boundary: cite for accessibility floors and review mapping, not typography taste or business outcomes. | Stable ID: #wcag22-visual-presentation
 
 ## iso40500-status
-Pointer: https://www.iso.org/standard/91933.html | Date/version: ISO/IEC 40500:2025 published 2025-09; records WCAG 2.2 text as of 2023-10, so it diverges from later W3C revisions. | Scope note: formal standard status for WCAG 2.2 baseline. | Local use boundary: cite when standard status matters; use W3C WCAG anchor for latest revision details. | Stable ID: #iso40500-status
+Pointer: https://www.iso.org/standard/91029.html | Date/version: ISO/IEC 40500:2025 published 2025-09; records WCAG 2.2 text as of 2023-10, so it diverges from later W3C revisions. | Scope note: formal standard status for WCAG 2.2 baseline. | Local use boundary: cite when standard status matters; use W3C WCAG anchor for latest revision details. | Stable ID: #iso40500-status
 
 ## bringhurst-measure-rhythm
 Pointer: https://search.worldcat.org/title/784875720 | Date/version: The Elements of Typographic Style v4.0, 2012 | Scope note: Latin typography literature anchor for measure, rhythm, proportion, and typographic judgment. | Local use boundary: cite as the Latin half of mixed-script reasoning; it does not promote the Latin-systems area alone. | Stable ID: #bringhurst-measure-rhythm

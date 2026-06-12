@@ -1,6 +1,6 @@
 # UI/UX Knowledge Architecture
 
-Status: Cycle 2 architecture, with hierarchy/layout anchors, bilingual retirements, manifest, and validator delta authorized by contract `contract-20260612-082659-d74b37f-uiux-cycle2-hierarchy-layout`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
+Status: Cycle 3 architecture, with color/accessibility anchors, citation plans, manifest, and validator delta authorized by contract `contract-20260612-910b9c2-cycle3-color-accessibility`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
 
 Related docs: [domain map](domain-map.md), [absorption ledger](absorption-ledger.md), [authoring program](authoring-program.md).
 
@@ -25,6 +25,7 @@ Future anchor files under `.agent-org/knowledge/ui/anchors/` use this format:
 | Content model | Public canonical pointer, date/version, scope note, local use boundary, and card-facing citation ID. No copied excerpts. |
 | Fast-moving sources | Apple HIG, Material 3, market convention sources, and similar guidance must be dated in the anchor entry. |
 | Card citation rule | Future cards cite anchor IDs, not raw source URLs, for every semantic guard they depend on. |
+| Scope-keyed ownership | An entry is a duplicate only if it covers the same decision scope, not merely the same URL. |
 
 ## Handbook Promotion
 
@@ -89,6 +90,7 @@ Contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography` authorizes th
 | Discovery | Glob-discover `.agent-org/knowledge/ui/*.md`, `.agent-org/knowledge/ui/anchors/*.md`, and later `.agent-org/knowledge/ui/handbooks/*.md`. |
 | Format-only caps | Enforce existing card frontmatter, evidence pointer caps, optional exemplar format, 12 nonblank-line card body cap, and anchor approximate 40 nonblank-line cap. |
 | Citation resolution | For each future card citation such as `anchor:typography-cjk-latin#jlreq-line-composition`, verify the target anchor file and stable section ID exist. |
+| Card-required citations | Per-card required anchor citations are table-driven by card filename and required anchor slug so later cycles can add citation requirements as data-only rows. |
 | Phrase checks | Retire a per-card phrase check only in the authoring cycle where the absorbing area lands an anchor entry, the card cites the replacement anchor ID, and [absorption-ledger.md](absorption-ledger.md) records the retired phrase's destination. |
 | Prohibition checks | Flag new prose prohibitions that lack a graduation path: structural check, positive rewrite, or delete. |
 | Exemplar checks | Treat exemplar URLs as pointers only; unverified exemplars such as antgroup cannot satisfy acceptance evidence. |

@@ -382,6 +382,14 @@ UI_PROHIBITION_ALLOWLIST = [
     (".agent-org/knowledge/ui/ui-information-design.md", "never conversion, engagement, or SEO"),
 ]
 
+CARD_REQUIRED_ANCHOR_SLUGS = {
+    "ui-bilingual-typography.md": [
+        "typography-cjk-latin",
+        "hierarchy-gestalt",
+        "grid-layout",
+    ],
+}
+
 
 def is_allowed_ui_prohibition(path: Path, line: str) -> bool:
     relative = rel(path)
@@ -426,6 +434,15 @@ def check_ui_anchor_citations(ui_dir: Path, anchors: dict[str, set[str]]) -> lis
                 errors.append(f"{rel(path)} unresolved anchor citation: anchor:{slug}#{anchor_id} missing anchor file")
             elif anchor_id not in anchors[slug]:
                 errors.append(f"{rel(path)} unresolved anchor citation: anchor:{slug}#{anchor_id} missing stable ID")
+    return errors
+
+
+def check_frontmatter_watch_anchor_refs(path: Path, frontmatter: dict[str, str]) -> list[str]:
+    errors: list[str] = []
+    evidence_refs = frontmatter.get("evidence_refs", "")
+    for slug, anchor_id in ANCHOR_CITATION_RE.findall(evidence_refs):
+        if anchor_id.endswith("-watch"):
+            errors.append(f"{rel(path)} frontmatter evidence_refs must not cite watch anchor: anchor:{slug}#{anchor_id}")
     return errors
 
 
@@ -899,6 +916,7 @@ def check_ui_profile_cards() -> list[str]:
         for key in sorted(required_keys & actual_keys):
             if not frontmatter[key]:
                 errors.append(f"{rel(path)} empty UI profile frontmatter key: {key}")
+        errors.extend(check_frontmatter_watch_anchor_refs(path, frontmatter))
         if frontmatter.get("profile_id") != path.stem:
             errors.append(f"{rel(path)} profile_id must match filename stem")
         evidence_refs = [item.strip() for item in frontmatter.get("evidence_refs", "").split(";") if item.strip()]
@@ -948,27 +966,14 @@ def check_ui_profile_cards() -> list[str]:
                 "Claim limit: Claim legibility and focus effects only; never claim conversion, engagement, or SEO outcomes.",
             ]):
                 errors.append(f"{rel(path)} missing bilingual profile phrase: {phrase}")
-            if "typography-cjk-latin" in anchors:
+        for required_slug in CARD_REQUIRED_ANCHOR_SLUGS.get(filename, []):
+            if required_slug in anchors:
                 citations = ANCHOR_CITATION_RE.findall(text(path))
                 if not any(
-                    slug == "typography-cjk-latin" and anchor_id in anchors[slug]
+                    slug == required_slug and anchor_id in anchors[slug]
                     for slug, anchor_id in citations
                 ):
-                    errors.append(f"{rel(path)} must cite a resolving anchor:typography-cjk-latin# ID")
-            if "hierarchy-gestalt" in anchors:
-                citations = ANCHOR_CITATION_RE.findall(text(path))
-                if not any(
-                    slug == "hierarchy-gestalt" and anchor_id in anchors[slug]
-                    for slug, anchor_id in citations
-                ):
-                    errors.append(f"{rel(path)} must cite a resolving anchor:hierarchy-gestalt# ID")
-            if "grid-layout" in anchors:
-                citations = ANCHOR_CITATION_RE.findall(text(path))
-                if not any(
-                    slug == "grid-layout" and anchor_id in anchors[slug]
-                    for slug, anchor_id in citations
-                ):
-                    errors.append(f"{rel(path)} must cite a resolving anchor:grid-layout# ID")
+                    errors.append(f"{rel(path)} must cite a resolving anchor:{required_slug}# ID")
         if filename == "ui-composition-patterns.md":
             for phrase in contains_all(body, [
                 "Decidable check",
