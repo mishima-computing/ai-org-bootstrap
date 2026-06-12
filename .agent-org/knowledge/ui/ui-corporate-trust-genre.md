@@ -14,4 +14,4 @@ Decidable check: decision register names proof objects, announcements, officers,
 Advisory check: trust-vs-LP register separates institutional assurance from promotional persuasion before copy or layout polish.
 Decidable check: register-selection record chooses corporate trust register when legitimacy judgment is primary.
 Freshness: Treat as short-horizon guidance until a second corporate engagement or Stage-A spec ratifies it.
-Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.
+Claim class: Focus, scanability, and credibility are design-knowledge effects; conversion, engagement, and SEO are product-measurement effects per anchor:evaluation-instruments#claim-classes.

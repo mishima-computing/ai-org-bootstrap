@@ -388,11 +388,6 @@ ANCHOR_PERSISTENCE_IDIOMS = {
 UI_PROHIBITION_ALLOWLIST = [
     (".agent-org/knowledge/ui/README.md", "do not authorize selector inference"),
     (".agent-org/knowledge/ui/exemplars.md", "never cite bare domain"),
-    (".agent-org/knowledge/ui/ui-bilingual-typography.md", "never claim conversion, engagement, or SEO outcomes"),
-    (".agent-org/knowledge/ui/ui-composition-patterns.md", "never a pack constant"),
-    (".agent-org/knowledge/ui/ui-composition-patterns.md", "never conversion, engagement, or SEO"),
-    (".agent-org/knowledge/ui/ui-corporate-trust-genre.md", "never conversion, engagement, or SEO"),
-    (".agent-org/knowledge/ui/ui-information-design.md", "never conversion, engagement, or SEO"),
 ]
 
 CARD_REQUIRED_ANCHOR_SLUGS = {
@@ -423,6 +418,14 @@ CARD_REQUIRED_ANCHOR_SLUGS = {
         "motion",
     ],
 }
+
+CLAIM_CLASS_CITATION_ROWS = [
+    "ui-bilingual-typography.md",
+    "ui-composition-patterns.md",
+    "ui-corporate-trust-genre.md",
+    "ui-information-design.md",
+    "ui-feel-foundations.md",
+]
 
 
 def is_allowed_ui_prohibition(path: Path, line: str) -> bool:
@@ -507,6 +510,20 @@ def check_ui_prohibition_lines(ui_dir: Path) -> list[str]:
         for line_number, line in enumerate(text(path).splitlines(), start=1):
             if PROHIBITION_RE.search(line) and not is_allowed_ui_prohibition(path, line):
                 errors.append(f"{rel(path)}:{line_number} prohibition line lacks ledger annotation allowlist")
+    return errors
+
+
+def check_claim_class_citations(ui_dir: Path, anchors: dict[str, set[str]]) -> list[str]:
+    errors: list[str] = []
+    if "claim-classes" not in anchors.get("evaluation-instruments", set()):
+        errors.append(".agent-org/knowledge/ui/anchors/evaluation-instruments.md missing stable ID: #claim-classes")
+    for filename in CLAIM_CLASS_CITATION_ROWS:
+        path = ui_dir / filename
+        content = text(path)
+        if "anchor:evaluation-instruments#claim-classes" not in content:
+            errors.append(f"{rel(path)} must cite anchor:evaluation-instruments#claim-classes for claim class")
+        if re.search(r"never\s+(?:claim\s+)?(?:conversion|engagement|seo)|never\s+conversion", content, re.IGNORECASE):
+            errors.append(f"{rel(path)} must retire legacy conversion/engagement/SEO claim prohibition prose")
     return errors
 
 
@@ -923,6 +940,7 @@ def check_ui_profile_cards() -> list[str]:
     errors.extend(anchor_errors)
     errors.extend(check_anchor_persistence_idioms(ui_dir))
     errors.extend(check_ui_anchor_citations(ui_dir, anchors))
+    errors.extend(check_claim_class_citations(ui_dir, anchors))
     errors.extend(check_ui_prohibition_lines(ui_dir))
 
     readme = text(ui_dir / "README.md")
@@ -1002,7 +1020,8 @@ def check_ui_profile_cards() -> list[str]:
                 "timing-ranges",
                 "multimodal cue",
                 "silent fallback",
-                "usability or performance claims require user-test evidence",
+                "usability-performance gains require product measurement",
+                "anchor:evaluation-instruments#claim-classes",
                 "Hicks et al.",
             ]):
                 errors.append(f"{rel(path)} missing feel profile phrase: {phrase}")
@@ -1021,7 +1040,8 @@ def check_ui_profile_cards() -> list[str]:
         if filename == "ui-bilingual-typography.md":
             for phrase in contains_all(body, [
                 "Translation-only preserves structure",
-                "Claim limit: Claim legibility and focus effects only; never claim conversion, engagement, or SEO outcomes.",
+                "Claim class: Legibility and focus are design-knowledge effects",
+                "anchor:evaluation-instruments#claim-classes",
             ]):
                 errors.append(f"{rel(path)} missing bilingual profile phrase: {phrase}")
         for required_slug in CARD_REQUIRED_ANCHOR_SLUGS.get(filename, []):
@@ -1041,7 +1061,8 @@ def check_ui_profile_cards() -> list[str]:
                 "one lead language per view",
                 "plain-problem lead",
                 "jargon lead",
-                "Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.",
+                "Claim class: Focus, scanability, and credibility are design-knowledge effects",
+                "anchor:evaluation-instruments#claim-classes",
             ]):
                 errors.append(f"{rel(path)} missing composition profile phrase: {phrase}")
         if filename == "ui-information-design.md":
@@ -1049,7 +1070,8 @@ def check_ui_profile_cards() -> list[str]:
                 "図解",
                 "A list must become a figure",
                 "Label",
-                "Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.",
+                "Claim class: Focus, scanability, and credibility are design-knowledge effects",
+                "anchor:evaluation-instruments#claim-classes",
             ]):
                 errors.append(f"{rel(path)} missing information-design profile phrase: {phrase}")
         if filename == "ui-corporate-trust-genre.md":
@@ -1060,7 +1082,8 @@ def check_ui_profile_cards() -> list[str]:
                 "company personhood",
                 "trust-vs-LP register",
                 "short-horizon",
-                "Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.",
+                "Claim class: Focus, scanability, and credibility are design-knowledge effects",
+                "anchor:evaluation-instruments#claim-classes",
             ]):
                 errors.append(f"{rel(path)} missing corporate-trust profile phrase: {phrase}")
     return errors
