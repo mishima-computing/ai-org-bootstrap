@@ -18,6 +18,10 @@ Exemplars: optional `exemplars` key, exemplars cap: 4 pointers, separated by sem
 
 An objective may name UI/UX profiles in Experience Constraints. Controllers forward those names verbatim; `conservative-designer` may use only named profiles and still respects the `selected_profiles` cap of 5.
 
+## Anchor URL Format
+
+For WorldCat literature pointers with a stable ISBN, prefer `https://search.worldcat.org/isbn/<isbn>` over `/title/` records. When no stable ISBN is known, keep the `/title/` pointer and note the edition/year in `Date/version`. Positive rewrite path: future anchor edits convert `/title/` to `/isbn/` only with a stable ISBN in the same entry.
+
 ## Profile Slugs
 
 | Slug | Current citation update |

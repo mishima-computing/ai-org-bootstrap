@@ -14,18 +14,25 @@ import http.client
 import json
 import socket
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
+from typing import Callable
+
+from chrome_capture import (  # noqa: E402
+    browser_class_user_agent,
+    browser_class_user_agent_for_chrome_version,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
 ANCHORS_DIR = ROOT / ".agent-org/knowledge/ui/anchors"
 POINTER_PREFIX = "Pointer: "
-BROWSER_CLASS_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 BOT_BLOCK_HOSTS = {"doi.org", "search.worldcat.org"}
 BOT_BLOCK_STATUS = {403, 429}
+DEFAULT_HOST_DELAY_SECONDS = 2.0
 
 
 class SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
@@ -114,7 +121,7 @@ def build_request(url: str) -> urllib.request.Request:
         url,
         method="GET",
         headers={
-            "User-Agent": BROWSER_CLASS_UA,
+            "User-Agent": browser_class_user_agent(),
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.9",
             "Connection": "close",
@@ -141,25 +148,80 @@ def fetch_url(opener: urllib.request.OpenerDirector, url: str, timeout: float) -
         return None, "network_unavailable", exc.__class__.__name__
 
 
-def run_check(timeout: float) -> tuple[int, dict[str, object]]:
+def wait_for_host(
+    host: str,
+    last_seen: dict[str, float],
+    host_delay: float,
+    now: Callable[[], float],
+    sleep: Callable[[float], None],
+) -> None:
+    if host_delay <= 0:
+        last_seen[host] = now()
+        return
+    current = now()
+    previous = last_seen.get(host)
+    if previous is not None:
+        remaining = host_delay - (current - previous)
+        if remaining > 0:
+            sleep(remaining)
+            current = now()
+    last_seen[host] = current
+
+
+def should_retry_after_delay(url: str, status: int | None, result_class: str) -> bool:
+    host = urllib.parse.urlparse(url).netloc.lower()
+    return bool(status in BOT_BLOCK_STATUS and result_class != "bot_block" and host not in BOT_BLOCK_HOSTS)
+
+
+def fetch_with_retry(
+    opener: urllib.request.OpenerDirector,
+    pointer: dict[str, object],
+    timeout: float,
+    host_delay: float,
+    last_seen: dict[str, float],
+    now: Callable[[], float] = time.monotonic,
+    sleep: Callable[[float], None] = time.sleep,
+    fetch: Callable[[urllib.request.OpenerDirector, str, float], tuple[int | None, str, str | None]] = fetch_url,
+) -> dict[str, object]:
+    host = str(pointer["host"])
+    url = str(pointer["url"])
+    wait_for_host(host, last_seen, host_delay, now, sleep)
+    status, result_class, error = fetch(opener, url, timeout)
+    item = dict(pointer)
+    item.update({
+        "status": status,
+        "class": result_class,
+    })
+    if error:
+        item["error"] = error
+    if should_retry_after_delay(url, status, result_class):
+        wait_for_host(host, last_seen, host_delay, now, sleep)
+        retry_status, retry_class, retry_error = fetch(opener, url, timeout)
+        retry: dict[str, object] = {
+            "attempt": 2,
+            "status": retry_status,
+            "class": retry_class,
+            "classification_policy": "original classification stands after exactly one retry-after-delay",
+        }
+        if retry_error:
+            retry["error"] = retry_error
+        item["retry"] = retry
+    return item
+
+
+def run_check(timeout: float, host_delay: float) -> tuple[int, dict[str, object]]:
     opener = build_opener()
     results: list[dict[str, object]] = []
+    last_seen: dict[str, float] = {}
     for pointer in discover_pointers(ANCHORS_DIR):
-        status, result_class, error = fetch_url(opener, str(pointer["url"]), timeout)
-        item = dict(pointer)
-        item.update({
-            "status": status,
-            "class": result_class,
-        })
-        if error:
-            item["error"] = error
-        results.append(item)
+        results.append(fetch_with_retry(opener, pointer, timeout, host_delay, last_seen))
 
     code = exit_code(results)
     return code, {
         "status": status_for_exit(code),
         "exit_code": code,
         "checked_count": len(results),
+        "host_delay_seconds": host_delay,
         "results": results,
     }
 
@@ -210,18 +272,117 @@ def run_self_test() -> tuple[int, dict[str, object]]:
             "passed": passed,
         })
     request = build_request("https://example.com/")
-    ua_passed = request.get_header("User-agent") == BROWSER_CLASS_UA
+    expected_ua = browser_class_user_agent()
+    ua_passed = request.get_header("User-agent") == expected_ua
+    version_ua = browser_class_user_agent_for_chrome_version("Google Chrome 149.0.7586.0")
+    version_ua_passed = version_ua is not None and "Chrome/149.0.0.0" in version_ua
     http_passed = (
         BrowserHTTPConnection._http_vsn_str == "HTTP/1.1"
         and BrowserHTTPSConnection._http_vsn_str == "HTTP/1.1"
     )
-    failed = failed or not ua_passed or not http_passed
+    failed = failed or not ua_passed or not version_ua_passed or not http_passed
+
+    def retry_fixture() -> tuple[bool, dict[str, object]]:
+        calls: list[str] = []
+        slept: list[float] = []
+        clock = {"value": 10.0}
+
+        def now() -> float:
+            return clock["value"]
+
+        def sleep(seconds: float) -> None:
+            slept.append(round(seconds, 3))
+            clock["value"] += seconds
+
+        def fetch(_opener: urllib.request.OpenerDirector, url: str, _timeout: float) -> tuple[int | None, str, str | None]:
+            calls.append(url)
+            return (429, classify_status(url, 429), None) if len(calls) == 1 else (200, "ok", None)
+
+        pointer = {
+            "path": ".agent-org/knowledge/ui/anchors/example.md",
+            "line": 1,
+            "url": "https://example.com/throttle",
+            "host": "example.com",
+        }
+        item = fetch_with_retry(build_opener(), pointer, 1.0, 2.0, {}, now=now, sleep=sleep, fetch=fetch)
+        passed = (
+            len(calls) == 2
+            and slept == [2.0]
+            and item["status"] == 429
+            and item["class"] == "hard_non_200"
+            and isinstance(item.get("retry"), dict)
+            and item["retry"]["status"] == 200
+        )
+        return passed, {
+            "name": "non_bot_block_429_retried_once_original_class_stands",
+            "expected_exit": 0,
+            "actual_exit": 0 if passed else 1,
+            "passed": passed,
+        }
+
+    def host_delay_fixture() -> tuple[bool, dict[str, object]]:
+        slept: list[float] = []
+        clock = {"value": 100.0}
+        last_seen: dict[str, float] = {}
+
+        def now() -> float:
+            return clock["value"]
+
+        def sleep(seconds: float) -> None:
+            slept.append(round(seconds, 3))
+            clock["value"] += seconds
+
+        wait_for_host("example.com", last_seen, 2.0, now, sleep)
+        clock["value"] += 0.5
+        wait_for_host("other.example", last_seen, 2.0, now, sleep)
+        wait_for_host("example.com", last_seen, 2.0, now, sleep)
+        passed = slept == [1.5]
+        return passed, {
+            "name": "host_delay_applies_per_host",
+            "expected_exit": 0,
+            "actual_exit": 0 if passed else 1,
+            "passed": passed,
+        }
+
+    def bot_block_no_retry_fixture() -> tuple[bool, dict[str, object]]:
+        calls: list[str] = []
+
+        def fetch(_opener: urllib.request.OpenerDirector, url: str, _timeout: float) -> tuple[int | None, str, str | None]:
+            calls.append(url)
+            return 403, classify_status(url, 403), None
+
+        pointer = {
+            "path": ".agent-org/knowledge/ui/anchors/example.md",
+            "line": 1,
+            "url": "https://search.worldcat.org/isbn/9780961392147",
+            "host": "search.worldcat.org",
+        }
+        item = fetch_with_retry(build_opener(), pointer, 1.0, 2.0, {}, now=lambda: 0.0, sleep=lambda _seconds: None, fetch=fetch)
+        passed = len(calls) == 1 and item["class"] == "bot_block" and "retry" not in item
+        return passed, {
+            "name": "documented_bot_block_host_not_retried",
+            "expected_exit": 0,
+            "actual_exit": 0 if passed else 1,
+            "passed": passed,
+        }
+
+    for fixture_func in (retry_fixture, host_delay_fixture, bot_block_no_retry_fixture):
+        passed, case = fixture_func()
+        failed = failed or not passed
+        cases.append(case)
+
     cases.extend([
         {
             "name": "browser_class_user_agent",
             "expected_exit": 0,
             "actual_exit": 0 if ua_passed else 1,
             "passed": ua_passed,
+        },
+        {
+            "name": "browser_class_user_agent_from_chrome_version",
+            "expected_exit": 0,
+            "actual_exit": 0 if version_ua_passed else 1,
+            "passed": version_ua_passed,
         },
         {
             "name": "http_1_1_request_profile",
@@ -244,10 +405,13 @@ def main(argv: list[str] | None = None) -> int:
         epilog="Exit 0 all 200; 1 hard non-200; 2 network unavailable; 3 only bot-block-class 403/429 from documented hosts; exit 3 is recorded pass semantics for controller liveness.",
     )
     parser.add_argument("--timeout", type=float, default=10.0, help="Per-request timeout in seconds.")
+    parser.add_argument("--host-delay", type=float, default=DEFAULT_HOST_DELAY_SECONDS, help="Minimum delay in seconds between requests to the same host. Default: 2.0.")
     parser.add_argument("--self-test", action="store_true", help="Run offline classifier fixtures without network.")
     args = parser.parse_args(argv)
+    if args.host_delay < 0:
+        parser.error("--host-delay must be non-negative")
 
-    code, payload = run_self_test() if args.self_test else run_check(args.timeout)
+    code, payload = run_self_test() if args.self_test else run_check(args.timeout, args.host_delay)
     print(json.dumps(payload, indent=2, sort_keys=True))
     return code
 

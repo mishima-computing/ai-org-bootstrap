@@ -227,6 +227,13 @@
       "required": false
     },
     {
+      "path": ".agent-org/knowledge/ui/perceptual-review-profile.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/ecosystems/",
       "type": "dir",
       "tier": "pack_level",
@@ -486,7 +493,21 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "scripts/chrome_capture.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": "scripts/check-spatial.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "scripts/capture-screens.py",
       "type": "file",
       "tier": "pack_level",
       "check_applicability": "everywhere",
