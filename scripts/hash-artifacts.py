@@ -61,15 +61,17 @@ def verify_embed(argv: list[str]) -> int:
                 "embedded": False,
             })
 
+    exit_code = 0 if not errors and all(item["embedded"] for item in sources) else 1
     payload = {
-        "status": "pass" if not errors and all(item["embedded"] for item in sources) else "fail",
+        "status": "pass" if exit_code == 0 else "fail",
+        "exit_code": exit_code,
         "composed": args.composed,
         "sources": sources,
     }
     if errors:
         payload["errors"] = errors
     print(json.dumps(payload, indent=2, ensure_ascii=False))
-    return 0 if payload["status"] == "pass" else 1
+    return exit_code
 
 
 def main(argv: list[str]) -> int:
@@ -82,7 +84,11 @@ def main(argv: list[str]) -> int:
         if path.is_file():
             items.append({"path": str(path), "sha256": sha256(path)})
 
-    print(json.dumps({"artifacts": items}, indent=2, ensure_ascii=False))
+    print(json.dumps({
+        "status": "pass",
+        "exit_code": 0,
+        "artifacts": items,
+    }, indent=2, ensure_ascii=False))
     return 0
 
 

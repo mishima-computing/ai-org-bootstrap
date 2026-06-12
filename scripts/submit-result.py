@@ -27,6 +27,55 @@ FORMAT_STATUS = "PROVISIONAL submit-result.v1"
 SUPERSEDE_TRIGGER = "adoption of the #39 tool-I/O substrate"
 
 
+def repair_error(field_path: str, actual: object, allowed: object, repair_hint: str) -> dict[str, object]:
+    return {
+        "field_path": field_path,
+        "actual": actual,
+        "allowed": allowed,
+        "repair_hint": repair_hint,
+    }
+
+
+def validation_error_from_message(message: str, schema_rel: str | None = None) -> dict[str, object]:
+    field_path, separator, detail = message.partition(": ")
+    if not separator:
+        field_path = "$"
+        detail = message
+    return repair_error(
+        field_path=field_path,
+        actual=detail,
+        allowed=schema_rel or "selected agent schema",
+        repair_hint="Return JSON that conforms to the selected schema and drop unsupported keys.",
+    )
+
+
+def parse_payload_error(message: str) -> dict[str, object]:
+    return repair_error(
+        field_path="$",
+        actual=message,
+        allowed="valid JSON payload",
+        repair_hint="Return pure JSON with no Markdown fences or explanatory text.",
+    )
+
+
+def output_path_error(message: str) -> dict[str, object]:
+    return repair_error(
+        field_path="expected_output",
+        actual=message,
+        allowed=".agent-runs/<run>/... path",
+        repair_hint="Use an output path contained under the run directory.",
+    )
+
+
+def write_error(message: str) -> dict[str, object]:
+    return repair_error(
+        field_path="expected_output",
+        actual=message,
+        allowed="writable run artifact path",
+        repair_hint="Retry with a writable path under .agent-runs/ or let the controller write the artifact.",
+    )
+
+
 def load_schema(agent: str) -> tuple[dict[str, Any] | None, str | None, str | None]:
     schema_rel = SCHEMA_BY_AGENT.get(agent)
     if schema_rel is None:
@@ -125,23 +174,33 @@ def print_status(payload: dict[str, object]) -> None:
 def submit(agent: str, expected_output: str, raw_payload: str, root: Path = ROOT) -> int:
     instance, parse_error = parse_payload(raw_payload)
     if parse_error:
-        print_status(status_payload("fail", agent=agent, errors=[parse_error]))
+        print_status(status_payload("fail", agent=agent, errors=[parse_payload_error(parse_error)]))
         return 1
 
     errors, schema_rel = validate_payload(agent, instance)
     if errors:
-        print_status(status_payload("fail", agent=agent, schema=schema_rel, errors=errors))
+        print_status(status_payload(
+            "fail",
+            agent=agent,
+            schema=schema_rel,
+            errors=[validation_error_from_message(item, schema_rel) for item in errors],
+        ))
         return 1
 
     output_path, path_error = contained_output_path(expected_output, root=root)
     if path_error or output_path is None:
-        print_status(status_payload("fail", agent=agent, schema=schema_rel, errors=[path_error or "output_path_error"]))
+        print_status(status_payload(
+            "fail",
+            agent=agent,
+            schema=schema_rel,
+            errors=[output_path_error(path_error or "output_path_error")],
+        ))
         return 1
 
     try:
         atomic_write_json(output_path, instance)
     except Exception as exc:  # noqa: BLE001
-        print_status(status_payload("fail", agent=agent, schema=schema_rel, errors=[f"atomic_write_error: {exc}"]))
+        print_status(status_payload("fail", agent=agent, schema=schema_rel, errors=[write_error(f"atomic_write_error: {exc}")]))
         return 1
 
     print_status(status_payload("pass", agent=agent, schema=schema_rel, expected_output=str(output_path)))
@@ -275,6 +334,27 @@ def _self_test_path_containment() -> None:
         _assert(error is not None and ".agent-runs" in error, "symlink escape error must name .agent-runs")
 
 
+def _self_test_emitted_validation_error_shape() -> None:
+    import contextlib
+    import io
+    import tempfile as _tempfile
+
+    with _tempfile.TemporaryDirectory() as tmpdir:
+        root = Path(tmpdir)
+        out = root / ".agent-runs" / "self-test" / "result.json"
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            exit_code = submit("aggressive-designer", str(out), "{not-json", root=root)
+        _assert(exit_code == 1, "invalid JSON submit should fail")
+        payload = json.loads(stdout.getvalue())
+        error = payload["errors"][0]
+        _assert(
+            set(error) == {"field_path", "actual", "allowed", "repair_hint"},
+            "validation error must use repair object shape",
+        )
+        _assert(error["field_path"] == "$", "parse error path must point at payload root")
+
+
 def run_self_tests() -> int:
     cases = [
         ("unknown_key_tombstone", _self_test_unknown_key),
@@ -282,6 +362,7 @@ def run_self_tests() -> int:
         ("missing_required_field_path", _self_test_missing_required_field),
         ("passing_instance_and_atomic_write", _self_test_passing_instance_and_atomic_write),
         ("path_containment", _self_test_path_containment),
+        ("emitted_validation_error_shape", _self_test_emitted_validation_error_shape),
     ]
     results = []
     for name, test in cases:
@@ -315,7 +396,11 @@ def main(argv: list[str] | None = None) -> int:
     if raw_payload is None:
         raw_payload = sys.stdin.read()
     if not raw_payload.strip():
-        print_status(status_payload("fail", agent=args.agent, errors=["payload_missing: provide --json or stdin JSON"]))
+        print_status(status_payload(
+            "fail",
+            agent=args.agent,
+            errors=[parse_payload_error("payload_missing: provide --json or stdin JSON")],
+        ))
         return 1
 
     return submit(args.agent, args.expected_output, raw_payload)
