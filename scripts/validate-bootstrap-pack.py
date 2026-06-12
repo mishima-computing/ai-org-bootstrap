@@ -635,6 +635,107 @@ def manifest_pack_files(manifest: dict) -> list[str]:
     return sorted(files)
 
 
+def manifest_entry_sets(manifest: dict) -> tuple[set[str], set[str], set[str]]:
+    files: set[str] = set()
+    dirs: set[str] = set()
+    repo_local_dirs: set[str] = set()
+    for entry in manifest.get("entries", []):
+        if not isinstance(entry, dict):
+            continue
+        raw_path = entry.get("path")
+        if not isinstance(raw_path, str):
+            continue
+        path = raw_path.rstrip("/") + ("/" if raw_path.endswith("/") else "")
+        if entry.get("type") == "file":
+            files.add(path)
+        elif entry.get("type") == "dir":
+            dirs.add(path)
+            if entry.get("tier") == "repo_local":
+                repo_local_dirs.add(path)
+    return files, dirs, repo_local_dirs
+
+
+def pack_level_dirs(manifest: dict) -> set[str]:
+    dirs: set[str] = set()
+    for entry in manifest.get("entries", []):
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("tier") == "pack_level" and entry.get("type") == "dir":
+            raw_path = entry.get("path")
+            if isinstance(raw_path, str):
+                dirs.add(raw_path.rstrip("/") + "/")
+    return dirs
+
+
+def parent_dirs_declared(path: str, declared_dirs: set[str]) -> list[str]:
+    missing: list[str] = []
+    parts = path.rstrip("/").split("/")[:-1]
+    for index in range(1, len(parts) + 1):
+        parent = "/".join(parts[:index]) + "/"
+        if parent not in declared_dirs:
+            missing.append(parent)
+    return missing
+
+
+def is_under_any_dir(path: str, dirs: set[str]) -> bool:
+    return any(path.startswith(item) for item in dirs)
+
+
+def should_skip_completeness_path(path: Path) -> bool:
+    return any(part in {"__pycache__", ".git"} for part in path.parts)
+
+
+def check_manifest_completeness_for_root(root: Path, manifest: dict, label: str) -> list[str]:
+    errors: list[str] = []
+    manifest_files, manifest_dirs, repo_local_dirs = manifest_entry_sets(manifest)
+    declared_pack_dirs = pack_level_dirs(manifest)
+    found_files: set[str] = set()
+
+    for directory in sorted(declared_pack_dirs):
+        absolute_dir = root / directory
+        if not absolute_dir.is_dir():
+            continue
+        for path in sorted(absolute_dir.rglob("*")):
+            if should_skip_completeness_path(path) or not path.is_file():
+                continue
+            relative = path.relative_to(root).as_posix()
+            if is_under_any_dir(relative, repo_local_dirs):
+                continue
+            found_files.add(relative)
+
+    for found in sorted(found_files):
+        if found not in manifest_files:
+            errors.append(f"{label}: manifest_completeness_missing_file: {found}")
+        missing_parents = parent_dirs_declared(found, manifest_dirs)
+        if missing_parents:
+            errors.append(f"{label}: manifest_completeness_missing_parent_dirs: {found}: {missing_parents}")
+
+    for path in sorted(manifest_files | manifest_dirs):
+        if is_under_any_dir(path, repo_local_dirs) or path in repo_local_dirs:
+            continue
+        missing_parents = parent_dirs_declared(path, manifest_dirs)
+        if missing_parents:
+            errors.append(f"{label}: manifest_parent_dirs_missing: {path}: {missing_parents}")
+
+    return errors
+
+
+def check_pack_manifest_completeness(manifest: dict) -> list[str]:
+    return check_manifest_completeness_for_root(ROOT, manifest, "source")
+
+
+def check_pack_manifest_completeness_negative_fixture() -> list[str]:
+    fixture_root = ROOT / "fixtures/pack-completeness/under-listed-tree"
+    manifest_path = fixture_root / "pack-manifest.json"
+    loaded, error = load_json(manifest_path)
+    if error or not isinstance(loaded, dict):
+        return [f"pack_completeness_fixture_invalid: {error or 'manifest must be object'}"]
+    errors = check_manifest_completeness_for_root(fixture_root, loaded, "under-listed-tree-fixture")
+    if not any("manifest_completeness_missing_file: pack/missing.txt" in item for item in errors):
+        return ["pack_completeness_fixture_failed: under-listed-tree fixture did not report pack/missing.txt red"]
+    return []
+
+
 def legacy_required_files() -> list[str]:
     required = [
         "bootstrap/codex-bootstrap.md",
@@ -1262,8 +1363,23 @@ def check_controller_role() -> list[str]:
         "sandbox cannot write a file",
         "verify findings limited to mechanical fact-checking against repo evidence",
         "no adoption authority",
+        "## MERGE GATE",
+        "## VERIFICATION BATTERY",
+        "scripts/merge-gate.py",
     ]):
         errors.append(f"{rel(path)} missing controller phrase: {phrase}")
+    battery = content.split("## VERIFICATION BATTERY", 1)[1] if "## VERIFICATION BATTERY" in content else ""
+    instrument_paths = sorted({
+        item
+        for item in re.findall(r"`([^`]+)`", battery)
+        if "/" in item and "<" not in item
+    })
+    if not instrument_paths:
+        errors.append(f"{rel(path)} verification battery must name instrument paths")
+    for instrument in instrument_paths:
+        candidate = ROOT / instrument.rstrip("/")
+        if not candidate.exists():
+            errors.append(f"{rel(path)} verification battery instrument missing: {instrument}")
     return errors
 
 
@@ -1687,6 +1803,9 @@ def main(argv: list[str] | None = None) -> int:
         errors.extend(check_pack_manifest_self_test(manifest))
         errors.extend(check_required_files(manifest))
         errors.extend(guarded("check_pack_stamp", check_pack_stamp, manifest, mode, stamp_exists))
+        if mode == "source":
+            errors.extend(guarded("check_pack_manifest_completeness", check_pack_manifest_completeness, manifest))
+            errors.extend(guarded("check_pack_manifest_completeness_negative_fixture", check_pack_manifest_completeness_negative_fixture))
     errors.extend(f"json_parse_error: {item}" for item in guarded("parse_json_files", parse_json_files))
     errors.extend(f"schema_conformance_error: {item}" for item in guarded("check_schema_samples", check_schema_samples))
     errors.extend(f"schema_explicit_type_error: {item}" for item in guarded("check_schema_explicit_types", check_schema_explicit_types))

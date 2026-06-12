@@ -526,6 +526,13 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "scripts/merge-gate.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": "roles/",
       "type": "dir",
       "tier": "pack_level",
@@ -694,6 +701,97 @@
     {
       "path": "fixtures/",
       "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/merge-gate/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/merge-gate/all-pass.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/merge-gate/empty.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/merge-gate/legacy-status-only.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/merge-gate/mixed-fail.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/merge-gate/pending.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/merge-gate/timeout.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/pack-completeness/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/pack-completeness/under-listed-tree/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/pack-completeness/under-listed-tree/pack/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/pack-completeness/under-listed-tree/pack-manifest.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/pack-completeness/under-listed-tree/pack/declared.txt",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/pack-completeness/under-listed-tree/pack/missing.txt",
+      "type": "file",
       "tier": "pack_level",
       "check_applicability": "everywhere",
       "required": false
