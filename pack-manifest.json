@@ -692,7 +692,35 @@
       "required": false
     },
     {
+      "path": "fixtures/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": "fixtures/spatial/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/known-bad/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/known-good/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/blobs/",
       "type": "dir",
       "tier": "pack_level",
       "check_applicability": "everywhere",
