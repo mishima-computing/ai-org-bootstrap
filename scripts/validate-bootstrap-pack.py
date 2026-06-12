@@ -378,7 +378,6 @@ UI_PROHIBITION_ALLOWLIST = [
     (".agent-org/knowledge/ui/ui-feel-foundations.md", "do not encode fixed constants"),
     (".agent-org/knowledge/ui/ui-feel-foundations.md", "do not claim usability or performance gains"),
     (".agent-org/knowledge/ui/ui-gacha-genre.md", "never hide odds or material constraints"),
-    (".agent-org/knowledge/ui/ui-information-design.md", "do not count as information design"),
     (".agent-org/knowledge/ui/ui-information-design.md", "never conversion, engagement, or SEO"),
 ]
 
@@ -386,6 +385,10 @@ CARD_REQUIRED_ANCHOR_SLUGS = {
     "ui-bilingual-typography.md": [
         "typography-cjk-latin",
         "hierarchy-gestalt",
+        "grid-layout",
+    ],
+    "ui-information-design.md": [
+        "information-design",
         "grid-layout",
     ],
 }
@@ -990,7 +993,6 @@ def check_ui_profile_cards() -> list[str]:
             for phrase in contains_all(body, [
                 "図解",
                 "A list must become a figure",
-                "anti-monotony rules",
                 "Label",
                 "Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.",
             ]):

@@ -1,6 +1,6 @@
 # UI/UX Absorption Ledger
 
-Status: Cycle 3 mapping plus authorized color/accessibility absorption. Contract `contract-20260612-910b9c2-cycle3-color-accessibility` authorizes Color and Accessibility anchors, citation plans, validator, ledger, manifest, and planning-doc deltas only.
+Status: Cycle 4 mapping plus authorized IA/information-design absorption. Contract `contract-20260612-091325-6e81d85-uiux-cycle4-ia-information-design` authorizes Information Architecture and Information Design anchors, ui-information-design citation updates, validator data rows, ledger, manifest, and planning-doc deltas only.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [authoring program](authoring-program.md).
 
@@ -146,3 +146,13 @@ Zero. Every line-bearing README rule and every line-bearing rule from the seven 
 | Scope-keyed federation ownership | ownership-decision | WCAG IDs remain area-owned when the decision scope is criterion-specific: typography owns `anchor:typography-cjk-latin#wcag22-visual-presentation`, hierarchy owns `anchor:hierarchy-gestalt#wcag22-focus-appearance`, color owns `anchor:color#wcag22-contrast-criteria`; accessibility owns conformance-planning pointers only. |
 | ISO status migration | migration-plan | `anchor:typography-cjk-latin#iso40500-status` remains typography-owned this cycle; migration is deferred to the typography cycle, with the same-ID URL corrected to `https://www.iso.org/standard/91029.html` after controller verification that `91933` returned 404 and `91029` returned 200 on 2026-06-12. |
 | Card-body retirement count | retirement-record | Zero card-body lines retired in cycle 3; existing cards keep their current bodies until a future contract authorizes citation retargeting. |
+
+## Cycle 4 IA and Information Design Decisions
+
+| Item | Status | Graduation annotation |
+| --- | --- | --- |
+| Authorization | implementation-contract | `contract-20260612-091325-6e81d85-uiux-cycle4-ia-information-design` authorizes IA and information-design anchors, the bounded `ui-information-design.md` citation update, validator data deltas, manifest rows, and planning-doc status updates only. |
+| `ui-information-design.md:15` accessibility citation plan supersession | supersession-record | Cycle 3 destination `anchor:accessibility#wcag22-recommendation` is superseded for figure/representation text alternatives by `anchor:information-design#wcag22-text-alternatives`; use `anchor:accessibility#wcag2ict` only when non-web ICT scope is explicit. |
+| `ui-information-design.md:13` anti-monotony phrase check | retirement-record | Validator phrase requirement for `anti-monotony rules` retires because the card now cites `anchor:grid-layout#m3-layout-overview` and CARD_REQUIRED_ANCHOR_SLUGS requires a resolving `grid-layout` citation. |
+| `ui-information-design.md:14` caption prohibition allowlist | retirement-record | The `do not count as information design` allowlist row retires because card wording graduated to "captions name the relation or source" with destination `anchor:information-design#nng-data-tables`. |
+| `ui-bilingual-typography.md:16` IA citation plan | citation-plan | Future authorized cycle may cite `anchor:information-architecture#nng-ia-vs-navigation` for localization divergence; this cycle intentionally does not edit `ui-bilingual-typography.md`. |

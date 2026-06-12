@@ -2,7 +2,7 @@
 
 Scope: conformance-planning pointers for WCAG, ARIA practices, WCAG2ICT, and successor-watch status; pointer notes only, with zero copied source excerpts.
 
-Scope note: area-owned WCAG IDs stay with `anchor:typography-cjk-latin#wcag22-visual-presentation`, `anchor:hierarchy-gestalt#wcag22-focus-appearance`, and `anchor:color#wcag22-contrast-criteria`; this file owns conformance-planning pointers.
+Scope note: area-owned WCAG IDs stay with `anchor:typography-cjk-latin#wcag22-visual-presentation`, `anchor:hierarchy-gestalt#wcag22-focus-appearance`, `anchor:color#wcag22-contrast-criteria`, and `anchor:information-design#wcag22-text-alternatives`; this file owns conformance-planning pointers.
 
 ## wcag22-recommendation
 Pointer: https://www.w3.org/TR/WCAG22/ | Date/version: W3C Recommendation latest revision 2024-12-12 | Scope note: WCAG 2.2 conformance-planning baseline across perceivable, operable, understandable, and robust acceptance. | Local use boundary: cite for WCAG mapping tables and conformance status; criterion-specific math and spatial floors stay in .agent-org/knowledge/ecosystems/htmlcss-computable-spatial.md and area anchors. | Stable ID: #wcag22-recommendation
