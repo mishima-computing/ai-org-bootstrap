@@ -1,6 +1,6 @@
 # UI/UX Knowledge Architecture
 
-Status: Cycle 5 architecture, with interaction/motion anchors, URL-persistence policy, controller-run liveness script, manifest, and validator delta authorized by contract `contract-20260612-093339-f45eb86-uiux-cycle5-interaction-motion-url-persistence`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
+Status: Cycle 6 architecture, with composition and genre-grammar anchors, card citation updates, exemplar-class rule, manifest, and validator data delta authorized by contract `contract-20260612-100305-2993b5f-uiux-cycle6-composition-genre-grammars`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
 
 Related docs: [domain map](domain-map.md), [absorption ledger](absorption-ledger.md), [authoring program](authoring-program.md).
 
@@ -105,6 +105,10 @@ Contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography` authorizes th
 | Card-required citations | Per-card required anchor citations are table-driven by card filename and required anchor slug so later cycles can add citation requirements as data-only rows. |
 | Phrase checks | Retire a per-card phrase check only in the authoring cycle where the absorbing area lands an anchor entry, the card cites the replacement anchor ID, and [absorption-ledger.md](absorption-ledger.md) records the retired phrase's destination. |
 | Prohibition checks | Flag new prose prohibitions that lack a graduation path: structural check, positive rewrite, or delete. |
-| Exemplar checks | Treat exemplar URLs as pointers only; unverified exemplars such as antgroup cannot satisfy acceptance evidence. |
+| Exemplar checks | Treat exemplar URLs as hypothesis-class pointers only; unverified exemplars such as antgroup cannot satisfy acceptance evidence. |
 
 The phrase-check path is a graduation path, not silent deletion. Existing phrase checks remain authoritative until their absorbing area is authored.
+
+## Exemplar-Class Referencing
+
+`exemplars.md` entries are hypothesis-class pointers. Cards may reference them through the existing `exemplars` key with `slug@date` format, while acceptance evidence excludes them until #44 capture/fetch verification exists. Anchors may mention `exemplars.md` only in local use-boundary text, preserving the cycle-2 repo-path ruling; antgroup keeps its unverified marker.

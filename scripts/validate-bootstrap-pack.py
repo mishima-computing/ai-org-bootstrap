@@ -391,9 +391,7 @@ UI_PROHIBITION_ALLOWLIST = [
     (".agent-org/knowledge/ui/ui-bilingual-typography.md", "never claim conversion, engagement, or SEO outcomes"),
     (".agent-org/knowledge/ui/ui-composition-patterns.md", "never a pack constant"),
     (".agent-org/knowledge/ui/ui-composition-patterns.md", "never conversion, engagement, or SEO"),
-    (".agent-org/knowledge/ui/ui-corporate-trust-genre.md", "Avoid borrowed startup landing-page tempo"),
     (".agent-org/knowledge/ui/ui-corporate-trust-genre.md", "never conversion, engagement, or SEO"),
-    (".agent-org/knowledge/ui/ui-gacha-genre.md", "never hide odds or material constraints"),
     (".agent-org/knowledge/ui/ui-information-design.md", "never conversion, engagement, or SEO"),
 ]
 
@@ -409,6 +407,19 @@ CARD_REQUIRED_ANCHOR_SLUGS = {
     ],
     "ui-feel-foundations.md": [
         "interaction-feedback",
+        "motion",
+    ],
+    "ui-composition-patterns.md": [
+        "composition",
+        "grid-layout",
+        "hierarchy-gestalt",
+    ],
+    "ui-corporate-trust-genre.md": [
+        "genre-corporate-trust",
+        "composition",
+    ],
+    "ui-gacha-genre.md": [
+        "genre-gacha",
         "motion",
     ],
 }
@@ -1002,8 +1013,9 @@ def check_ui_profile_cards() -> list[str]:
                 "rarity signaled before item",
                 "rarity language",
                 "anticipation",
+                "pre-draw audit record",
                 "short-horizon",
-                "yatai Stage-A pilot",
+                "Yin & Xiao CHI 2022",
             ]):
                 errors.append(f"{rel(path)} missing gacha profile phrase: {phrase}")
         if filename == "ui-bilingual-typography.md":
