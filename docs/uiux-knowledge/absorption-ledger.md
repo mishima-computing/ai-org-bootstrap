@@ -1,6 +1,6 @@
 # UI/UX Absorption Ledger
 
-Status: Cycle 5 mapping plus authorized interaction/motion absorption. Contract `contract-20260612-093339-f45eb86-uiux-cycle5-interaction-motion-url-persistence` authorizes Interaction and Feedback and Motion anchors, ui-feel-foundations citation updates, URL-persistence policy, controller-run liveness script, validator data rows, ledger, manifest, and planning-doc deltas only.
+Status: Cycle 6 mapping plus authorized composition and genre-grammar absorption. Contract `contract-20260612-100305-2993b5f-uiux-cycle6-composition-genre-grammars` authorizes composition and genre anchors, three card citation updates, validator data rows, ledger, manifest, Kao correction, exemplar-class rule, and SaaS stay-stub note only.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [authoring program](authoring-program.md).
 
@@ -84,7 +84,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-corporate-trust-genre.md:12` | Disclosure gravity changes tone and requires sober register/audit-friendly hierarchy. | Genre Grammars: Corporate Trust | absorbed | Positive rewrite: disclosure adjacency flag changes hierarchy/tone requirements. |
 | `ui-corporate-trust-genre.md:13` | Decision register names proof objects supporting credibility per view. | Composition | absorbed | Structural check: proof-object register. |
 | `ui-corporate-trust-genre.md:14` | Trust-vs-LP register separates assurance from persuasion before copy/layout polish. | Genre Grammars: Corporate Trust | absorbed | Structural check: register selected before implementation. |
-| `ui-corporate-trust-genre.md:15` | Avoid borrowed startup landing-page tempo for corporate legitimacy judgment. | Genre Grammars: Corporate Trust | superseded-later | Positive rewrite: choose corporate trust register when legitimacy judgment is primary; delete negative wording after genre check lands. |
+| `ui-corporate-trust-genre.md:15` | Avoid borrowed startup landing-page tempo for corporate legitimacy judgment. | Genre Grammars: Corporate Trust | absorbed | Destination: `anchor:genre-corporate-trust#nng-corporate-credibility`; positive rewrite landed as register-selection record for primary legitimacy judgment. |
 | `ui-corporate-trust-genre.md:16` | Short-horizon guidance until second engagement or Stage-A ratification. | Process Methodology | retained-as-hypothesis | Structural check: freshness date and ratification evidence required. |
 | `ui-corporate-trust-genre.md:17` | Claim focus, scanability, credibility only; never conversion, engagement, or SEO. | Evaluation Instruments | absorbed | Structural check: claim-class allowlist replaces prose prohibition. |
 
@@ -109,7 +109,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-gacha-genre.md:3-7` | Scope, coverage, freshness, supersede trigger, and evidence refs for gacha flows. | Genre Grammars: Game/Gacha | absorbed | Structural check: future gacha card cites genre/motion/accessibility anchors. |
 | `ui-gacha-genre.md:10` | Reveal ceremony separates anticipation, rarity signal, and item identity. | Genre Grammars: Game/Gacha | absorbed | Positive rewrite: reveal sequence fields. |
 | `ui-gacha-genre.md:11` | Rarity is signaled before item. | Genre Grammars: Game/Gacha | absorbed | Structural check: reveal order lists rarity before identity or records exception. |
-| `ui-gacha-genre.md:11` | Never hide odds or material constraints behind spectacle. | Accessibility | superseded-later | Structural check: odds/material constraints visible before draw; delete negative wording after disclosure check exists. |
+| `ui-gacha-genre.md:11` | Never hide odds or material constraints behind spectacle. | Genre Grammars: Game/Gacha | absorbed | Destination: `anchor:genre-gacha#cesa-guideline-20160427` and `anchor:genre-gacha#joga-guideline-index`; positive structural check records pre-draw odds/material-constraint visibility. |
 | `ui-gacha-genre.md:12` | Rarity language is consistent across copy, color, audio, motion, and inventory state. | Interaction and Feedback | absorbed | Structural check: rarity-token consistency matrix. |
 | `ui-gacha-genre.md:13` | Entrance, suspense, rarity confirmation, item reveal, and recovery must be skippable. | Motion | absorbed | Structural check: skip/reduced-motion path for each ceremony phase. |
 | `ui-gacha-genre.md:14` | Genre conventions stale quickly and vary by market. | Genre Grammars: Game/Gacha | retained-as-hypothesis | Positive rewrite: dated market-source requirement per authoring cycle. |
@@ -169,3 +169,16 @@ Zero. Every line-bearing README rule and every line-bearing rule from the seven 
 | Controller dated-URL synthesis prohibition | graduation-delete | The controller prompt prohibition on dated-URL synthesis is deleted effective this ratification because the positive rule, offline validator, and controller-run liveness script land in this contract; controller executes the external prompt edit. |
 | `ui-gacha-genre.md:13` motion skip citation PLAN | citation-plan | Cycle 6 Destination: `anchor:motion#wcag22-motion-criteria` for pause/stop/hide and animation-from-interactions scope, plus `anchor:motion#nng-animation-duration` for duration bands; this cycle intentionally does not edit `ui-gacha-genre.md`. |
 | `ui-gacha-genre.md:13` reduced-motion citation PLAN | citation-plan | Cycle 6 Destination: `anchor:motion#apple-hig-motion` and `anchor:motion#wcag22-motion-criteria`; structural check: every ceremony phase names same-information reduced-motion behavior. |
+
+## Cycle 6 Composition and Genre Grammar Decisions
+
+| Item | Status | Graduation annotation |
+| --- | --- | --- |
+| Authorization | implementation-contract | `contract-20260612-100305-2993b5f-uiux-cycle6-composition-genre-grammars` authorizes three thin anchors, three card rewrites, validator data deltas, manifest rows, Kao correction, exemplar-class rule, and SaaS stay-stub note only. |
+| `ui-composition-patterns.md:13` section-cap citation | graduation-record | Rows 69-70 landed with `anchor:grid-layout#m3-layout-overview` and `anchor:hierarchy-gestalt#upod-gestalt-principles`; section sequence and grouping rationale remain decidable from intake/audit records. |
+| `ui-corporate-trust-genre.md:15` startup-tempo phrase | retirement-record | Destination: `anchor:genre-corporate-trust#nng-corporate-credibility`; allowlist row removed after card wording graduated to a register-selection check. |
+| `ui-gacha-genre.md:11` odds/constraints phrase | retirement-record | Destination: `anchor:genre-gacha#cesa-guideline-20160427` plus `anchor:genre-gacha#joga-guideline-index`; allowlist row removed after card wording graduated to pre-draw visibility audit record. |
+| `ui-gacha-genre.md:13` motion citation plan | graduation-record | Rows 170-171 landed with `anchor:motion#wcag22-motion-criteria`, `anchor:motion#apple-hig-motion`, and `anchor:motion#nng-animation-duration`; skip and reduced-motion paths are card-visible. |
+| CHI-2024-Kao named research | refutation-record | Four-search/controller outcome found no stable usable ACM DOI for the Kao reference; substitute is Yin & Xiao CHI 2022 DOI 10.1145/3491102.3517642 for RRM reveal/player experience only. Re-verify if the owner supplies an exact 2024 Kao DOI. |
+| Exemplar-class rule | rule-record | `exemplars.md` entries are hypothesis-class pointers; antgroup remains unverified pending #44 and is excluded from acceptance evidence. |
+| SaaS/Operational Tools | stay-stub-record | 2026-06-12 stay-stub follows cycle-1 Latin precedent: available anchors alone are insufficient without a named deliverable decision and detection instrument. |
