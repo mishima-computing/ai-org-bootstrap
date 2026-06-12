@@ -199,3 +199,9 @@ Zero. Every line-bearing README rule and every line-bearing rule from the seven 
 | DOI liveness rider | verification-idiom-record | `doi.org` joins documented bot-block hosts after recorded probe evidence: DOI 10.1145/3491102.3517642 redirected 302 to `dl.acm.org` then returned 403 on 2026-06-12. Compensating verification for DOI pointer changes is `https://api.crossref.org/works/<doi>`. |
 | Quarto liveness rider | controller-probe-record | `anchor:hierarchy-gestalt#upod-gestalt-principles` keeps the `quarto.com` pointer; controller evidence says the page is live, so the script receives the browser-class UA plus HTTP/1.1 request profile and no documented-host fallback unless a later controller probe fails. |
 | ISO 9241-210 rider | controller-probe-record | `anchor:process-methodology#iso9241-210-human-centered-design` uses ISO record id 77520 under the verified-ISO-URL idiom; genius client saw 403, so controller should record whether the post-fix probe is 200 or documented-host evidence. |
+
+## Cycle 8 Computable Spatial Decisions
+
+| Item | Status | Graduation annotation |
+| --- | --- | --- |
+| `htmlcss-computable-spatial.md` follow-up-4 instrument | graduation-record | Destination: `scripts/check-spatial.py` implements overflow/page-widening, fixed-element bounds, opaque-solid contrast, and tap-target advisory checks; spacing-token modulo, paint-based contrast #44, and safe-area assertions remain named follow-ups. |

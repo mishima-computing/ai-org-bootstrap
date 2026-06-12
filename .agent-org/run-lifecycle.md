@@ -45,6 +45,8 @@ Stage-A/Stage-B for UI/UX:
 
 - Stage-A UI/UX SPEC: for human-facing surfaces, run a docs-only UI/UX SPEC cycle and ratify it by merge before implementation cycles.
 - Stage-B intake: the ratified spec enters implementation intake at CI-constraints rank.
+- Stage-B closeout note: for human-facing surfaces, `scripts/check-spatial.py` is the docs-placed computable spatial lint for overflow/page-widening, fixed-element bounds, opaque-solid contrast, and tap-target advisory review. Deferred follow-ups remain spacing-token modulo after a token-source contract, paint-based contrast #44, safe-area assertions, and CI wiring.
+- Stage-B Chrome caveat: `scripts/check-spatial.py` does not pass `--user-data-dir` in the live Chrome invocation because new headless already creates an ephemeral profile and Chrome 149, observed 2026-06-12, can hang when `--user-data-dir` is combined with `--headless=new` and `--virtual-time-budget`.
 - Experience Constraints live in `.agent-org/intake-template.md`; this lifecycle only orders Stage-A and Stage-B.
 
 Aufheben verdict handling:
