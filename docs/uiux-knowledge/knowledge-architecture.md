@@ -105,10 +105,10 @@ Contract `contract-20260612-075757-bd7c42c-uiux-cycle1-typography` authorizes th
 | Card-required citations | Per-card required anchor citations are table-driven by card filename and required anchor slug so later cycles can add citation requirements as data-only rows. |
 | Phrase checks | Retire a per-card phrase check only in the authoring cycle where the absorbing area lands an anchor entry, the card cites the replacement anchor ID, and [absorption-ledger.md](absorption-ledger.md) records the retired phrase's destination. |
 | Prohibition checks | Flag new prose prohibitions that lack a graduation path: structural check, positive rewrite, or delete. |
-| Exemplar checks | Treat exemplar URLs as hypothesis-class pointers only; unverified exemplars such as antgroup cannot satisfy acceptance evidence. |
+| Exemplar checks | Treat exemplar URLs as hypothesis-class pointers only; capture verification requires `scripts/capture-screens.py` metadata plus a run-dir PNG path before exemplars such as antgroup can satisfy acceptance evidence. |
 
 The phrase-check path is a graduation path, not silent deletion. Existing phrase checks remain authoritative until their absorbing area is authored.
 
 ## Exemplar-Class Referencing
 
-`exemplars.md` entries are hypothesis-class pointers. Cards may reference them through the existing `exemplars` key with `slug@date` format, while acceptance evidence excludes them until #44 capture/fetch verification exists. Anchors may mention `exemplars.md` only in local use-boundary text, preserving the cycle-2 repo-path ruling; antgroup keeps its unverified marker.
+`exemplars.md` entries are hypothesis-class pointers. Cards may reference them through the existing `exemplars` key with `slug@date` format, while acceptance evidence requires #44 capture/fetch verification. The capture instrument is `scripts/capture-screens.py`; durable evidence cites the run-dir PNG path and `capture-metadata.json`, while `exemplars.md` remains the date-pinned registry. Anchors may mention `exemplars.md` only in local use-boundary text, preserving the cycle-2 repo-path ruling; antgroup keeps its unverified marker until a controller-executed capture lands.
