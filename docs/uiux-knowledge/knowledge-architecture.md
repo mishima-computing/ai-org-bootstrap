@@ -1,6 +1,6 @@
 # UI/UX Knowledge Architecture
 
-Status: Cycle 3 architecture, with color/accessibility anchors, citation plans, manifest, and validator delta authorized by contract `contract-20260612-910b9c2-cycle3-color-accessibility`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
+Status: Cycle 5 architecture, with interaction/motion anchors, URL-persistence policy, controller-run liveness script, manifest, and validator delta authorized by contract `contract-20260612-093339-f45eb86-uiux-cycle5-interaction-motion-url-persistence`; no CI, workflow, handbook, adoption, or downstream-sync change is authorized here.
 
 Related docs: [domain map](domain-map.md), [absorption ledger](absorption-ledger.md), [authoring program](authoring-program.md).
 
@@ -26,6 +26,18 @@ Future anchor files under `.agent-org/knowledge/ui/anchors/` use this format:
 | Fast-moving sources | Apple HIG, Material 3, market convention sources, and similar guidance must be dated in the anchor entry. |
 | Card citation rule | Future cards cite anchor IDs, not raw source URLs, for every semantic guard they depend on. |
 | Scope-keyed ownership | An entry is a duplicate only if it covers the same decision scope, not merely the same URL. |
+
+## Anchor URL Persistence
+
+Every anchor pointer declares URL-persistence class through the existing `Date/version` idiom; no separate pipe field is used.
+
+| Class | Date/version declaration idiom | Use |
+| --- | --- | --- |
+| dated-permalink | Publisher-minted version or dated resource plus date, for example `https://www.w3.org/TR/2024/REC-WCAG22-20241212/` and `W3C Recommendation dated this-version 2024-12-12`. | Prefer for specifications and publisher-stable dated articles. |
+| edition-pinned | Named work plus edition/year, for example a literature pointer with `2nd edition, 2001`. | Use for books and editioned literature records. |
+| living | `checked YYYY-MM-DD; re-check on <trigger>`. | Use for current platform, design-system, repository, and live guidance pages. |
+
+Worked example: W3C explains URI persistence at `https://www.w3.org/policies/uri-persistence/`; WCAG 2.2's dated this-version URL above is the pack example of a dated-permalink declaration.
 
 ## Handbook Promotion
 

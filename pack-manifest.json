@@ -129,6 +129,20 @@
       "required": false
     },
     {
+      "path": ".agent-org/knowledge/ui/anchors/interaction-feedback.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/ui/anchors/motion.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/ui/ui-bilingual-typography.md",
       "type": "file",
       "tier": "pack_level",
@@ -426,6 +440,12 @@
     },
     {
       "path": "scripts/validate-bootstrap-pack.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
+      "path": "scripts/check-anchor-urls.py",
       "type": "file",
       "tier": "pack_level",
       "check_applicability": "everywhere"
