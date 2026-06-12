@@ -14,4 +14,4 @@ Decidable check: anti-monotony rules declare allowed section-shape ranges before
 Rule: Labels name the relation being shown; captions name the relation or source; cite anchor:information-design#nng-data-tables.
 Advisory check: figures must preserve text alternatives and source-of-truth copy for accessibility and localization; cite anchor:information-design#wcag22-text-alternatives.
 Boundary: This card chooses representation form; it does not authorize new facts, claims, or product promises.
-Claim limit: focus, scanability, and credibility effects only; never conversion, engagement, or SEO.
+Claim class: Focus, scanability, and credibility are design-knowledge effects; conversion, engagement, and SEO are product-measurement effects per anchor:evaluation-instruments#claim-classes.

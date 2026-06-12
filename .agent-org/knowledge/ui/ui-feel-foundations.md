@@ -12,5 +12,5 @@ Rule: Feedback-as-proof uses `proves:` statements tying each effect to the state
 Timing: Use timing-ranges from anchor:motion#nng-animation-duration bands and product tests; record range rationale.
 Coherence: Motion, audio, haptics, copy, and visual state must tell the same story.
 Fallback: Every multimodal cue needs silent fallback and reduced-motion-safe behavior.
-Claim limit: Juiciness may increase appeal or expressiveness; usability or performance claims require user-test evidence.
+Claim class: Juiciness may increase appeal or expressiveness; usability-performance gains require product measurement per anchor:evaluation-instruments#claim-classes.
 Pointers: Hicks et al. juiciness finding; cite anchor:interaction-feedback#nng-visibility-system-status and anchor:motion#m3-easing-duration-tokens.

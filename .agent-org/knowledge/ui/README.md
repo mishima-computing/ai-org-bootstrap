@@ -17,3 +17,13 @@ Exemplars: optional `exemplars` key, exemplars cap: 4 pointers, separated by sem
 ## Use
 
 An objective may name UI/UX profiles in Experience Constraints. Controllers forward those names verbatim; `conservative-designer` may use only named profiles and still respects the `selected_profiles` cap of 5.
+
+## Profile Slugs
+
+| Slug | Current citation update |
+| --- | --- |
+| `ui-bilingual-typography` | Claim classes cite `anchor:evaluation-instruments#claim-classes`. |
+| `ui-composition-patterns` | Claim classes cite `anchor:evaluation-instruments#claim-classes`. |
+| `ui-corporate-trust-genre` | Claim classes cite `anchor:evaluation-instruments#claim-classes`. |
+| `ui-information-design` | Claim classes cite `anchor:evaluation-instruments#claim-classes`. |
+| `ui-feel-foundations` | Product-measurement wording cites `anchor:evaluation-instruments#claim-classes`. |

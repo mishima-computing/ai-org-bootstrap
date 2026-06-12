@@ -1,6 +1,6 @@
 # UI/UX Absorption Ledger
 
-Status: Cycle 6 mapping plus authorized composition and genre-grammar absorption. Contract `contract-20260612-100305-2993b5f-uiux-cycle6-composition-genre-grammars` authorizes composition and genre anchors, three card citation updates, validator data rows, ledger, manifest, Kao correction, exemplar-class rule, and SaaS stay-stub note only.
+Status: Cycle 7 mapping plus authorized process/evaluation absorption. Contract `uiux-cycle7-20260612-cc18fdd-process-eval-claimclass` authorizes process/evaluation anchors, five claim-class rewrites, validator data rows, URL-rider notes, UX Writing stay-stub conditions, manifest, and row-7 closure only.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [authoring program](authoring-program.md).
 
@@ -54,7 +54,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-bilingual-typography.md:15` | Enforce contrast floors by script and display size. | Accessibility | absorbed | Structural check: WCAG 2.2 contrast criteria cited and tested on worst-case image region. |
 | `ui-bilingual-typography.md:16` | Translation-only preserves structure; localization may change IA and visual design. | Information Architecture | absorbed | Positive rewrite: localization divergence decision record. |
 | `ui-bilingual-typography.md:17` | Bind micro-rules to JLREQ/CLREQ instead of restating exceptions in cards. | Typography: CJK+Latin | absorbed | Destination: `anchor:typography-cjk-latin#jlreq-line-composition` and `anchor:typography-cjk-latin#clreq-mixed-spacing`; local pointer prose superseded by anchor citations. |
-| `ui-bilingual-typography.md:18` | Claim legibility/focus effects only; never conversion, engagement, or SEO. | Evaluation Instruments | absorbed | Positive rewrite: allowed-claim field lists supported effect class; delete phrase after validator enforces claim class. |
+| `ui-bilingual-typography.md:18` | Legacy claim-limit line separated legibility/focus from conversion, engagement, and SEO outcomes. | Evaluation Instruments | absorbed | Positive rewrite: allowed-claim field lists supported effect class; delete phrase after validator enforces claim class. |
 | `ui-bilingual-typography.md:19` | Pointers list CJK, cross-cultural, line length, text-over-images, and spacing sources. | Typography: CJK+Latin | absorbed | Supersede raw pointer list with anchor citations during typography cycle. |
 
 ## ui-composition-patterns.md
@@ -63,7 +63,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | --- | --- | --- | --- | --- |
 | `ui-composition-patterns.md:3-8` | Scope, coverage, freshness, supersede trigger, evidence refs, and exemplars for composition propositions. | Composition | absorbed | Structural check: future card cites composition anchor IDs; exemplars remain date-pinned. |
 | `ui-composition-patterns.md:11` | Proof-artifact density has objective-declared floor or band validated by product tests. | Composition | absorbed | Structural check: intake requires floor/band. |
-| `ui-composition-patterns.md:11` | Proof-artifact density is never a pack constant. | Composition | superseded-later | Positive rewrite: "objective declares proof density band"; delete negative wording after validator checks threshold source. |
+| `ui-composition-patterns.md:11` | Proof-artifact density is objective-specific rather than a pack constant. | Composition | superseded-later | Positive rewrite: "objective declares proof density band"; delete negative wording after validator checks threshold source. |
 | `ui-composition-patterns.md:12` | Reject token proof-objects. | Composition | superseded-later | Structural check: proof object must map to visible state, institutional fact, or capability. |
 | `ui-composition-patterns.md:12` | Proof explains a user-visible state, institutional fact, or capability. | Composition | absorbed | Positive rewrite: proof-object inventory field. |
 | `ui-composition-patterns.md:13` | Consecutive same-type section cap is objective-declared. | Grid and Layout | absorbed | Citation-plan Destination for cycle 6: `anchor:grid-layout#m3-layout-overview`; structural check: section-sequence scan. |
@@ -72,7 +72,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-composition-patterns.md:15` | One lead language per view declares focus script and secondary support. | Typography: CJK+Latin | absorbed | Structural check: lead-language field. |
 | `ui-composition-patterns.md:16` | Plain-problem lead vs jargon lead follows audience fluency and risk, not internal preference. | UX Writing | absorbed | Positive rewrite: lead-copy choice records audience fluency and risk. |
 | `ui-composition-patterns.md:17` | Named propositions carry per-objective thresholds before implementation. | Process Methodology | absorbed | Structural check: intake threshold record. |
-| `ui-composition-patterns.md:18` | Claim focus, scanability, credibility only; never conversion, engagement, or SEO. | Evaluation Instruments | absorbed | Structural check: claim-class allowlist replaces prose prohibition. |
+| `ui-composition-patterns.md:18` | Legacy claim-limit line separated focus, scanability, and credibility from conversion, engagement, and SEO. | Evaluation Instruments | absorbed | Structural check: claim-class allowlist replaces prose prohibition. |
 
 ## ui-corporate-trust-genre.md
 
@@ -86,7 +86,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-corporate-trust-genre.md:14` | Trust-vs-LP register separates assurance from persuasion before copy/layout polish. | Genre Grammars: Corporate Trust | absorbed | Structural check: register selected before implementation. |
 | `ui-corporate-trust-genre.md:15` | Avoid borrowed startup landing-page tempo for corporate legitimacy judgment. | Genre Grammars: Corporate Trust | absorbed | Destination: `anchor:genre-corporate-trust#nng-corporate-credibility`; positive rewrite landed as register-selection record for primary legitimacy judgment. |
 | `ui-corporate-trust-genre.md:16` | Short-horizon guidance until second engagement or Stage-A ratification. | Process Methodology | retained-as-hypothesis | Structural check: freshness date and ratification evidence required. |
-| `ui-corporate-trust-genre.md:17` | Claim focus, scanability, credibility only; never conversion, engagement, or SEO. | Evaluation Instruments | absorbed | Structural check: claim-class allowlist replaces prose prohibition. |
+| `ui-corporate-trust-genre.md:17` | Legacy claim-limit line separated focus, scanability, and credibility from conversion, engagement, and SEO. | Evaluation Instruments | absorbed | Structural check: claim-class allowlist replaces prose prohibition. |
 
 ## ui-feel-foundations.md
 
@@ -130,7 +130,7 @@ Legend: `absorbed` means the rule has a target area for future anchors/cards. `s
 | `ui-information-design.md:14` | Decorative captions do not count as information design. | Information Design | superseded-later | Structural check: caption must name relation or source; delete negative wording after check lands. |
 | `ui-information-design.md:15` | Figures preserve text alternatives and source-of-truth copy. | Accessibility | absorbed | Structural check: alt text and source copy fields. |
 | `ui-information-design.md:16` | Card chooses representation form and does not authorize new facts, claims, or product promises. | Process Methodology | absorbed | Structural check: representation decision cannot add product claims; positive rewrite in intake template. |
-| `ui-information-design.md:17` | Claim focus, scanability, credibility only; never conversion, engagement, or SEO. | Evaluation Instruments | absorbed | Structural check: claim-class allowlist replaces prose prohibition. |
+| `ui-information-design.md:17` | Legacy claim-limit line separated focus, scanability, and credibility from conversion, engagement, and SEO. | Evaluation Instruments | absorbed | Structural check: claim-class allowlist replaces prose prohibition. |
 
 ## Unmapped Rules
 
@@ -163,7 +163,7 @@ Zero. Every line-bearing README rule and every line-bearing rule from the seven 
 | --- | --- | --- |
 | Authorization | implementation-contract | `contract-20260612-093339-f45eb86-uiux-cycle5-interaction-motion-url-persistence` authorizes interaction/motion anchors, `ui-feel-foundations.md` citations, URL-persistence policy, controller-run URL liveness script, validator deltas, manifest rows, and planning-doc status updates only. |
 | `ui-feel-foundations.md:12` fixed-constant prohibition | retirement-record | Destination: `anchor:motion#nng-animation-duration` and `anchor:motion#m3-easing-duration-tokens`; card wording graduated to positive timing-ranges with range rationale, and validator keeps the fixed-ms structural check. |
-| `ui-feel-foundations.md:15` usability/performance claim prohibition | retirement-record | Destination: `anchor:motion#m3-expressive-motion` plus evaluation-instrument claim class; card wording graduated to "usability or performance claims require user-test evidence." |
+| `ui-feel-foundations.md:15` usability/performance claim limit | retirement-record | Destination: `anchor:motion#m3-expressive-motion` plus evaluation-instrument claim class; card wording now federates usability-performance gains into product measurement. |
 | `ui-feel-foundations.md` raw evidence refs | graduation-record | Destination: resolving citations for `anchor:interaction-feedback#apple-hig-feedback`, `anchor:interaction-feedback#m3-interaction-states`, `anchor:interaction-feedback#nng-visibility-system-status`, `anchor:motion#nng-animation-duration`, `anchor:motion#m3-easing-duration-tokens`, and `anchor:accessibility#wcag22-recommendation`. |
 | Issue #51 URL-persistence rule | rule-record | Anchor pointers declare persistence class through the `Date/version` idiom: dated-permalink, edition-pinned, or living with `checked YYYY-MM-DD; re-check on <trigger>`; validator enforces the idiom offline and controller-run `scripts/check-anchor-urls.py` proves liveness only. |
 | Controller dated-URL synthesis prohibition | graduation-delete | The controller prompt prohibition on dated-URL synthesis is deleted effective this ratification because the positive rule, offline validator, and controller-run liveness script land in this contract; controller executes the external prompt edit. |
@@ -182,3 +182,20 @@ Zero. Every line-bearing README rule and every line-bearing rule from the seven 
 | CHI-2024-Kao named research | refutation-record | Four-search/controller outcome found no stable usable ACM DOI for the Kao reference; substitute is Yin & Xiao CHI 2022 DOI 10.1145/3491102.3517642 for RRM reveal/player experience only. Re-verify if the owner supplies an exact 2024 Kao DOI. |
 | Exemplar-class rule | rule-record | `exemplars.md` entries are hypothesis-class pointers; antgroup remains unverified pending #44 and is excluded from acceptance evidence. |
 | SaaS/Operational Tools | stay-stub-record | 2026-06-12 stay-stub follows cycle-1 Latin precedent: available anchors alone are insufficient without a named deliverable decision and detection instrument. |
+
+## Cycle 7 Process, Evaluation, and Claim-Class Decisions
+
+| Item | Status | Graduation annotation |
+| --- | --- | --- |
+| Authorization | implementation-contract | `uiux-cycle7-20260612-cc18fdd-process-eval-claimclass` authorizes process/evaluation anchors, claim-class rewrites, validator data/code delta, DOI/quarto liveness rider handling, UX Writing stay-stub conditions, manifest rows, and program row-7 closure only. |
+| `ui-bilingual-typography.md:18` claim-limit phrase | retirement-record | Destination: `anchor:evaluation-instruments#claim-classes`; card wording now names legibility/focus as design-knowledge effects and conversion/engagement/SEO as product-measurement effects. |
+| `ui-composition-patterns.md:18` claim-limit phrase | retirement-record | Destination: `anchor:evaluation-instruments#claim-classes`; card wording now names focus/scanability/credibility as design-knowledge effects and conversion/engagement/SEO as product-measurement effects. |
+| `ui-corporate-trust-genre.md:17` claim-limit phrase | retirement-record | Destination: `anchor:evaluation-instruments#claim-classes`; card wording now names focus/scanability/credibility as design-knowledge effects and conversion/engagement/SEO as product-measurement effects. |
+| `ui-information-design.md:17` claim-limit phrase | retirement-record | Destination: `anchor:evaluation-instruments#claim-classes`; card wording now names focus/scanability/credibility as design-knowledge effects and conversion/engagement/SEO as product-measurement effects. |
+| `ui-feel-foundations.md:15` product-measurement wording | retirement-record | Destination: `anchor:evaluation-instruments#claim-classes`; appeal/expressiveness stays design-knowledge class, while usability-performance gains require product measurement. |
+| UX Writing | stay-stub-record | 2026-06-12 stay-stub follows cycle-1/6 precedent: verified anchors exist for Microsoft Writing Style Guide, Apple HIG Writing, Material 3 UX writing, and NN/g error-message guidelines, but promotion requires a named copy decision plus copy-audit instrument. |
+| Process Methodology | demote-condition-record | `anchor:process-methodology#process-checklist` names row-7 closure and future intake review as citation consumers; demote to Stub if no consumer cites it by the next authoring-program revision. |
+| HP benchmark readiness | owner-question-record | `anchor:evaluation-instruments#hp-benchmark-readiness` records preconditions and row-8 owner questions for scope, pass/fail rubric, and constraints; benchmark is not run in cycle 7. |
+| DOI liveness rider | verification-idiom-record | `doi.org` joins documented bot-block hosts after recorded probe evidence: DOI 10.1145/3491102.3517642 redirected 302 to `dl.acm.org` then returned 403 on 2026-06-12. Compensating verification for DOI pointer changes is `https://api.crossref.org/works/<doi>`. |
+| Quarto liveness rider | controller-probe-record | `anchor:hierarchy-gestalt#upod-gestalt-principles` keeps the `quarto.com` pointer; controller evidence says the page is live, so the script receives the browser-class UA plus HTTP/1.1 request profile and no documented-host fallback unless a later controller probe fails. |
+| ISO 9241-210 rider | controller-probe-record | `anchor:process-methodology#iso9241-210-human-centered-design` uses ISO record id 77520 under the verified-ISO-URL idiom; genius client saw 403, so controller should record whether the post-fix probe is 200 or documented-host evidence. |
