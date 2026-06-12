@@ -101,6 +101,14 @@ Before invoking Claude Code, create:
 Return pure JSON conforming to the schema. Do not wrap it in Markdown, code fences, or explanatory text.
 ```
 
+Claude role inputs MUST also include this template text:
+
+```text
+Drop any key not present in the schema instead of adding tombstone or explanatory fields for removed keys.
+```
+
+Deletion condition: remove the drop-the-key sentence only after 3 consecutive clean submit-result Claude-path runs with zero schema-field carrier retries.
+
 Required preflight:
 
 1. `command -v claude`
@@ -119,6 +127,10 @@ Codex may run Claude either:
 ### Read-only Claude Roles
 
 Read-only Claude roles are `aggressive-designer`, `genius`, and `aufheben-designer`.
+
+PROVISIONAL pending #39: `scripts/submit-result.py` stdout shape, validation-error format, and artifact-write contract are local v1 interfaces. Supersede them when the #39 tool-I/O substrate is adopted.
+
+Recorded gate outcome (controller verification, 2026-06-12, Claude Code CLI current): live scratch run used `claude --print --tools "Bash" --allowedTools "Bash(python3 scripts/submit-result.py *)"` with a prompt asking Claude to run plain `ls`; the off-pattern Bash command succeeded and returned the repository listing. Disposition per the gate: the proposed read-only Claude write path `Bash(python3 scripts/submit-result.py *)` is not adopted; read-only Claude roles keep the extract-then-validate path below, and the write-path question routes to #39. Until the #39 tool-I/O substrate supersedes local v1, `scripts/submit-result.py` remains documented for write-capable carriers such as Codex implementer and for controller-side validation.
 
 Invocation template:
 

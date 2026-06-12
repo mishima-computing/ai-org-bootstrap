@@ -653,6 +653,7 @@ def legacy_required_files() -> list[str]:
         "scripts/check-anchor-urls.py",
         "scripts/extract-claude-result.py",
         "scripts/hash-artifacts.py",
+        "scripts/submit-result.py",
         "scripts/validate-bootstrap-pack.py",
     ]
     required.extend(DISTRIBUTION_REQUIRED_FILES)
@@ -729,7 +730,7 @@ def validate_schema_instance(schema: dict, instance: object, path: str = "$") ->
         if isinstance(required, list):
             for key in required:
                 if key not in instance:
-                    errors.append(f"{path}: missing required field {key}")
+                    errors.append(f"{path}.{key}: missing required field")
 
         properties = schema.get("properties", {})
         if isinstance(properties, dict):
@@ -758,7 +759,10 @@ def validate_schema_instance(schema: dict, instance: object, path: str = "$") ->
 
     max_length = schema.get("maxLength")
     if isinstance(max_length, int) and isinstance(instance, str) and len(instance) > max_length:
-        errors.append(f"{path}: expected string length at most {max_length}")
+        errors.append(
+            f"{path}: expected string length at most {max_length} "
+            f"(actual {len(instance)}, allowed {max_length})"
+        )
 
     pattern = schema.get("pattern")
     if isinstance(pattern, str) and isinstance(instance, str):
