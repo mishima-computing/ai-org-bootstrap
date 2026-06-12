@@ -365,6 +365,24 @@ def parse_frontmatter(path: Path) -> tuple[dict[str, str], str, str | None]:
 ANCHOR_CITATION_RE = re.compile(r"\banchor:([a-z0-9-]+)#([a-z0-9-]+)\b")
 ANCHOR_STABLE_ID_RE = re.compile(r"#([a-z0-9][a-z0-9-]*)\b")
 PROHIBITION_RE = re.compile(r"\b(?:never|do not|avoid|forbid)\b", re.IGNORECASE)
+ANCHOR_POINTER_RE = re.compile(r"^Pointer:\s+https?://\S+\s+\|\s+Date/version:\s+(.+?)\s+\|")
+
+ANCHOR_PERSISTENCE_IDIOMS = {
+    "dated-permalink": [
+        re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
+        re.compile(r"\bpublished\s+\d{4}-\d{2}\b", re.IGNORECASE),
+    ],
+    "edition-pinned": [
+        re.compile(r"\bedition\b.*\b\d{4}\b", re.IGNORECASE),
+        re.compile(r"\bedition\b", re.IGNORECASE),
+        re.compile(r"\bv\d+(?:\.\d+)*\b.*\b\d{4}\b", re.IGNORECASE),
+        re.compile(r",\s*\d{4}\b"),
+    ],
+    "living": [
+        re.compile(r"\bchecked\s+\d{4}-\d{2}-\d{2};\s+re-check on\s+[^.]+", re.IGNORECASE),
+        re.compile(r"\bcontroller follow-up required for date capture\b", re.IGNORECASE),
+    ],
+}
 
 # Ledger-backed allowlist for existing UI prohibition lines.
 UI_PROHIBITION_ALLOWLIST = [
@@ -375,8 +393,6 @@ UI_PROHIBITION_ALLOWLIST = [
     (".agent-org/knowledge/ui/ui-composition-patterns.md", "never conversion, engagement, or SEO"),
     (".agent-org/knowledge/ui/ui-corporate-trust-genre.md", "Avoid borrowed startup landing-page tempo"),
     (".agent-org/knowledge/ui/ui-corporate-trust-genre.md", "never conversion, engagement, or SEO"),
-    (".agent-org/knowledge/ui/ui-feel-foundations.md", "do not encode fixed constants"),
-    (".agent-org/knowledge/ui/ui-feel-foundations.md", "do not claim usability or performance gains"),
     (".agent-org/knowledge/ui/ui-gacha-genre.md", "never hide odds or material constraints"),
     (".agent-org/knowledge/ui/ui-information-design.md", "never conversion, engagement, or SEO"),
 ]
@@ -390,6 +406,10 @@ CARD_REQUIRED_ANCHOR_SLUGS = {
     "ui-information-design.md": [
         "information-design",
         "grid-layout",
+    ],
+    "ui-feel-foundations.md": [
+        "interaction-feedback",
+        "motion",
     ],
 }
 
@@ -426,6 +446,27 @@ def discover_ui_anchors(ui_dir: Path) -> tuple[dict[str, set[str]], list[str]]:
                 ids.update(ANCHOR_STABLE_ID_RE.findall(line))
         anchors[slug] = ids
     return anchors, errors
+
+
+def check_anchor_persistence_idioms(ui_dir: Path) -> list[str]:
+    errors: list[str] = []
+    anchors_dir = ui_dir / "anchors"
+    if not anchors_dir.is_dir():
+        return errors
+
+    for path in sorted(anchors_dir.glob("*.md")):
+        for line_number, line in enumerate(text(path).splitlines(), start=1):
+            match = ANCHOR_POINTER_RE.match(line.strip())
+            if not match:
+                continue
+            date_version = match.group(1)
+            if not any(
+                pattern.search(date_version)
+                for patterns in ANCHOR_PERSISTENCE_IDIOMS.values()
+                for pattern in patterns
+            ):
+                errors.append(f"{rel(path)}:{line_number} anchor pointer Date/version must declare persistence idiom")
+    return errors
 
 
 def check_ui_anchor_citations(ui_dir: Path, anchors: dict[str, set[str]]) -> list[str]:
@@ -581,6 +622,7 @@ def legacy_required_files() -> list[str]:
         ".codex/config.toml",
         ".claude/settings.json",
         "scripts/run-gates.sh",
+        "scripts/check-anchor-urls.py",
         "scripts/extract-claude-result.py",
         "scripts/hash-artifacts.py",
         "scripts/validate-bootstrap-pack.py",
@@ -868,6 +910,7 @@ def check_ui_profile_cards() -> list[str]:
 
     anchors, anchor_errors = discover_ui_anchors(ui_dir)
     errors.extend(anchor_errors)
+    errors.extend(check_anchor_persistence_idioms(ui_dir))
     errors.extend(check_ui_anchor_citations(ui_dir, anchors))
     errors.extend(check_ui_prohibition_lines(ui_dir))
 
@@ -948,7 +991,7 @@ def check_ui_profile_cards() -> list[str]:
                 "timing-ranges",
                 "multimodal cue",
                 "silent fallback",
-                "do not claim usability or performance gains",
+                "usability or performance claims require user-test evidence",
                 "Hicks et al.",
             ]):
                 errors.append(f"{rel(path)} missing feel profile phrase: {phrase}")

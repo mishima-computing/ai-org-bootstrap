@@ -1,6 +1,6 @@
 # UI/UX Absorption Ledger
 
-Status: Cycle 4 mapping plus authorized IA/information-design absorption. Contract `contract-20260612-091325-6e81d85-uiux-cycle4-ia-information-design` authorizes Information Architecture and Information Design anchors, ui-information-design citation updates, validator data rows, ledger, manifest, and planning-doc deltas only.
+Status: Cycle 5 mapping plus authorized interaction/motion absorption. Contract `contract-20260612-093339-f45eb86-uiux-cycle5-interaction-motion-url-persistence` authorizes Interaction and Feedback and Motion anchors, ui-feel-foundations citation updates, URL-persistence policy, controller-run liveness script, validator data rows, ledger, manifest, and planning-doc deltas only.
 
 Related docs: [domain map](domain-map.md), [knowledge architecture](knowledge-architecture.md), [authoring program](authoring-program.md).
 
@@ -156,3 +156,16 @@ Zero. Every line-bearing README rule and every line-bearing rule from the seven 
 | `ui-information-design.md:13` anti-monotony phrase check | retirement-record | Validator phrase requirement for `anti-monotony rules` retires because the card now cites `anchor:grid-layout#m3-layout-overview` and CARD_REQUIRED_ANCHOR_SLUGS requires a resolving `grid-layout` citation. |
 | `ui-information-design.md:14` caption prohibition allowlist | retirement-record | The `do not count as information design` allowlist row retires because card wording graduated to "captions name the relation or source" with destination `anchor:information-design#nng-data-tables`. |
 | `ui-bilingual-typography.md:16` IA citation plan | citation-plan | Future authorized cycle may cite `anchor:information-architecture#nng-ia-vs-navigation` for localization divergence; this cycle intentionally does not edit `ui-bilingual-typography.md`. |
+
+## Cycle 5 Interaction, Motion, and URL Persistence Decisions
+
+| Item | Status | Graduation annotation |
+| --- | --- | --- |
+| Authorization | implementation-contract | `contract-20260612-093339-f45eb86-uiux-cycle5-interaction-motion-url-persistence` authorizes interaction/motion anchors, `ui-feel-foundations.md` citations, URL-persistence policy, controller-run URL liveness script, validator deltas, manifest rows, and planning-doc status updates only. |
+| `ui-feel-foundations.md:12` fixed-constant prohibition | retirement-record | Destination: `anchor:motion#nng-animation-duration` and `anchor:motion#m3-easing-duration-tokens`; card wording graduated to positive timing-ranges with range rationale, and validator keeps the fixed-ms structural check. |
+| `ui-feel-foundations.md:15` usability/performance claim prohibition | retirement-record | Destination: `anchor:motion#m3-expressive-motion` plus evaluation-instrument claim class; card wording graduated to "usability or performance claims require user-test evidence." |
+| `ui-feel-foundations.md` raw evidence refs | graduation-record | Destination: resolving citations for `anchor:interaction-feedback#apple-hig-feedback`, `anchor:interaction-feedback#m3-interaction-states`, `anchor:interaction-feedback#nng-visibility-system-status`, `anchor:motion#nng-animation-duration`, `anchor:motion#m3-easing-duration-tokens`, and `anchor:accessibility#wcag22-recommendation`. |
+| Issue #51 URL-persistence rule | rule-record | Anchor pointers declare persistence class through the `Date/version` idiom: dated-permalink, edition-pinned, or living with `checked YYYY-MM-DD; re-check on <trigger>`; validator enforces the idiom offline and controller-run `scripts/check-anchor-urls.py` proves liveness only. |
+| Controller dated-URL synthesis prohibition | graduation-delete | The controller prompt prohibition on dated-URL synthesis is deleted effective this ratification because the positive rule, offline validator, and controller-run liveness script land in this contract; controller executes the external prompt edit. |
+| `ui-gacha-genre.md:13` motion skip citation PLAN | citation-plan | Cycle 6 Destination: `anchor:motion#wcag22-motion-criteria` for pause/stop/hide and animation-from-interactions scope, plus `anchor:motion#nng-animation-duration` for duration bands; this cycle intentionally does not edit `ui-gacha-genre.md`. |
+| `ui-gacha-genre.md:13` reduced-motion citation PLAN | citation-plan | Cycle 6 Destination: `anchor:motion#apple-hig-motion` and `anchor:motion#wcag22-motion-criteria`; structural check: every ceremony phase names same-information reduced-motion behavior. |
