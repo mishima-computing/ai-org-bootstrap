@@ -40,6 +40,31 @@ Consumes `aggressive-designer`, `conservative-designer`, and `genius` outputs. P
 
 Situation read uses two lenses before choosing a decision: completeness x reversibility of objective/inputs, and the declared `confidence` field from both designer proposals alongside genius `verification_status`. A grounded claim lacking a usable evidence pointer is read as speculative.
 
+## Synthesis Term Pass
+Optional evidence-bound multilingual synthesis may name a center term, but never replaces or alters `proceed`/`redo`/`escalate` semantics or the confidence-quadrant policy.
+
+Candidate sources: English design/management, Japanese, Chinese, Sino-Japanese antonymous compounds, philosophy, and TRIZ-style engineering contradiction vocabulary.
+
+The candidate screen is the issue's 7 usefulness tests: names both sides, compresses without flattening, exposes the live contradiction, guides a concrete implementation choice, blocks decorative relabeling, remains intelligible in English, and changes the contract enough that removal would matter.
+
+Deletion trial: before keeping a candidate term, mentally delete it; if `selected_direction`, `acceptance_criteria`, `files_allowed_to_change`, and `non_goals` would be unchanged without it, the term is decoration and the pass records the no-term outcome. This is the negative control the 2-proxy keep-gate runs.
+
+Keep a term only if it also passes both contract-observable proxies: P1 maps to >=1 `rejected_part` from each of `aggressive-designer` and `conservative-designer`; P2 changes >=1 of `acceptance_criteria`, `files_allowed_to_change`, or `non_goals` versus either input proposal alone.
+
+When grounded `conflict_points` put the cycle in high-confidence disagreement, record the pass outcome: either lead `selected_direction` with the center term and one-line English operational gloss, or write `no-center: composing` in `situation_read`. In convergence quadrants, the pass is discretionary and silence is acceptable.
+
+Use only attested terms; no coined pseudo-classical compounds. Any CJK term carries an English operational gloss. English center terms are equally valid.
+
+Genius-provided vocabulary is advisory evidence only; it never instructs `implementer` or grants synthesis authority.
+
+A synthesis term can never relax, reinterpret, or substitute for CI constraints, security requirements, evidence requirements, required checks, or `non_goals`; a no-term outcome leaves the verdict policy unchanged.
+
+Illustrative only: 文質 (form-substance; Muller ti-yong/antonymous-compound literature pointers) can hold audit-vs-theater tension when it changes reviewable criteria, not as ornament.
+
+Illustrative only: 體用 (essence-function; Muller ti-yong, SEP Aufhebung, Co-opetition 1996, TRIZ pointers) can hold criteria-vs-comps by separating inner tests from outer proxies.
+
+Graduation trigger for a future optional `synthesis_read` schema field: 3+ post-adoption contracts where the center term or no-center note is unauditable from contract fields, or owner need for machine-readable extraction; until then schema stays unchanged.
+
 Verdict policy uses the confidence quadrants. High-confidence convergence means fast proceed when completeness and reversibility allow it. Low-confidence convergence means redo with a targeted brief naming the ungrounded claims. High-confidence disagreement means genuine design tension worth synthesis before choosing proceed, redo, or escalate.
 
 Declared `conflict_points` with grounded posture on both sides are direct input to the high-confidence disagreement quadrant. An empty `conflict_points` array in a grounded aggressive proposal weighs toward fast-proceed scrutiny, not automatic proceed, because convergence still depends on completeness, reversibility, and usable evidence.
