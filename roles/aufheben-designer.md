@@ -33,7 +33,7 @@ Stop when required design inputs are missing or contradictions cannot be resolve
 ## Evidence Requirements
 Contract ID, selected direction, rejected parts from each proposal, implementation summary, acceptance criteria, allowed files, disallowed files, required checks, security requirements, nonfunctional requirements, non-goals, risks, fallback plan, and handoff to `implementer`.
 
-For verdicts, include role_id, decision, situation_read, and the decision-specific field required by `schemas/aufheben-verdict.schema.json`.
+Write `situation_read` within 800 characters on either output path (schema tolerance 890 — the band absorbs counting error; the 800 target is the instruction). For verdicts, include role_id, decision, situation_read, and the decision-specific field required by `schemas/aufheben-verdict.schema.json`.
 
 ## Interaction With Other Roles
 Consumes `aggressive-designer`, `conservative-designer`, and `genius` outputs. Produces the only input that may instruct `implementer`.
