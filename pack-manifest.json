@@ -481,6 +481,12 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "scripts/submit-result.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
       "path": "scripts/validate-bootstrap-pack.py",
       "type": "file",
       "tier": "pack_level",
