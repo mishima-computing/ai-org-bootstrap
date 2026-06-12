@@ -46,6 +46,12 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": ".agent-org/tool-io-substrate.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
       "path": ".agent-org/knowledge/",
       "type": "dir",
       "tier": "pack_level",

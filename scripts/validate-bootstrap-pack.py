@@ -742,6 +742,7 @@ def legacy_required_files() -> list[str]:
         "bootstrap/README.md",
         ".agent-org/runtime-registry.yaml",
         ".agent-org/execution-substrate.md",
+        ".agent-org/tool-io-substrate.md",
         ".agent-org/knowledge/README.md",
         ".agent-org/worktree-policy.md",
         ".agent-org/artifact-policy.md",
@@ -786,6 +787,29 @@ def check_pack_manifest_self_test(manifest: dict) -> list[str]:
         entry = next((item for item in entries if isinstance(item, dict) and item.get("path") == path), None)
         if not entry or entry.get("tier") != "repo_local":
             errors.append(f"manifest_boundary_error: {path} must be repo_local")
+    return errors
+
+
+def check_tool_io_substrate() -> list[str]:
+    path = ROOT / ".agent-org/tool-io-substrate.md"
+    if not path.is_file():
+        return ["tool_io_substrate_missing: .agent-org/tool-io-substrate.md"]
+
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError as exc:
+        return [f"tool_io_substrate_unreadable: {exc}"]
+
+    rows = [line for line in lines if line.lstrip().startswith("|")]
+    errors: list[str] = []
+    for script in sorted((ROOT / "scripts").glob("*.py")):
+        basename = script.name
+        matches = [row for row in rows if basename in row]
+        if len(matches) != 1:
+            errors.append(f"tool_io_substrate_audit_row_count: {basename}: expected 1, actual {len(matches)}")
+            continue
+        if "--self-test" not in script.read_text(encoding="utf-8") and "no `--self-test`" not in matches[0]:
+            errors.append(f"tool_io_substrate_self_test_exception_missing: {basename}")
     return errors
 
 
@@ -975,6 +999,7 @@ def validate_instance_cli(schema_arg: str, instance_arg: str) -> int:
 
     payload = {
         "status": "pass" if not errors else "fail",
+        "exit_code": 0 if not errors else 1,
         "schema": schema_arg,
         "instance": instance_arg,
         "errors": errors,
@@ -1783,6 +1808,7 @@ def main(argv: list[str] | None = None) -> int:
         if not args.schema or not args.instance:
             print(json.dumps({
                 "status": "fail",
+                "exit_code": 1,
                 "errors": ["--schema and --instance must be provided together"],
             }, indent=2))
             return 1
@@ -1801,6 +1827,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(check_mode_detection_samples())
     if manifest is not None:
         errors.extend(check_pack_manifest_self_test(manifest))
+        errors.extend(guarded("check_tool_io_substrate", check_tool_io_substrate))
         errors.extend(check_required_files(manifest))
         errors.extend(guarded("check_pack_stamp", check_pack_stamp, manifest, mode, stamp_exists))
         if mode == "source":
@@ -1828,6 +1855,7 @@ def main(argv: list[str] | None = None) -> int:
 
     payload = {
         "status": "pass" if not errors else "fail",
+        "exit_code": 0 if not errors else 1,
         "mode": mode,
         "errors": errors,
         "warnings": warnings,

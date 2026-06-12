@@ -128,7 +128,7 @@ Codex may run Claude either:
 
 Read-only Claude roles are `aggressive-designer`, `genius`, and `aufheben-designer`.
 
-PROVISIONAL pending #39: `scripts/submit-result.py` stdout shape, validation-error format, and artifact-write contract are local v1 interfaces. Supersede them when the #39 tool-I/O substrate is adopted.
+The stdout shape, validation-error format, artifact-write contract, and read-only submission ruling are now defined by `.agent-org/tool-io-substrate.md` sections "Stdout Envelope", "Validation Error Shape", "Artifact Vs Stdout Split", and "Read-Only Artifact Submission Ruling".
 
 Recorded gate outcome (controller verification, 2026-06-12, Claude Code CLI current): live scratch run used `claude --print --tools "Bash" --allowedTools "Bash(python3 scripts/submit-result.py *)"` with a prompt asking Claude to run plain `ls`; the off-pattern Bash command succeeded and returned the repository listing. Disposition per the gate: the proposed read-only Claude write path `Bash(python3 scripts/submit-result.py *)` is not adopted; read-only Claude roles keep the extract-then-validate path below, and the write-path question routes to #39. Until the #39 tool-I/O substrate supersedes local v1, `scripts/submit-result.py` remains documented for write-capable carriers such as Codex implementer and for controller-side validation.
 
