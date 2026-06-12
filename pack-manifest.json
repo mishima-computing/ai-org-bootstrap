@@ -486,6 +486,13 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "scripts/check-spatial.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": "scripts/sync-pack.py",
       "type": "file",
       "tier": "pack_level",
@@ -654,6 +661,55 @@
       "path": ".agent-runs/",
       "type": "dir",
       "tier": "repo_local",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/known-bad/index.html",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/known-good/index.html",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/blobs/known-bad.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/blobs/known-good.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/blobs/indeterminate-only.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/spatial/blobs/unknown-version.json",
+      "type": "file",
+      "tier": "pack_level",
       "check_applicability": "everywhere",
       "required": false
     },
