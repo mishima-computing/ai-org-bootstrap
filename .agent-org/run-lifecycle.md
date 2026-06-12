@@ -125,6 +125,7 @@ Final report must include:
 - gaps
 - warnings
 - retry_rate: for runs from this cycle forward, record per-run carrier retry count and cause class for each retry. Cause class is one of `schema_field`, `parse`, `truncation`, or `other`. Historical runs are never recomputed.
+- merge_gate_evidence: path to the `scripts/merge-gate.py --out` evidence JSON for any merged pull request.
 - `.agent-runs/<run_id>/gates/aufheben-input-embed.json`
 - `.agent-runs/<run_id>/gates/controller-disclosure.json` when controller disclosure is written
 - controller may distill adopted-cycle facts into `.agent-org/knowledge/cards/` per `.agent-org/knowledge/README.md`
