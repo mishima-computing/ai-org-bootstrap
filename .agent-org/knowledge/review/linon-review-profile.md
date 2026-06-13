@@ -75,7 +75,7 @@ For runtime-only properties, Linon records `unverifiable-static` rather than `co
 
 ## Calibration Reference Set
 
-The seeded reference is `.agent-runs/20260613-040230-c014-headroom-core/review/code-review-findings.md`.
+The seeded reference is the tracked pack fixture `.agent-org/knowledge/review/calibration/c014-c016-reference-set.md`, whose sha256 is listed in `pack-manifest.json`. Linon activation must never depend on an untracked `.agent-runs/` path.
 
 Catchable from diff/static repository evidence:
 

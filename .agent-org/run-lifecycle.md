@@ -45,6 +45,8 @@ Codex main is responsible for confirming the ignore rule during approved pack ma
 Linon pre-PR adversarial review:
 
 - The controller composes the Linon packet with a controller-generated implementation diff artifact under `.agent-runs/<run_id>/`, the implementation contract embedded verbatim, and sha256 values recorded for both the diff artifact and embedded contract.
+- Activation requires the recorded-sha256 packet shape demonstrated by `fixtures/linon-review/packet/`: a controller-owned diff artifact plus an embedded implementation contract, with matching `diff_sha256` and `contract_sha256` values recorded in the packet and hash-listed in `pack-manifest.json`.
+- Inline diff review was a bootstrap-only path before the tracked packet fixture existed; it is not an activation path for default Linon operation.
 - Linon runs as a read-only Claude profile invocation in plan permission mode with `Read`, `Grep`, and `Glob`, then emits schema-valid `linon-review` JSON via extract-then-validate.
 - Mechanical routing is field-based: `severity=critical` AND `verdict=refuted` blocks PR creation once calibrated; `defect_locus=implementation` routes to implementer verify-fix for max 2 rounds with verbatim findings; `defect_locus=contract` or ambiguous locus routes to aufheben escalation.
 - Blocking remains pending-calibration until one calibration run against the C014-C016 reference set shows zero false-positive Criticals. Until then, Linon findings are advisory and disclosed at closeout.

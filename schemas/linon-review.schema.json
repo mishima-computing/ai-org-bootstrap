@@ -34,6 +34,7 @@
           },
           "line_range": {
             "type": "object",
+            "description": "start and end are positive line numbers. The repository validator enforces end >= start because portable JSON Schema draft 2020-12 cannot compare sibling numeric fields without nonstandard $data extensions.",
             "required": [
               "start",
               "end"
@@ -195,12 +196,12 @@
     },
     "gaps": {
       "type": "array",
+      "maxItems": 12,
       "items": {
         "type": "object",
         "required": [
           "kind",
-          "description",
-          "severity_first_truncation_applied"
+          "description"
         ],
         "properties": {
           "kind": {
@@ -220,6 +221,26 @@
             "type": "boolean"
           }
         },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "truncation"
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "severity_first_truncation_applied"
+              ]
+            }
+          }
+        ],
         "additionalProperties": false
       }
     }
