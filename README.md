@@ -23,6 +23,15 @@ same pipeline (Mode A self-hosting).
 | `implementer` | builds strictly within the contract's allowed scope |
 | `functional` / `security` / `nonfunctional`-`ci-action-writer` | wire existing checks into GitHub Actions |
 
+The **verifier tier** runs after the implementer, reading what was built rather
+than designing it. Verifiers are profiles, not extra designer seats — the
+design roster above is unchanged.
+
+| Verifier | Role |
+| --- | --- |
+| `linon` | standing adversarial pre-PR reviewer; reads the implementer diff against the contract by four non-negotiable principles (NN1–NN4: self-reported numbers aren't evidence; interested-party-writable surfaces aren't evidence; unverified integration doesn't ship default-on; silent degradation is worse than failure). Per-finding `file:line` + refute-or-confirm; a confirmed Critical blocks. Precedent search is persuasive, never binding. Calibrated against its own track record. |
+| `perceptual-reviewer` | verifier profile for human-facing UI surfaces (per-proposition verdicts tied to screenshot regions). |
+
 Codex main is the **controller** (protocol, not an agent). Deterministic tooling
 (gate reporting, schema validation, artifact hashing) is a **subsystem**.
 
@@ -32,7 +41,7 @@ Codex main is the **controller** (protocol, not an agent). Deterministic tooling
 objective
   ├─▶ aggressive ─┐
   ├─▶ conservative ┼─▶ aufheben ──▶ verdict
-  └─▶ genius ──────┘                  ├─ proceed  ─▶ contract ─▶ implementer ─▶ gates ─▶ human adoption
+  └─▶ genius ──────┘                  ├─ proceed  ─▶ contract ─▶ implementer ─▶ linon ─▶ gates ─▶ human adoption
                                       ├─ redo     ─▶ (controller re-runs designers, max 2)
                                       └─ escalate ─▶ controller / human
 ```
