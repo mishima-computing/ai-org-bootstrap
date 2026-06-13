@@ -269,6 +269,41 @@
       "sha256": "c326eadedabe02f114ce5e5ae966ff70183a29d88ee98374e64e3909ce721c7f"
     },
     {
+      "path": ".agent-org/knowledge/review/precedents/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/review/precedents/README.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/review/precedents/do-not-break-userspace.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/review/precedents/regression-burden.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/review/precedents/tone-step-back.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/ecosystems/",
       "type": "dir",
       "tier": "pack_level",
@@ -558,6 +593,13 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "scripts/select-review-precedents.py",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": "scripts/chrome_capture.py",
       "type": "file",
       "tier": "pack_level",
@@ -773,6 +815,41 @@
     {
       "path": "fixtures/linon-review/",
       "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/review-precedents/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/review-precedents/valid-do-not-break-userspace.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/review-precedents/invalid-undated-anchor.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/review-precedents/invalid-binding-language.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/review-precedents/invalid-over-cap-body.md",
+      "type": "file",
       "tier": "pack_level",
       "check_applicability": "everywhere",
       "required": false

@@ -48,6 +48,7 @@ Linon pre-PR adversarial review:
 - Activation requires the recorded-sha256 packet shape demonstrated by `fixtures/linon-review/packet/`: a controller-owned diff artifact plus an embedded implementation contract, with matching `diff_sha256` and `contract_sha256` values recorded in the packet and hash-listed in `pack-manifest.json`.
 - Inline diff review was a bootstrap-only path before the tracked packet fixture existed; it is not an activation path for default Linon operation.
 - Linon runs as a read-only Claude profile invocation in plan permission mode with `Read`, `Grep`, and `Glob`, then emits schema-valid `linon-review` JSON via extract-then-validate.
+- Linon precedent lookup is local-first from `.agent-org/knowledge/review/precedents/` and falls through to web long-tail verification by genius; this changes no blocking mechanics, roster, or live-battery authority.
 - Mechanical routing is field-based: `severity=critical` AND `verdict=refuted` blocks PR creation once calibrated; `defect_locus=implementation` routes to implementer verify-fix for max 2 rounds with verbatim findings; `defect_locus=contract` or ambiguous locus routes to aufheben escalation.
 - Blocking remains pending-calibration until one calibration run against the C014-C016 reference set shows zero false-positive Criticals. Until then, Linon findings are advisory and disclosed at closeout.
 - Advisory findings and `unverifiable-static` verdicts are disclosed at closeout.
