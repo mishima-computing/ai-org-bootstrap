@@ -97,3 +97,13 @@ C015 and C016 are reserved reference-set slots for the calibration run. Missing 
 ## Zero-Finding Spot Check
 
 A first-pass zero-finding Linon result triggers controller spot-check against the packet, diff, contract, and C014-C016 calibration expectations before closeout. The pre-contract slot is an intake-declared option only: the controller may request a docs-only Linon read before contract creation when intake declares it, and the recorded rejection condition is to cut that option if undeclared in the first 5 eligible cycles.
+
+
+## Verbosity ruling (owner, 2026-06-13)
+
+Linon talks. The owner ruled Linon into the accepted-verbose set alongside
+genius and aufheben (asymmetry principle: this profile ingests a diff, a
+contract, and the live repo, so per-finding fields scale with what it read).
+Write `claim` and `exploit_path` within 500 characters; the schema tolerance
+is 600 — the band absorbs counting error. Evidence density still beats
+adjectives: the cap got wider, the obligations did not get softer.
