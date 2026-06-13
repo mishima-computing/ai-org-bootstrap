@@ -164,7 +164,8 @@
           },
           "criterion_text_echo": {
             "type": "string",
-            "maxLength": 200
+            "maxLength": 400,
+            "description": "criterion text echo. Cap matches the contract acceptance-criteria cap; an echo field must never be shorter than its source (self-application finding, 2026-06-13)."
           },
           "verdict": {
             "type": "string",
