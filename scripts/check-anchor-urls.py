@@ -12,8 +12,10 @@ from __future__ import annotations
 import argparse
 import http.client
 import json
+import re
 import socket
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -29,10 +31,12 @@ from chrome_capture import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 ANCHORS_DIR = ROOT / ".agent-org/knowledge/ui/anchors"
+PRECEDENTS_DIR = ROOT / ".agent-org/knowledge/review/precedents"
 POINTER_PREFIX = "Pointer: "
 BOT_BLOCK_HOSTS = {"doi.org", "search.worldcat.org"}
 BOT_BLOCK_STATUS = {403, 429}
 DEFAULT_HOST_DELAY_SECONDS = 2.0
+DATED_PRECEDENT_REF_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})\s+(https?://[^\s;]+)$")
 
 
 class SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
@@ -64,10 +68,13 @@ class BrowserHTTPSHandler(urllib.request.HTTPSHandler):
 
 
 def rel(path: Path) -> str:
-    return str(path.relative_to(ROOT))
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return path.as_posix()
 
 
-def discover_pointers(anchors_dir: Path) -> list[dict[str, object]]:
+def discover_anchor_pointers(anchors_dir: Path) -> list[dict[str, object]]:
     pointers: list[dict[str, object]] = []
     for path in sorted(anchors_dir.glob("*.md")):
         for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
@@ -83,8 +90,63 @@ def discover_pointers(anchors_dir: Path) -> list[dict[str, object]]:
                 "line": line_number,
                 "url": raw_url,
                 "host": parsed.netloc.lower(),
+                "source": "ui-anchor",
             })
     return pointers
+
+
+def parse_precedent_evidence_ref(path: Path, line_number: int, raw_ref: str) -> dict[str, object] | None:
+    match = DATED_PRECEDENT_REF_RE.match(raw_ref.strip())
+    if not match:
+        return None
+    date, raw_url = match.groups()
+    parsed = urllib.parse.urlparse(raw_url)
+    if parsed.scheme not in {"http", "https"}:
+        return None
+    return {
+        "path": rel(path),
+        "line": line_number,
+        "url": raw_url,
+        "host": parsed.netloc.lower(),
+        "source": "review-precedent",
+        "date": date,
+    }
+
+
+def discover_precedent_pointer_scan(precedents_dir: Path) -> tuple[list[dict[str, object]], int, list[str]]:
+    pointers: list[dict[str, object]] = []
+    skipped_count = 0
+    warnings: list[str] = []
+    if not precedents_dir.is_dir():
+        return pointers, skipped_count, warnings
+    for path in sorted(precedents_dir.glob("*.md")):
+        if path.name == "README.md":
+            continue
+        for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            stripped = line.strip()
+            if not stripped.startswith("evidence_refs:"):
+                continue
+            _key, raw_value = stripped.split(":", 1)
+            for raw_ref in raw_value.split(";"):
+                cleaned_ref = raw_ref.strip()
+                if not cleaned_ref:
+                    continue
+                pointer = parse_precedent_evidence_ref(path, line_number, raw_ref)
+                if pointer is not None:
+                    pointers.append(pointer)
+                else:
+                    skipped_count += 1
+                    warnings.append(f"{rel(path)}:{line_number} skipped malformed evidence_refs item: {cleaned_ref}")
+    return pointers, skipped_count, warnings
+
+
+def discover_precedent_pointers(precedents_dir: Path) -> list[dict[str, object]]:
+    pointers, _skipped_count, _warnings = discover_precedent_pointer_scan(precedents_dir)
+    return pointers
+
+
+def discover_pointers(anchors_dir: Path = ANCHORS_DIR, precedents_dir: Path = PRECEDENTS_DIR) -> list[dict[str, object]]:
+    return discover_anchor_pointers(anchors_dir) + discover_precedent_pointers(precedents_dir)
 
 
 def classify_status(url: str, status: int) -> str:
@@ -213,17 +275,29 @@ def run_check(timeout: float, host_delay: float) -> tuple[int, dict[str, object]
     opener = build_opener()
     results: list[dict[str, object]] = []
     last_seen: dict[str, float] = {}
-    for pointer in discover_pointers(ANCHORS_DIR):
+    anchor_pointers = discover_anchor_pointers(ANCHORS_DIR)
+    precedent_pointers, skipped_count, warnings = discover_precedent_pointer_scan(PRECEDENTS_DIR)
+    for pointer in anchor_pointers + precedent_pointers:
         results.append(fetch_with_retry(opener, pointer, timeout, host_delay, last_seen))
 
     code = exit_code(results)
-    return code, {
+    payload: dict[str, object] = {
         "status": status_for_exit(code),
         "exit_code": code,
         "checked_count": len(results),
         "host_delay_seconds": host_delay,
+        "precedent_evidence_ref_skipped_count": skipped_count,
+        "scan_scope": [
+            ".agent-org/knowledge/ui/anchors/",
+            ".agent-org/knowledge/review/precedents/",
+        ],
         "results": results,
     }
+    if warnings:
+        payload["warnings"] = warnings
+    if code == 2:
+        payload["offline_degradation"] = "network unavailable; review precedent anchors were still scanned for dated format and presence before fetch attempts"
+    return code, payload
 
 
 def run_self_test() -> tuple[int, dict[str, object]]:
@@ -281,6 +355,36 @@ def run_self_test() -> tuple[int, dict[str, object]]:
         and BrowserHTTPSConnection._http_vsn_str == "HTTP/1.1"
     )
     failed = failed or not ua_passed or not version_ua_passed or not http_passed
+
+    precedent_pointer = parse_precedent_evidence_ref(
+        Path("<synthetic>/review-precedent.md"),
+        7,
+        "2012-12-23 https://lkml.org/lkml/2012/12/23/75",
+    )
+    precedent_pointer_passed = (
+        isinstance(precedent_pointer, dict)
+        and precedent_pointer.get("source") == "review-precedent"
+        and precedent_pointer.get("date") == "2012-12-23"
+        and precedent_pointer.get("url") == "https://lkml.org/lkml/2012/12/23/75"
+    )
+    failed = failed or not precedent_pointer_passed
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        malformed_card = Path(temp_dir) / "synthetic-malformed.md"
+        malformed_card.write_text(
+            "---\n"
+            "evidence_refs: https://example.com/undated; 2012-12-23 https://lkml.org/lkml/2012/12/23/75\n"
+            "---\n",
+            encoding="utf-8",
+        )
+        malformed_pointers, malformed_skipped_count, malformed_warnings = discover_precedent_pointer_scan(Path(temp_dir))
+    malformed_scan_passed = (
+        len(malformed_pointers) == 1
+        and malformed_skipped_count == 1
+        and len(malformed_warnings) == 1
+        and "skipped malformed evidence_refs item" in malformed_warnings[0]
+    )
+    failed = failed or not malformed_scan_passed
 
     def retry_fixture() -> tuple[bool, dict[str, object]]:
         calls: list[str] = []
@@ -389,6 +493,18 @@ def run_self_test() -> tuple[int, dict[str, object]]:
             "expected_exit": 0,
             "actual_exit": 0 if http_passed else 1,
             "passed": http_passed,
+        },
+        {
+            "name": "review_precedent_dated_pointer",
+            "expected_exit": 0,
+            "actual_exit": 0 if precedent_pointer_passed else 1,
+            "passed": precedent_pointer_passed,
+        },
+        {
+            "name": "review_precedent_malformed_pointer_declared",
+            "expected_exit": 0,
+            "actual_exit": 0 if malformed_scan_passed else 1,
+            "passed": malformed_scan_passed,
         },
     ])
     code = 1 if failed else 0

@@ -426,6 +426,33 @@ UI_PROHIBITION_ALLOWLIST = [
     (".agent-org/knowledge/ui/exemplars.md", "never cite bare domain"),
 ]
 
+PRECEDENT_REQUIRED_KEYS = {
+    "precedent_id",
+    "profile_id",
+    "scope",
+    "covers",
+    "freshness",
+    "supersede_trigger",
+    "evidence_refs",
+    "lens_nn_map",
+    "authority",
+}
+PRECEDENT_ALLOWED_LENSES = {
+    "self-report-trust",
+    "forgeability",
+    "unverified-integration",
+    "silent-failure",
+    "other",
+}
+PRECEDENT_ALLOWED_NN_CLASSES = {"NN1", "NN2", "NN3", "NN4", "none"}
+DATED_EVIDENCE_REF_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\s+https?://[^\s;]+$")
+PRECEDENT_PROHIBITION_ALLOWLIST = [
+    'quoted precedent label: "do not break userspace"',
+    "authority: persuasive-not-binding; never-overrides-nn1-nn4",
+    "authority: persuasive-not-binding and never overrides nn1-nn4",
+    "never overrides nn1-nn4",
+]
+
 CARD_REQUIRED_ANCHOR_SLUGS = {
     "ui-bilingual-typography.md": [
         "typography-cjk-latin",
@@ -471,6 +498,11 @@ def is_allowed_ui_prohibition(path: Path, line: str) -> bool:
         relative == allowed_path and substring.lower() in lowered
         for allowed_path, substring in UI_PROHIBITION_ALLOWLIST
     )
+
+
+def is_allowed_precedent_prohibition(line: str) -> bool:
+    lowered = line.lower()
+    return any(substring in lowered for substring in PRECEDENT_PROHIBITION_ALLOWLIST)
 
 
 def discover_ui_anchors(ui_dir: Path) -> tuple[dict[str, set[str]], list[str]]:
@@ -723,7 +755,12 @@ def is_under_any_dir(path: str, dirs: set[str]) -> bool:
 
 
 def should_skip_completeness_path(path: Path) -> bool:
-    return any(part in {"__pycache__", ".git"} for part in path.parts)
+    parts = path.parts
+    return (
+        any(part in {"__pycache__", ".git"} for part in parts)
+        # Claude worktree sandboxes are controller-local runtime state, not pack material.
+        or path.as_posix().startswith(".claude/worktrees/")
+    )
 
 
 def check_manifest_completeness_for_root(root: Path, manifest: dict, label: str) -> list[str]:
@@ -737,9 +774,10 @@ def check_manifest_completeness_for_root(root: Path, manifest: dict, label: str)
         if not absolute_dir.is_dir():
             continue
         for path in sorted(absolute_dir.rglob("*")):
-            if should_skip_completeness_path(path) or not path.is_file():
+            relative_path = path.relative_to(root)
+            if should_skip_completeness_path(relative_path) or not path.is_file():
                 continue
-            relative = path.relative_to(root).as_posix()
+            relative = relative_path.as_posix()
             if is_under_any_dir(relative, repo_local_dirs):
                 continue
             found_files.add(relative)
@@ -1576,6 +1614,156 @@ def check_ecosystem_profile_cards() -> list[str]:
     return errors
 
 
+def validate_precedent_card(path: Path) -> list[str]:
+    errors: list[str] = []
+    frontmatter, body, error = parse_frontmatter(path)
+    if error:
+        return [f"{rel(path)} {error}"]
+
+    actual_keys = set(frontmatter)
+    for key in sorted(PRECEDENT_REQUIRED_KEYS - actual_keys):
+        errors.append(f"{rel(path)} missing precedent frontmatter key: {key}")
+    for key in sorted(actual_keys - PRECEDENT_REQUIRED_KEYS):
+        errors.append(f"{rel(path)} unexpected precedent frontmatter key: {key}")
+    for key in sorted(PRECEDENT_REQUIRED_KEYS & actual_keys):
+        if not frontmatter[key]:
+            errors.append(f"{rel(path)} empty precedent frontmatter key: {key}")
+
+    precedent_id = frontmatter.get("precedent_id")
+    if precedent_id != path.stem:
+        errors.append(f"{rel(path)} precedent_id must match filename stem")
+    if frontmatter.get("profile_id") != precedent_id:
+        errors.append(f"{rel(path)} profile_id must equal precedent_id")
+
+    evidence_refs = [item.strip() for item in frontmatter.get("evidence_refs", "").split(";") if item.strip()]
+    if not evidence_refs:
+        errors.append(f"{rel(path)} evidence_refs must contain at least one dated fetchable anchor")
+    if len(evidence_refs) > 6:
+        errors.append(f"{rel(path)} evidence_refs must contain at most 6 pointers")
+    for item in evidence_refs:
+        if not DATED_EVIDENCE_REF_RE.match(item):
+            errors.append(f"{rel(path)} evidence_refs item must match 'YYYY-MM-DD URL': {item}")
+
+    lens_items = [item.strip() for item in frontmatter.get("lens_nn_map", "").split(";") if item.strip()]
+    if not lens_items:
+        errors.append(f"{rel(path)} lens_nn_map must contain at least one lens:NN-class item")
+    for item in lens_items:
+        if ":" not in item:
+            errors.append(f"{rel(path)} invalid lens_nn_map item: {item}")
+            continue
+        lens, nn_class = [part.strip() for part in item.split(":", 1)]
+        if lens not in PRECEDENT_ALLOWED_LENSES:
+            errors.append(f"{rel(path)} lens_nn_map lens must be one of {sorted(PRECEDENT_ALLOWED_LENSES)}: {lens}")
+        if nn_class not in PRECEDENT_ALLOWED_NN_CLASSES:
+            errors.append(f"{rel(path)} lens_nn_map NN class must be one of {sorted(PRECEDENT_ALLOWED_NN_CLASSES)}: {nn_class}")
+
+    nonblank_body_lines = [line for line in body.splitlines() if line.strip()]
+    if len(nonblank_body_lines) > 12:
+        errors.append(f"{rel(path)} body must be at most 12 nonblank lines")
+
+    combined = f"{frontmatter.get('authority', '')}\n{body}".lower()
+    has_persuasive = "persuasive-not-binding" in combined
+    has_no_override = "never-overrides-nn1-nn4" in combined or "never overrides nn1-nn4" in combined
+    if not has_persuasive or not has_no_override:
+        errors.append(f"{rel(path)} must state persuasive-not-binding and never overrides NN1-NN4")
+    if "binding" in combined and "persuasive-not-binding" not in combined and "not binding" not in combined:
+        errors.append(f"{rel(path)} must not grant binding authority")
+    if "overrides" in combined and not has_no_override:
+        errors.append(f"{rel(path)} must not grant override authority over NN1-NN4")
+
+    for line_number, line in enumerate(text(path).splitlines(), start=1):
+        if PROHIBITION_RE.search(line) and not is_allowed_precedent_prohibition(line):
+            errors.append(f"{rel(path)}:{line_number} precedent prohibition line lacks quoting convention allowlist")
+
+    return errors
+
+
+def check_review_precedent_cards() -> list[str]:
+    errors: list[str] = []
+    precedents_dir = ROOT / ".agent-org/knowledge/review/precedents"
+    if not precedents_dir.is_dir():
+        return [".agent-org/knowledge/review/precedents/ missing"]
+
+    readme = text(precedents_dir / "README.md")
+    for phrase in contains_all(readme, [
+        "Precedent Card Format",
+        "profile_id",
+        "scope",
+        "covers",
+        "freshness",
+        "supersede_trigger",
+        "evidence_refs",
+        "lens_nn_map",
+        "evidence_refs` cap: 6 pointers",
+        "YYYY-MM-DD URL",
+        "body cap: 12 nonblank lines",
+        "filename stem must equal `precedent_id`",
+        "no embedded essays or research excerpts",
+        "persuasive-not-binding",
+        "never overrides NN1-NN4",
+        "talk-is-cheap-show-me-the-code",
+        "good-taste-maintainability",
+        "not padded to a floor",
+    ]):
+        errors.append(f".agent-org/knowledge/review/precedents/README.md missing precedent phrase: {phrase}")
+
+    required_cards = [
+        "do-not-break-userspace.md",
+        "regression-burden.md",
+        "tone-step-back.md",
+    ]
+    for filename in required_cards:
+        path = precedents_dir / filename
+        if not path.is_file():
+            errors.append(f"missing precedent card: {rel(path)}")
+            continue
+        errors.extend(validate_precedent_card(path))
+    return errors
+
+
+def check_review_precedent_fixtures() -> list[str]:
+    errors: list[str] = []
+    fixture_dir = ROOT / "fixtures/review-precedents"
+    expected_files = sorted(fixture_dir.glob("*.md"))
+    if not expected_files:
+        return ["review_precedent_fixture_missing: no fixtures/review-precedents/*.md files found"]
+
+    saw_valid = False
+    saw_invalid = False
+    for path in expected_files:
+        validation_errors = validate_precedent_card(path)
+        name = path.name
+        if name.startswith("valid-"):
+            saw_valid = True
+            if validation_errors:
+                errors.append(f"review_precedent_fixture_expected_green_failed: {rel(path)}: {validation_errors}")
+        elif name.startswith("invalid-"):
+            saw_invalid = True
+            if not validation_errors:
+                errors.append(f"review_precedent_fixture_expected_red_passed: {rel(path)}")
+        else:
+            errors.append(f"review_precedent_fixture_unclassified: {rel(path)}")
+
+        if name == "invalid-undated-anchor.md" and not any(
+            "evidence_refs item must match 'YYYY-MM-DD URL'" in item for item in validation_errors
+        ):
+            errors.append("review_precedent_fixture_undated_anchor_not_proven: invalid-undated-anchor.md")
+        if name == "invalid-binding-language.md" and not any(
+            "must state persuasive-not-binding and never overrides NN1-NN4" in item for item in validation_errors
+        ):
+            errors.append("review_precedent_fixture_binding_language_not_proven: invalid-binding-language.md")
+        if name == "invalid-over-cap-body.md" and not any(
+            "body must be at most 12 nonblank lines" in item for item in validation_errors
+        ):
+            errors.append("review_precedent_fixture_body_cap_not_proven: invalid-over-cap-body.md")
+
+    if not saw_valid:
+        errors.append("review_precedent_fixture_missing_green")
+    if not saw_invalid:
+        errors.append("review_precedent_fixture_missing_red")
+    return errors
+
+
 def check_intake_template() -> list[str]:
     errors: list[str] = []
     path = ROOT / ".agent-org/intake-template.md"
@@ -1990,6 +2178,23 @@ def check_detect_ecosystem_profiles_self_test() -> list[str]:
     return [f"detect_ecosystem_profiles_self_test_failed: {detail}"]
 
 
+def check_select_review_precedents_self_test() -> list[str]:
+    try:
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "scripts/select-review-precedents.py"), "--self-test"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        return [f"select_review_precedents_self_test_error: {exc}"]
+    if result.returncode == 0:
+        return []
+    detail = " ".join((result.stdout + " " + result.stderr).split())
+    return [f"select_review_precedents_self_test_failed: {detail}"]
+
+
 def is_source_repo() -> bool:
     try:
         result = subprocess.run(
@@ -2104,6 +2309,7 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(check_mode(mode, stamp_exists))
     errors.extend(check_mode_detection_samples())
     errors.extend(check_detect_ecosystem_profiles_self_test())
+    errors.extend(check_select_review_precedents_self_test())
     if manifest is not None:
         errors.extend(check_pack_manifest_self_test(manifest))
         errors.extend(guarded("check_tool_io_substrate", check_tool_io_substrate))
@@ -2122,6 +2328,8 @@ def main(argv: list[str] | None = None) -> int:
     errors.extend(guarded("check_knowledge_cards", check_knowledge_cards))
     errors.extend(guarded("check_ui_profile_cards", check_ui_profile_cards))
     errors.extend(guarded("check_ecosystem_profile_cards", check_ecosystem_profile_cards))
+    errors.extend(guarded("check_review_precedent_cards", check_review_precedent_cards))
+    errors.extend(guarded("check_review_precedent_fixtures", check_review_precedent_fixtures))
     errors.extend(guarded("check_intake_template", check_intake_template))
     errors.extend(guarded("check_active_directories", check_active_directories))
     errors.extend(guarded("check_controller_role", check_controller_role))

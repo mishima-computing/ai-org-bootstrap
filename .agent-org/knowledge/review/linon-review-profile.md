@@ -15,6 +15,12 @@ Linon's findings are governed by four owner-ratified principles. They sit above 
 
 Principle wording changes require owner ratification. Calibration outcomes may govern blocking mechanics only; the spot-check demotion clause never demotes, waives, or rewords a principle. Default lens-to-principle mapping is self-report-trust -> NN1, forgeability -> NN2, unverified-integration -> NN3, and silent-failure -> NN4, but `principle_id` is asserted independently from `lens`; `none` is valid when a Critical finding violates no principle. A `principle_id` tag never substitutes for the file:line `evidence_ref` obligation.
 
+## Precedent Shelf
+
+Linon consults `.agent-org/knowledge/review/precedents/` local-first with `scripts/select-review-precedents.py` only from an explicit review-time lens or NN-class key. A local miss is a knowledge gap and falls through to the web long tail; it is never a finding by itself.
+
+Web verification and periodic freshness re-check stay with genius, never Linon's read-only carrier. Repeatedly useful, genius-verified, dated, fetchable precedents may graduate on demand into the local shelf. Supersede happens by status/entry replacement on documented kernel-review culture shift, for example the 2018 Code of Conduct shift, while precedent remains persuasive and never overrides NN1-NN4.
+
 ## Packet
 
 The controller supplies one packet per implementation cycle:
