@@ -79,7 +79,7 @@
           },
           "claim": {
             "type": "string",
-            "maxLength": 300
+            "maxLength": 600
           },
           "evidence_ref": {
             "type": "string",
@@ -104,7 +104,7 @@
           },
           "exploit_path": {
             "type": "string",
-            "maxLength": 300
+            "maxLength": 600
           }
         },
         "if": {
