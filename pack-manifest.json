@@ -240,6 +240,20 @@
       "required": false
     },
     {
+      "path": ".agent-org/knowledge/review/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": ".agent-org/knowledge/review/linon-review-profile.md",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
       "path": ".agent-org/knowledge/ecosystems/",
       "type": "dir",
       "tier": "pack_level",
@@ -656,6 +670,12 @@
       "check_applicability": "everywhere"
     },
     {
+      "path": "schemas/linon-review.schema.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere"
+    },
+    {
       "path": "schemas/security-ci-profile-selection.schema.json",
       "type": "file",
       "tier": "pack_level",
@@ -707,6 +727,34 @@
     {
       "path": "fixtures/",
       "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/linon-review/",
+      "type": "dir",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/linon-review/valid-minimal.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/linon-review/invalid-missing-evidence.json",
+      "type": "file",
+      "tier": "pack_level",
+      "check_applicability": "everywhere",
+      "required": false
+    },
+    {
+      "path": "fixtures/linon-review/invalid-critical-missing-principle.json",
+      "type": "file",
       "tier": "pack_level",
       "check_applicability": "everywhere",
       "required": false

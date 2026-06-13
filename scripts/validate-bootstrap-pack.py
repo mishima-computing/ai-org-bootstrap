@@ -48,6 +48,7 @@ REQUIRED_SCHEMAS = [
     "genius-packet.schema.json",
     "implementation-contract.schema.json",
     "implementation-result.schema.json",
+    "linon-review.schema.json",
     "aufheben-verdict.schema.json",
 ]
 
@@ -252,6 +253,41 @@ SCHEMA_SAMPLE_INSTANCES = {
         "remaining_failures": [],
         "scope_deviations": [],
         "manual_followup": [],
+    },
+    "schemas/linon-review.schema.json": {
+        "profile_id": "linon-review",
+        "findings": [
+            {
+                "file": "src/example.ts",
+                "line_range": {
+                    "start": 1,
+                    "end": 2,
+                },
+                "severity": "critical",
+                "lens": "forgeability",
+                "basis": "static-read",
+                "claim": "Client-writable evidence is accepted as authoritative.",
+                "evidence_ref": "src/example.ts:1-2",
+                "defect_locus": "implementation",
+                "principle_id": "NN2",
+            }
+        ],
+        "criterion_verdicts": [
+            {
+                "criterion_index": 0,
+                "criterion_text_echo": "Example acceptance criterion.",
+                "verdict": "refuted",
+                "evidence_ref": "src/example.ts:1",
+                "principle_id": "NN2",
+            }
+        ],
+        "gaps": [
+            {
+                "kind": "truncation",
+                "description": "No truncation applied.",
+                "severity_first_truncation_applied": False,
+            }
+        ],
     },
     "schemas/ecosystem-profile-selection.schema.json": {
         "primary_ecosystem": [
@@ -867,6 +903,17 @@ def validate_schema_instance(schema: dict, instance: object, path: str = "$") ->
                 for key in instance:
                     if key not in properties:
                         errors.append(f"{path}: additional property {key} is not allowed")
+
+    if "if" in schema and isinstance(schema["if"], dict):
+        condition_errors = validate_schema_instance(schema["if"], instance, path)
+        if not condition_errors and isinstance(schema.get("then"), dict):
+            errors.extend(validate_schema_instance(schema["then"], instance, path))
+
+    all_of = schema.get("allOf")
+    if isinstance(all_of, list):
+        for index, subschema in enumerate(all_of):
+            if isinstance(subschema, dict):
+                errors.extend(validate_schema_instance(subschema, instance, f"{path}.allOf[{index}]"))
 
     if isinstance(instance, list):
         max_items = schema.get("maxItems")
